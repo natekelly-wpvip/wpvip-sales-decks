@@ -681,7 +681,7 @@
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -699,38 +699,60 @@
         }
         .cdn-node:hover circle.node-dot {
             fill: var(--vip-gold);
-            r: 6;
+        }
+        .cdn-node circle.node-ring {
+            fill: none;
+            stroke: var(--vip-turquoise);
+            stroke-width: 1.5;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+        .cdn-node:hover circle.node-ring {
+            stroke: var(--vip-gold);
+            opacity: 0.6;
+        }
+        .cdn-node text.node-label {
+            fill: rgba(255,255,255,0.55);
+            font-size: 9px;
+            font-weight: 500;
+            pointer-events: none;
+            transition: fill 0.3s ease;
+        }
+        .cdn-node:hover text.node-label {
+            fill: var(--vip-gold);
         }
         .cdn-node circle.node-pulse {
             fill: var(--vip-turquoise);
             opacity: 0;
-            animation: cdn-pulse 2s infinite;
+            animation: cdn-pulse 2.5s infinite;
         }
         @keyframes cdn-pulse {
-            0% { opacity: 0.4; r: 4; }
-            100% { opacity: 0; r: 16; }
+            0% { opacity: 0.35; r: 5; }
+            100% { opacity: 0; r: 20; }
         }
         .cdn-tooltip {
             position: absolute;
-            background: var(--vip-black);
+            background: rgba(19,25,30,0.95);
             border: 1px solid var(--vip-gold);
             border-radius: 8px;
-            padding: 12px 16px;
+            padding: 14px 18px;
             font-size: 12px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s ease;
-            z-index: 10;
-            min-width: 160px;
+            z-index: 100;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            white-space: nowrap;
         }
         .cdn-tooltip.visible { opacity: 1; }
         .cdn-tooltip h5 {
-            font-size: 13px; font-weight: 600;
-            margin-bottom: 6px; color: var(--vip-gold);
+            font-size: 14px; font-weight: 600;
+            margin-bottom: 8px; color: var(--vip-gold);
         }
         .cdn-tooltip .tt-row {
             display: flex; justify-content: space-between;
-            margin-bottom: 3px; gap: 16px;
+            margin-bottom: 4px; gap: 20px;
         }
         .cdn-tooltip .tt-label { color: rgba(255,255,255,0.5); }
         .cdn-tooltip .tt-value { color: #fff; font-weight: 600; }
@@ -798,49 +820,58 @@
         .compare-table-container {
             flex: 1;
             overflow: hidden;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
         }
         .compare-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
+            table-layout: fixed;
         }
         .compare-table thead th {
-            padding: 12px 16px;
+            padding: 14px 20px;
             font-size: 13px; font-weight: 600;
             text-align: left;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid rgba(255,255,255,0.12);
             letter-spacing: 0.03em;
+            background: rgba(255,255,255,0.03);
         }
-        .compare-table thead th:first-child { width: 36%; }
+        .compare-table thead th:first-child { width: 34%; }
         .compare-table thead th.bs-col {
-            color: rgba(255,255,255,0.4);
-            width: 32%;
+            color: rgba(255,255,255,0.45);
+            width: 33%;
         }
         .compare-table thead th.vip-col {
             color: var(--vip-gold);
-            width: 32%;
+            width: 33%;
+        }
+        .compare-table tbody tr:nth-child(odd) td {
+            background: rgba(255,255,255,0.015);
         }
         .compare-table tbody td {
-            padding: 10px 16px;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            vertical-align: top;
+            padding: 13px 20px;
+            font-size: 13.5px;
+            line-height: 1.4;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            vertical-align: middle;
         }
         .compare-table tbody td:first-child {
             font-weight: 500;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.75);
         }
         .compare-table tbody td.bs-cell {
             color: rgba(255,255,255,0.4);
         }
         .compare-table tbody td.vip-cell {
             color: var(--vip-turquoise);
+            font-weight: 500;
         }
-        .compare-check { color: var(--vip-turquoise); font-weight: 700; }
-        .compare-x { color: var(--vip-red); opacity: 0.6; }
-        .compare-partial { color: var(--vip-orange); }
+        .compare-check { color: var(--vip-turquoise); font-weight: 700; margin-right: 4px; }
+        .compare-x { color: var(--vip-red); opacity: 0.6; margin-right: 4px; }
+        .compare-partial { color: var(--vip-orange); margin-right: 4px; }
         .compare-category { display: none; }
-        .compare-category.active { display: contents; }
+        .compare-category.active { display: table-row; }
 
         /* Slide 10: Case Studies */
         .cases-slide {
@@ -1165,8 +1196,8 @@
             color: var(--vip-gold);
         }
         .calendar-embed {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #FFFFFF;
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 12px;
             overflow: hidden;
             height: 100%;
@@ -1175,17 +1206,19 @@
         }
         .calendar-embed .cal-header {
             padding: 12px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid var(--vip-gold-light);
             font-size: 12px; font-weight: 600;
-            color: var(--vip-gold);
+            color: var(--vip-gold-text);
             letter-spacing: 0.05em;
             text-transform: uppercase;
+            background: #FFFFFF;
         }
         .calendar-embed iframe {
             flex: 1;
             width: 100%;
             border: none;
             border-radius: 0 0 12px 12px;
+            background: #FFFFFF;
         }
 
         /* ─── Animations ─── */
@@ -1530,46 +1563,66 @@
                                 <line x1="620" y1="140" x2="630" y2="295"/>
                                 <line x1="160" y1="145" x2="195" y2="270"/>
                             </g>
-                            <!-- CDN Nodes -->
+                            <!-- CDN Nodes with labels -->
                             <g class="cdn-node" data-city="Ashburn, VA" data-latency="12ms" data-pop="Primary" data-capacity="100 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="215" cy="145" r="4"/>
-                                <circle class="node-dot" cx="215" cy="145" r="4"/>
+                                <circle class="node-pulse" cx="215" cy="145" r="5"/>
+                                <circle class="node-ring" cx="215" cy="145" r="10"/>
+                                <circle class="node-dot" cx="215" cy="145" r="5"/>
+                                <text class="node-label" x="215" y="133" text-anchor="middle">Ashburn</text>
                             </g>
                             <g class="cdn-node" data-city="San Francisco" data-latency="18ms" data-pop="Primary" data-capacity="80 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="130" cy="148" r="4" style="animation-delay:0.3s"/>
-                                <circle class="node-dot" cx="130" cy="148" r="4"/>
+                                <circle class="node-pulse" cx="130" cy="148" r="5" style="animation-delay:0.3s"/>
+                                <circle class="node-ring" cx="130" cy="148" r="10"/>
+                                <circle class="node-dot" cx="130" cy="148" r="5"/>
+                                <text class="node-label" x="130" y="136" text-anchor="middle">San Francisco</text>
                             </g>
                             <g class="cdn-node" data-city="Chicago" data-latency="15ms" data-pop="Primary" data-capacity="60 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="180" cy="135" r="4" style="animation-delay:0.6s"/>
-                                <circle class="node-dot" cx="180" cy="135" r="4"/>
+                                <circle class="node-pulse" cx="180" cy="135" r="5" style="animation-delay:0.6s"/>
+                                <circle class="node-ring" cx="180" cy="135" r="10"/>
+                                <circle class="node-dot" cx="180" cy="135" r="5"/>
+                                <text class="node-label" x="180" y="123" text-anchor="middle">Chicago</text>
                             </g>
                             <g class="cdn-node" data-city="London" data-latency="22ms" data-pop="Primary" data-capacity="80 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="380" cy="115" r="4" style="animation-delay:0.9s"/>
-                                <circle class="node-dot" cx="380" cy="115" r="4"/>
+                                <circle class="node-pulse" cx="380" cy="115" r="5" style="animation-delay:0.9s"/>
+                                <circle class="node-ring" cx="380" cy="115" r="10"/>
+                                <circle class="node-dot" cx="380" cy="115" r="5"/>
+                                <text class="node-label" x="380" y="103" text-anchor="middle">London</text>
                             </g>
                             <g class="cdn-node" data-city="Frankfurt" data-latency="25ms" data-pop="Primary" data-capacity="60 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="400" cy="120" r="3.5" style="animation-delay:1.2s"/>
-                                <circle class="node-dot" cx="400" cy="120" r="3.5"/>
+                                <circle class="node-pulse" cx="410" cy="125" r="4.5" style="animation-delay:1.2s"/>
+                                <circle class="node-ring" cx="410" cy="125" r="9"/>
+                                <circle class="node-dot" cx="410" cy="125" r="4.5"/>
+                                <text class="node-label" x="410" y="140" text-anchor="middle">Frankfurt</text>
                             </g>
                             <g class="cdn-node" data-city="Tokyo" data-latency="35ms" data-pop="Secondary" data-capacity="40 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="640" cy="140" r="3.5" style="animation-delay:1.5s"/>
-                                <circle class="node-dot" cx="640" cy="140" r="3.5"/>
+                                <circle class="node-pulse" cx="650" cy="140" r="4.5" style="animation-delay:1.5s"/>
+                                <circle class="node-ring" cx="650" cy="140" r="9"/>
+                                <circle class="node-dot" cx="650" cy="140" r="4.5"/>
+                                <text class="node-label" x="650" y="128" text-anchor="middle">Tokyo</text>
                             </g>
                             <g class="cdn-node" data-city="Singapore" data-latency="42ms" data-pop="Secondary" data-capacity="40 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="580" cy="205" r="3.5" style="animation-delay:1.8s"/>
-                                <circle class="node-dot" cx="580" cy="205" r="3.5"/>
+                                <circle class="node-pulse" cx="580" cy="205" r="4.5" style="animation-delay:1.8s"/>
+                                <circle class="node-ring" cx="580" cy="205" r="9"/>
+                                <circle class="node-dot" cx="580" cy="205" r="4.5"/>
+                                <text class="node-label" x="580" y="220" text-anchor="middle">Singapore</text>
                             </g>
                             <g class="cdn-node" data-city="Sydney" data-latency="48ms" data-pop="Secondary" data-capacity="30 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="640" cy="310" r="3" style="animation-delay:2.1s"/>
-                                <circle class="node-dot" cx="640" cy="310" r="3"/>
+                                <circle class="node-pulse" cx="640" cy="310" r="4" style="animation-delay:2.1s"/>
+                                <circle class="node-ring" cx="640" cy="310" r="9"/>
+                                <circle class="node-dot" cx="640" cy="310" r="4"/>
+                                <text class="node-label" x="640" y="325" text-anchor="middle">Sydney</text>
                             </g>
                             <g class="cdn-node" data-city="S&#xE3;o Paulo" data-latency="55ms" data-pop="Secondary" data-capacity="30 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="225" cy="310" r="3" style="animation-delay:2.4s"/>
-                                <circle class="node-dot" cx="225" cy="310" r="3"/>
+                                <circle class="node-pulse" cx="225" cy="310" r="4" style="animation-delay:2.4s"/>
+                                <circle class="node-ring" cx="225" cy="310" r="9"/>
+                                <circle class="node-dot" cx="225" cy="310" r="4"/>
+                                <text class="node-label" x="225" y="325" text-anchor="middle">S&#xE3;o Paulo</text>
                             </g>
                             <g class="cdn-node" data-city="Mumbai" data-latency="38ms" data-pop="Secondary" data-capacity="40 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
-                                <circle class="node-pulse" cx="520" cy="185" r="3.5" style="animation-delay:0.4s"/>
-                                <circle class="node-dot" cx="520" cy="185" r="3.5"/>
+                                <circle class="node-pulse" cx="520" cy="185" r="4.5" style="animation-delay:0.4s"/>
+                                <circle class="node-ring" cx="520" cy="185" r="9"/>
+                                <circle class="node-dot" cx="520" cy="185" r="4.5"/>
+                                <text class="node-label" x="520" y="200" text-anchor="middle">Mumbai</text>
                             </g>
                         </svg>
                         <div class="cdn-tooltip" id="cdnTooltip">
@@ -1806,7 +1859,7 @@
                     <div class="trust-card">
                         <div class="trust-icon">&#128737;</div>
                         <div class="trust-value">SOC 2</div>
-                        <div class="trust-label">Type II Certified</div>
+                        <div class="trust-label">Type I Certified</div>
                         <div class="trust-desc">Independently audited security controls and processes</div>
                     </div>
                     <div class="trust-card">
@@ -2181,8 +2234,35 @@
             const scaleX = svgRect.width / 800;
             const scaleY = svgRect.height / 450;
 
-            tooltip.style.left = (cx * scaleX + svgRect.left - rect.left + 10) + 'px';
-            tooltip.style.top = (cy * scaleY + svgRect.top - rect.top - 40) + 'px';
+            // Calculate position relative to container
+            var ttLeft = cx * scaleX + svgRect.left - rect.left + 14;
+            var ttTop = cy * scaleY + svgRect.top - rect.top - 50;
+
+            // Clamp: keep tooltip inside the container
+            var ttWidth = 190;
+            var ttHeight = 100;
+            var containerW = rect.width;
+            var containerH = rect.height;
+
+            // If tooltip would overflow right, flip to left side
+            if (ttLeft + ttWidth > containerW) {
+                ttLeft = cx * scaleX + svgRect.left - rect.left - ttWidth - 14;
+            }
+            // If tooltip would overflow top, flip below the node
+            if (ttTop < 0) {
+                ttTop = cy * scaleY + svgRect.top - rect.top + 20;
+            }
+            // If tooltip would overflow bottom, push up
+            if (ttTop + ttHeight > containerH) {
+                ttTop = containerH - ttHeight - 8;
+            }
+            // If tooltip would overflow left, push right
+            if (ttLeft < 0) {
+                ttLeft = 8;
+            }
+
+            tooltip.style.left = ttLeft + 'px';
+            tooltip.style.top = ttTop + 'px';
             tooltip.classList.add('visible');
         }
 

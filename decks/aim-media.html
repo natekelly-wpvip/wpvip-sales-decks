@@ -251,12 +251,13 @@
         .parsely-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; padding: 1vw; height: calc(100% - 4vh); }
         .parsely-chart { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1vw; position: relative; }
         .parsely-chart-title { font-size: 0.75vw; font-weight: 600; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.8vh; }
-        .parsely-bar-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 65%; padding-top: 1vh; }
-        .parsely-bar-col { display: flex; flex-direction: column; align-items: center; gap: 0.5vh; flex: 1; }
-        .parsely-bar { width: 3.5vw; border-radius: 4px 4px 0 0; transition: height 0.8s ease, background 0.3s; cursor: pointer; min-height: 4px; position: relative; }
-        .parsely-bar:hover { filter: brightness(1.3); }
-        .parsely-bar-label { font-size: 0.55vw; color: var(--vip-gray); }
-        .parsely-bar-value { position: absolute; top: -1.5vh; left: 50%; transform: translateX(-50%); font-size: 0.6vw; color: var(--vip-white); font-weight: 600; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+        .parsely-bar-chart { display: flex; align-items: flex-end; justify-content: space-evenly; height: 70%; }
+        .parsely-bar-col { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; flex: 1; }
+        .parsely-bar-wrap { height: 85%; display: flex; align-items: flex-end; justify-content: center; width: 100%; }
+        .parsely-bar { width: 3.5vw; border-radius: 5px 5px 0 0; transition: height 1s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s; cursor: pointer; position: relative; height: 0; }
+        .parsely-bar:hover { filter: brightness(1.3); transform: scaleX(1.08); }
+        .parsely-bar-label { font-size: 0.65vw; color: var(--vip-gray); margin-top: 0.8vh; text-align: center; }
+        .parsely-bar-value { position: absolute; top: -2.2vh; left: 50%; transform: translateX(-50%); font-size: 0.75vw; color: var(--vip-white); font-weight: 700; opacity: 0; transition: opacity 0.25s; white-space: nowrap; background: rgba(19,25,30,0.85); padding: 0.2vh 0.5vw; border-radius: 3px; }
         .parsely-bar:hover .parsely-bar-value { opacity: 1; }
         .parsely-metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6vw; height: 70%; }
         .parsely-metric { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.6vw; display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: border-color 0.3s, background 0.3s; }
@@ -872,19 +873,19 @@
                     <div class="parsely-chart-title">Pageviews by Division (Last 30 Days)</div>
                     <div class="parsely-bar-chart" id="parselyBarChart">
                         <div class="parsely-bar-col">
-                            <div class="parsely-bar" style="height: 0%; background: var(--vip-gold);" data-target-height="75" data-value="2.4M"><span class="parsely-bar-value">2.4M</span></div>
+                            <div class="parsely-bar-wrap"><div class="parsely-bar" style="background: var(--vip-gold);" data-target-height="77" data-value="2.4M"><span class="parsely-bar-value">2.4M views</span></div></div>
                             <div class="parsely-bar-label">Home Arts</div>
                         </div>
                         <div class="parsely-bar-col">
-                            <div class="parsely-bar" style="height: 0%; background: var(--vip-turquoise);" data-target-height="60" data-value="1.8M"><span class="parsely-bar-value">1.8M</span></div>
+                            <div class="parsely-bar-wrap"><div class="parsely-bar" style="background: var(--vip-turquoise);" data-target-height="58" data-value="1.8M"><span class="parsely-bar-value">1.8M views</span></div></div>
                             <div class="parsely-bar-label">Collectibles</div>
                         </div>
                         <div class="parsely-bar-col">
-                            <div class="parsely-bar" style="height: 0%; background: var(--vip-purple);" data-target-height="55" data-value="1.6M"><span class="parsely-bar-value">1.6M</span></div>
+                            <div class="parsely-bar-wrap"><div class="parsely-bar" style="background: var(--vip-purple);" data-target-height="52" data-value="1.6M"><span class="parsely-bar-value">1.6M views</span></div></div>
                             <div class="parsely-bar-label">Home Bldg</div>
                         </div>
                         <div class="parsely-bar-col">
-                            <div class="parsely-bar" style="height: 0%; background: var(--vip-orange);" data-target-height="85" data-value="3.1M"><span class="parsely-bar-value">3.1M</span></div>
+                            <div class="parsely-bar-wrap"><div class="parsely-bar" style="background: var(--vip-orange);" data-target-height="100" data-value="3.1M"><span class="parsely-bar-value">3.1M views</span></div></div>
                             <div class="parsely-bar-label">Writer's Digest</div>
                         </div>
                     </div>
@@ -1146,9 +1147,10 @@
     // Bar chart animation
     function animateBars(slide) {
         slide.querySelectorAll('.parsely-bar[data-target-height]').forEach((bar, i) => {
+            bar.style.height = '0';
             setTimeout(() => {
                 bar.style.height = bar.dataset.targetHeight + '%';
-            }, i * 150);
+            }, 200 + i * 200);
         });
     }
 
@@ -1217,15 +1219,16 @@
                 chartArea.querySelector('.parsely-chart-title').textContent = 'Pageviews by Division (Last 30 Days)';
                 if (barChart) {
                     const cols = barChart.querySelectorAll('.parsely-bar-col');
-                    const data = [{h:75,v:'2.4M',l:'Home Arts',c:'var(--vip-gold)'},{h:60,v:'1.8M',l:'Collectibles',c:'var(--vip-turquoise)'},{h:55,v:'1.6M',l:'Home Bldg',c:'var(--vip-purple)'},{h:85,v:'3.1M',l:"Writer's Digest",c:'var(--vip-orange)'}];
+                    const data = [{h:77,v:'2.4M views',l:'Home Arts',c:'var(--vip-gold)'},{h:58,v:'1.8M views',l:'Collectibles',c:'var(--vip-turquoise)'},{h:52,v:'1.6M views',l:'Home Bldg',c:'var(--vip-purple)'},{h:100,v:'3.1M views',l:"Writer's Digest",c:'var(--vip-orange)'}];
                     cols.forEach((col, i) => {
                         if (data[i]) {
                             const bar = col.querySelector('.parsely-bar');
-                            bar.style.height = '0%';
+                            bar.style.height = '0';
                             bar.style.background = data[i].c;
+                            bar.dataset.targetHeight = data[i].h;
                             bar.querySelector('.parsely-bar-value').textContent = data[i].v;
                             col.querySelector('.parsely-bar-label').textContent = data[i].l;
-                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, i * 100);
+                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, 200 + i * 200);
                         }
                     });
                 }
@@ -1233,15 +1236,16 @@
                 chartArea.querySelector('.parsely-chart-title').textContent = 'Engagement by Brand (Top 4)';
                 if (barChart) {
                     const cols = barChart.querySelectorAll('.parsely-bar-col');
-                    const data = [{h:90,v:'4.8min',l:'Fine Woodworking',c:'var(--vip-gold)'},{h:72,v:'3.9min',l:"Writer's Digest",c:'var(--vip-orange)'},{h:65,v:'3.5min',l:'Antique Trader',c:'var(--vip-turquoise)'},{h:58,v:'3.1min',l:'Fine Homebuilding',c:'var(--vip-purple)'}];
+                    const data = [{h:100,v:'4.8 min',l:'Fine Woodworking',c:'var(--vip-gold)'},{h:81,v:'3.9 min',l:"Writer's Digest",c:'var(--vip-orange)'},{h:73,v:'3.5 min',l:'Antique Trader',c:'var(--vip-turquoise)'},{h:65,v:'3.1 min',l:'Fine Homebuilding',c:'var(--vip-purple)'}];
                     cols.forEach((col, i) => {
                         if (data[i]) {
                             const bar = col.querySelector('.parsely-bar');
-                            bar.style.height = '0%';
+                            bar.style.height = '0';
                             bar.style.background = data[i].c;
+                            bar.dataset.targetHeight = data[i].h;
                             bar.querySelector('.parsely-bar-value').textContent = data[i].v;
                             col.querySelector('.parsely-bar-label').textContent = data[i].l;
-                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, i * 100);
+                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, 200 + i * 200);
                         }
                     });
                 }
@@ -1249,15 +1253,16 @@
                 chartArea.querySelector('.parsely-chart-title').textContent = 'Top Performing Content (This Week)';
                 if (barChart) {
                     const cols = barChart.querySelectorAll('.parsely-bar-col');
-                    const data = [{h:95,v:'89K',l:'Dovetail Guide',c:'var(--vip-gold)'},{h:78,v:'72K',l:'2026 Coins',c:'var(--vip-turquoise)'},{h:68,v:'61K',l:'Query Letters',c:'var(--vip-orange)'},{h:52,v:'45K',l:'Cabin Plans',c:'var(--vip-purple)'}];
+                    const data = [{h:100,v:'89K views',l:'Dovetail Guide',c:'var(--vip-gold)'},{h:81,v:'72K views',l:'2026 Coins',c:'var(--vip-turquoise)'},{h:69,v:'61K views',l:'Query Letters',c:'var(--vip-orange)'},{h:51,v:'45K views',l:'Cabin Plans',c:'var(--vip-purple)'}];
                     cols.forEach((col, i) => {
                         if (data[i]) {
                             const bar = col.querySelector('.parsely-bar');
-                            bar.style.height = '0%';
+                            bar.style.height = '0';
                             bar.style.background = data[i].c;
+                            bar.dataset.targetHeight = data[i].h;
                             bar.querySelector('.parsely-bar-value').textContent = data[i].v;
                             col.querySelector('.parsely-bar-label').textContent = data[i].l;
-                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, i * 100);
+                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, 200 + i * 200);
                         }
                     });
                 }

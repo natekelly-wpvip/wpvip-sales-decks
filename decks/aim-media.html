@@ -22,633 +22,282 @@
             --vip-red: #FF595E;
             --vip-orange: #FB902F;
             --vip-blueberry: #3858E9;
-            --slide-width: 1280;
-            --slide-height: 720;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #000;
+            width: 100%; height: 100%; overflow: hidden; background: #000;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
-
-        /* Slide Deck Container */
-        .deck {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-
+        .deck { position: relative; width: 100vw; height: 100vh; }
         .slide {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 5vh 6vw;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            overflow: hidden;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 5vh 6vw; opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease; overflow: hidden;
         }
-
-        .slide.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Typography */
-        h1 {
-            font-size: 3.2vw;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 1.05;
-            margin-bottom: 1.5vh;
-        }
-
-        h2 {
-            font-size: 2.4vw;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-            margin-bottom: 1.5vh;
-        }
-
-        h3 {
-            font-size: 1.6vw;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            line-height: 1.2;
-            margin-bottom: 1vh;
-        }
-
-        p, li {
-            font-size: 1.3vw;
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        .caption {
-            font-size: 0.9vw;
-            font-weight: 500;
-            letter-spacing: 0.05em;
-            line-height: 1.4;
-            text-transform: uppercase;
-        }
-
-        .stat-number {
-            font-size: 5vw;
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            line-height: 1.0;
-        }
-
-        /* VIP Logo */
-        .vip-logo {
-            font-size: 1.2vw;
-            letter-spacing: -0.01em;
-            margin-bottom: 2vh;
-        }
+        .slide.active { opacity: 1; visibility: visible; }
+        h1 { font-size: 3.2vw; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5vh; }
+        h2 { font-size: 2.4vw; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 1.5vh; }
+        h3 { font-size: 1.6vw; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 1vh; }
+        p, li { font-size: 1.3vw; font-weight: 400; line-height: 1.5; }
+        .caption { font-size: 0.9vw; font-weight: 500; letter-spacing: 0.05em; line-height: 1.4; text-transform: uppercase; }
+        .stat-number { font-size: 5vw; font-weight: 700; letter-spacing: -0.04em; line-height: 1.0; }
+        .vip-logo { font-size: 1.2vw; letter-spacing: -0.01em; margin-bottom: 2vh; }
         .vip-logo .logo-wp { font-weight: 400; }
         .vip-logo .logo-vip { font-weight: 700; color: var(--vip-gold); }
-
-        .vip-logo-large {
-            font-size: 1.8vw;
-        }
-
-        /* Gold accent line */
-        .gold-line {
-            width: 60px;
-            height: 2px;
-            background: var(--vip-gold);
-            margin: 2vh 0;
-        }
-
-        .gold-line-wide {
-            width: 120px;
-        }
-
-        /* Geometric pattern backgrounds */
-        .geo-pattern {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: 0.04;
-        }
-
-        .geo-lines {
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 30px,
-                var(--vip-gold) 30px,
-                var(--vip-gold) 31px
-            );
-        }
-
-        .geo-circles {
-            background: radial-gradient(circle at 80% 20%, var(--vip-gold) 0%, transparent 50%),
-                        radial-gradient(circle at 20% 80%, var(--vip-turquoise) 0%, transparent 40%);
-            opacity: 0.06;
-        }
-
-        .geo-grid {
-            background:
-                linear-gradient(var(--vip-gold) 1px, transparent 1px),
-                linear-gradient(90deg, var(--vip-gold) 1px, transparent 1px);
-            background-size: 80px 80px;
-        }
-
-        .geo-moire {
-            background: repeating-linear-gradient(
-                0deg, transparent, transparent 20px, var(--vip-gold) 20px, var(--vip-gold) 21px
-            ), repeating-linear-gradient(
-                60deg, transparent, transparent 20px, var(--vip-gold) 20px, var(--vip-gold) 21px
-            );
-        }
-
-        /* Corner accents */
-        .corner-accent {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border-color: var(--vip-gold);
-            border-style: solid;
-            border-width: 0;
-        }
+        .vip-logo-large { font-size: 1.8vw; }
+        .gold-line { width: 60px; height: 2px; background: var(--vip-gold); margin: 2vh 0; }
+        .gold-line-wide { width: 120px; }
+        .geo-pattern { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.04; }
+        .geo-lines { background: repeating-linear-gradient(45deg, transparent, transparent 30px, var(--vip-gold) 30px, var(--vip-gold) 31px); }
+        .geo-circles { background: radial-gradient(circle at 80% 20%, var(--vip-gold) 0%, transparent 50%), radial-gradient(circle at 20% 80%, var(--vip-turquoise) 0%, transparent 40%); opacity: 0.06; }
+        .geo-grid { background: linear-gradient(var(--vip-gold) 1px, transparent 1px), linear-gradient(90deg, var(--vip-gold) 1px, transparent 1px); background-size: 80px 80px; }
+        .geo-moire { background: repeating-linear-gradient(0deg, transparent, transparent 20px, var(--vip-gold) 20px, var(--vip-gold) 21px), repeating-linear-gradient(60deg, transparent, transparent 20px, var(--vip-gold) 20px, var(--vip-gold) 21px); }
+        .corner-accent { position: absolute; width: 40px; height: 40px; border-color: var(--vip-gold); border-style: solid; border-width: 0; }
         .corner-tl { top: 3vh; left: 3vw; border-top-width: 2px; border-left-width: 2px; }
         .corner-tr { top: 3vh; right: 3vw; border-top-width: 2px; border-right-width: 2px; }
         .corner-bl { bottom: 3vh; left: 3vw; border-bottom-width: 2px; border-left-width: 2px; }
         .corner-br { bottom: 3vh; right: 3vw; border-bottom-width: 2px; border-right-width: 2px; }
-
-        /* Dark slide default */
-        .slide-dark {
-            background: var(--vip-black);
-            color: var(--vip-white);
-        }
-
-        .slide-dark .subtitle {
-            color: var(--vip-gray);
-        }
-
-        /* Light slide */
-        .slide-light {
-            background: var(--vip-white);
-            color: var(--vip-black);
-        }
-
-        .slide-light h2,
-        .slide-light h1 {
-            color: var(--vip-black);
-        }
-
-        .slide-light .gold-accent {
-            color: var(--vip-gold-text);
-        }
-
-        .slide-light .subtitle {
-            color: #555;
-        }
-
-        /* Gradient slide */
-        .slide-gradient {
-            background: linear-gradient(135deg, var(--vip-black) 0%, var(--vip-black-light) 100%);
-            color: var(--vip-white);
-        }
-
-        /* Card layouts */
-        .card-grid {
-            display: grid;
-            gap: 2vw;
-            margin-top: 2vh;
-        }
-
-        .card-grid-2 { grid-template-columns: 1fr 1fr; }
-        .card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-        .card-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-
-        .card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 2vw;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: var(--vip-gold);
-        }
-
-        .slide-light .card {
-            background: var(--vip-off-white);
-            border-color: var(--vip-gray-light);
-        }
-
-        .slide-light .card:hover {
-            border-color: var(--vip-gold);
-        }
-
-        .card-icon {
-            font-size: 2vw;
-            margin-bottom: 1vh;
-        }
-
-        .card h3 {
-            color: var(--vip-gold);
-            margin-bottom: 0.8vh;
-        }
-
-        .slide-light .card h3 {
-            color: var(--vip-gold-text);
-        }
-
-        .card p {
-            font-size: 1.1vw;
-            opacity: 0.85;
-            line-height: 1.4;
-        }
-
-        /* Stats row */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2vw;
-            text-align: center;
-            margin-top: 3vh;
-        }
-
-        .stat-item .stat-number {
-            color: var(--vip-gold);
-            display: block;
-        }
-
-        .stat-item .stat-label {
-            font-size: 1vw;
-            color: var(--vip-gray);
-            margin-top: 0.5vh;
-            display: block;
-        }
-
-        .slide-light .stat-item .stat-number {
-            color: var(--vip-gold-text);
-        }
-
-        .slide-light .stat-item .stat-label {
-            color: #666;
-        }
-
-        /* Two column layout */
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4vw;
-            align-items: start;
-            margin-top: 2vh;
-        }
-
-        .two-col-divider {
-            position: relative;
-        }
-
-        .two-col-divider::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 1px;
-            height: 100%;
-            background: var(--vip-gold);
-            opacity: 0.3;
-        }
-
-        /* Division badge */
-        .division-badge {
-            display: inline-block;
-            padding: 0.4vw 1.2vw;
-            border: 1px solid var(--vip-gold);
-            border-radius: 100px;
-            font-size: 0.85vw;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--vip-gold);
-            margin-bottom: 2vh;
-        }
-
-        .slide-light .division-badge {
-            color: var(--vip-gold-text);
-            border-color: var(--vip-gold-text);
-        }
-
-        /* Brand list */
-        .brand-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6vw;
-            margin-top: 1.5vh;
-        }
-
-        .brand-tag {
-            background: rgba(216,164,95,0.12);
-            color: var(--vip-gold);
-            padding: 0.3vw 0.8vw;
-            border-radius: 4px;
-            font-size: 0.9vw;
-            font-weight: 500;
-        }
-
-        .slide-light .brand-tag {
-            background: rgba(154,96,20,0.08);
-            color: var(--vip-gold-text);
-        }
-
-        /* List styling */
-        .feature-list {
-            list-style: none;
-            margin-top: 1.5vh;
-        }
-
-        .feature-list li {
-            padding: 0.8vh 0;
-            padding-left: 1.5vw;
-            position: relative;
-            font-size: 1.15vw;
-        }
-
-        .feature-list li::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 1.2vh;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--vip-gold);
-        }
-
-        .slide-light .feature-list li::before {
-            background: var(--vip-gold-text);
-        }
-
-        /* Challenge / Solution pairs */
-        .challenge-item {
-            padding: 1.5vh 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .challenge-item:last-child {
-            border-bottom: none;
-        }
-
-        .challenge-label {
-            font-size: 0.85vw;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--vip-turquoise);
-            margin-bottom: 0.4vh;
-        }
-
-        /* Quote styling */
-        .quote-block {
-            position: relative;
-            padding-left: 3vw;
-            margin: 3vh 0;
-        }
-
-        .quote-block::before {
-            content: '\201C';
-            position: absolute;
-            left: 0;
-            top: -1vh;
-            font-size: 5vw;
-            color: var(--vip-gold);
-            line-height: 1;
-            font-family: Georgia, serif;
-        }
-
-        .quote-text {
-            font-size: 1.8vw;
-            font-weight: 400;
-            line-height: 1.4;
-            font-style: italic;
-        }
-
-        .quote-attribution {
-            margin-top: 1.5vh;
-            font-size: 1vw;
-            color: var(--vip-gray);
-        }
-
-        /* CTA button style */
-        .cta-button {
-            display: inline-block;
-            padding: 1.2vh 2.5vw;
-            background: var(--vip-gold);
-            color: var(--vip-black);
-            font-size: 1.1vw;
-            font-weight: 600;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background 0.3s ease, transform 0.2s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .cta-button:hover {
-            background: #c4923f;
-            transform: translateY(-1px);
-        }
-
-        /* Calendar embed */
-        .calendar-container {
-            width: 100%;
-            max-width: 50vw;
-            margin: 2vh auto 0;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: var(--vip-white);
-        }
-
-        .calendar-container iframe {
-            display: block;
-            width: 100%;
-            height: 38vh;
-            border: 0;
-        }
-
-        /* Navigation Controls */
-        .nav-controls {
-            position: fixed;
-            bottom: 2.5vh;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 1.5vw;
-            z-index: 100;
-        }
-
-        .nav-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(19,25,30,0.8);
-            color: var(--vip-white);
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .nav-btn:hover {
-            border-color: var(--vip-gold);
-            color: var(--vip-gold);
-            background: rgba(19,25,30,0.95);
-        }
-
-        .slide-counter {
-            font-size: 14px;
-            color: rgba(255,255,255,0.5);
-            font-weight: 500;
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 20px;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .slide-counter:hover {
-            color: var(--vip-gold);
-            background: rgba(255,255,255,0.05);
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: var(--vip-gold);
-            transition: width 0.4s ease;
-            z-index: 100;
-        }
-
-        /* Overview Mode */
-        .overview-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0,0,0,0.95);
-            z-index: 200;
-            display: none;
-            padding: 4vh 4vw;
-            overflow-y: auto;
-        }
-
-        .overview-overlay.active {
-            display: block;
-        }
-
-        .overview-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2vw;
-        }
-
-        .overview-thumb {
-            aspect-ratio: 16/9;
-            border-radius: 6px;
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s ease, transform 0.2s ease;
-            position: relative;
-            background: var(--vip-black);
-        }
-
-        .overview-thumb:hover {
-            border-color: var(--vip-gold);
-            transform: scale(1.03);
-        }
-
-        .overview-thumb.current {
-            border-color: var(--vip-gold);
-        }
-
-        .overview-thumb-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1vw;
-            text-align: center;
-        }
-
-        .overview-thumb-title {
-            font-size: 0.9vw;
-            font-weight: 600;
-            color: var(--vip-white);
-        }
-
-        .overview-thumb-number {
-            position: absolute;
-            bottom: 6px;
-            right: 8px;
-            font-size: 0.7vw;
-            color: var(--vip-gray);
-        }
-
-        .overview-close {
-            position: fixed;
-            top: 2vh;
-            right: 2vw;
-            font-size: 1.5vw;
-            color: var(--vip-white);
-            cursor: pointer;
-            z-index: 210;
-            padding: 0.5vw;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .overview-close:hover {
-            opacity: 1;
-            color: var(--vip-gold);
-        }
+        .slide-dark { background: var(--vip-black); color: var(--vip-white); }
+        .slide-light { background: var(--vip-white); color: var(--vip-black); }
+        .slide-light h2, .slide-light h1 { color: var(--vip-black); }
+        .slide-gradient { background: linear-gradient(135deg, var(--vip-black) 0%, var(--vip-black-light) 100%); color: var(--vip-white); }
+        .slide-turquoise-accent { background: linear-gradient(135deg, var(--vip-black) 0%, var(--vip-turquoise-dark) 100%); color: var(--vip-white); }
 
         /* Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .slide.active .animate-in {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes slideRight { from { width: 0; } to { width: 100%; } }
+        @keyframes ripple { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.5); opacity: 0; } }
+        .slide.active .animate-in { animation: fadeInUp 0.6s ease forwards; }
         .slide.active .delay-1 { animation-delay: 0.1s; opacity: 0; }
         .slide.active .delay-2 { animation-delay: 0.2s; opacity: 0; }
         .slide.active .delay-3 { animation-delay: 0.3s; opacity: 0; }
         .slide.active .delay-4 { animation-delay: 0.4s; opacity: 0; }
         .slide.active .delay-5 { animation-delay: 0.5s; opacity: 0; }
+
+        /* Navigation */
+        .nav-controls { position: fixed; bottom: 2.5vh; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 1.5vw; z-index: 100; }
+        .nav-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: rgba(19,25,30,0.8); color: var(--vip-white); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .nav-btn:hover { border-color: var(--vip-gold); color: var(--vip-gold); background: rgba(19,25,30,0.95); }
+        .slide-counter { font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 500; cursor: pointer; padding: 6px 12px; border-radius: 20px; transition: all 0.2s ease; user-select: none; }
+        .slide-counter:hover { color: var(--vip-gold); background: rgba(255,255,255,0.05); }
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--vip-gold); transition: width 0.4s ease; z-index: 100; }
+
+        /* Overview */
+        .overview-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 200; display: none; padding: 4vh 4vw; overflow-y: auto; }
+        .overview-overlay.active { display: block; }
+        .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vw; }
+        .overview-thumb { aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s ease, transform 0.2s ease; position: relative; background: var(--vip-black); }
+        .overview-thumb:hover { border-color: var(--vip-gold); transform: scale(1.03); }
+        .overview-thumb.current { border-color: var(--vip-gold); }
+        .overview-thumb-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 1vw; text-align: center; }
+        .overview-thumb-title { font-size: 0.9vw; font-weight: 600; color: var(--vip-white); }
+        .overview-thumb-number { position: absolute; bottom: 6px; right: 8px; font-size: 0.7vw; color: var(--vip-gray); }
+        .overview-close { position: fixed; top: 2vh; right: 2vw; font-size: 1.5vw; color: var(--vip-white); cursor: pointer; z-index: 210; padding: 0.5vw; opacity: 0.7; transition: opacity 0.2s; }
+        .overview-close:hover { opacity: 1; color: var(--vip-gold); }
+
+        /* Interactive Cards */
+        .card-grid { display: grid; gap: 1.5vw; margin-top: 2vh; }
+        .card-grid-2 { grid-template-columns: 1fr 1fr; }
+        .card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .card-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1.8vw; transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease; cursor: default; }
+        .card:hover { transform: translateY(-3px); border-color: var(--vip-gold); background: rgba(255,255,255,0.08); }
+        .slide-light .card { background: var(--vip-off-white); border-color: var(--vip-gray-light); }
+        .slide-light .card:hover { border-color: var(--vip-gold); background: #eee; }
+        .card h3 { color: var(--vip-gold); margin-bottom: 0.6vh; }
+        .slide-light .card h3 { color: var(--vip-gold-text); }
+        .card p { font-size: 1.05vw; opacity: 0.85; line-height: 1.4; }
+
+        /* Clickable agenda cards */
+        .agenda-card { cursor: pointer; position: relative; overflow: hidden; }
+        .agenda-card::after { content: 'Click to jump \2192'; position: absolute; bottom: 0.8vw; right: 1vw; font-size: 0.75vw; color: var(--vip-gold); opacity: 0; transition: opacity 0.3s; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .agenda-card:hover::after { opacity: 1; }
+        .agenda-card:active { transform: scale(0.98); }
+
+        /* Stats with animated counters */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vw; text-align: center; margin-top: 3vh; }
+        .stat-item { cursor: default; transition: transform 0.3s; }
+        .stat-item:hover { transform: scale(1.05); }
+        .stat-item .stat-number { color: var(--vip-gold); display: block; }
+        .stat-item .stat-label { font-size: 1vw; color: var(--vip-gray); margin-top: 0.5vh; display: block; }
+
+        /* Tab system for division slides */
+        .tab-bar { display: flex; gap: 0.3vw; margin-bottom: 2vh; }
+        .tab-btn { padding: 0.6vw 1.5vw; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: transparent; color: var(--vip-gray); font-size: 0.9vw; font-weight: 600; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.02em; font-family: inherit; }
+        .tab-btn:hover { border-color: var(--vip-gold); color: var(--vip-white); }
+        .tab-btn.active { background: var(--vip-gold); color: var(--vip-black); border-color: var(--vip-gold); }
+        .tab-panel { display: none; animation: fadeIn 0.4s ease; }
+        .tab-panel.active { display: block; }
+
+        /* Division badge */
+        .division-badge { display: inline-block; padding: 0.4vw 1.2vw; border: 1px solid var(--vip-gold); border-radius: 100px; font-size: 0.85vw; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--vip-gold); margin-bottom: 2vh; }
+        .division-header { display: flex; align-items: center; gap: 1.5vw; margin-bottom: 1.5vh; }
+        .division-icon-large { width: 4vw; height: 4vw; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2vw; flex-shrink: 0; }
+        .bg-gold-subtle { background: rgba(216,164,95,0.12); border: 1px solid rgba(216,164,95,0.2); }
+        .bg-turquoise-subtle { background: rgba(62,160,173,0.12); border: 1px solid rgba(62,160,173,0.2); }
+        .bg-purple-subtle { background: rgba(156,92,225,0.12); border: 1px solid rgba(156,92,225,0.2); }
+        .bg-orange-subtle { background: rgba(251,144,47,0.12); border: 1px solid rgba(251,144,47,0.2); }
+
+        /* Brand mini grid */
+        .brand-mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7vw; margin-top: 1vh; }
+        .brand-mini-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.5vw 0.7vw; font-size: 0.85vw; font-weight: 500; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .brand-mini-item:hover { border-color: var(--vip-gold); background: rgba(216,164,95,0.1); transform: translateY(-2px); }
+        .brand-mini-item.selected { border-color: var(--vip-gold); background: rgba(216,164,95,0.15); color: var(--vip-gold); }
+
+        /* Feature list */
+        .feature-list { list-style: none; margin-top: 1vh; }
+        .feature-list li { padding: 0.6vh 0; padding-left: 1.5vw; position: relative; font-size: 1.05vw; }
+        .feature-list li::before { content: ''; position: absolute; left: 0; top: 1vh; width: 8px; height: 8px; border-radius: 50%; background: var(--vip-gold); }
+
+        /* Interactive before/after slider */
+        .slider-container { position: relative; width: 100%; height: 38vh; margin-top: 2vh; border-radius: 10px; overflow: hidden; cursor: col-resize; border: 1px solid rgba(255,255,255,0.1); }
+        .slider-side { position: absolute; top: 0; height: 100%; padding: 3vh 2.5vw; display: flex; flex-direction: column; justify-content: center; }
+        .slider-left { left: 0; width: 50%; background: rgba(255,89,94,0.08); border-right: none; overflow: hidden; }
+        .slider-right { right: 0; width: 50%; background: rgba(62,160,173,0.08); overflow: hidden; }
+        .slider-handle { position: absolute; top: 0; bottom: 0; width: 4px; background: var(--vip-gold); z-index: 10; cursor: col-resize; left: 50%; transform: translateX(-50%); }
+        .slider-handle::before { content: '\2B0C'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; background: var(--vip-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--vip-black); font-weight: 700; }
+        .slider-label { font-size: 0.8vw; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.5vh; }
+        .slider-label-red { color: var(--vip-red); }
+        .slider-label-teal { color: var(--vip-turquoise); }
+        .slider-point { font-size: 0.95vw; padding: 0.5vh 0; display: flex; align-items: flex-start; gap: 0.5vw; }
+        .slider-point-icon { flex-shrink: 0; margin-top: 0.15vh; }
+        .slider-hint { position: absolute; bottom: 1vh; left: 50%; transform: translateX(-50%); font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.1em; z-index: 11; background: rgba(19,25,30,0.8); padding: 0.3vh 0.8vw; border-radius: 4px; }
+
+        /* VS layout */
+        .vs-layout { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2vw; align-items: start; margin-top: 2vh; }
+        .vs-divider { width: 2px; height: 100%; min-height: 30vh; background: linear-gradient(to bottom, transparent, var(--vip-gold), transparent); }
+        .vs-item { padding: 0.8vh 0; font-size: 1vw; display: flex; align-items: flex-start; gap: 0.5vw; }
+
+        /* Interactive feature cards with flip */
+        .flip-card { perspective: 1000px; cursor: pointer; height: 22vh; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s ease; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; padding: 1.5vw; display: flex; flex-direction: column; justify-content: center; }
+        .flip-card-front { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        .flip-card-back { background: rgba(216,164,95,0.1); border: 1px solid var(--vip-gold); transform: rotateY(180deg); }
+        .flip-card-front h3 { color: var(--vip-gold); margin-bottom: 0.5vh; font-size: 1.2vw; }
+        .flip-card-front p { font-size: 0.95vw; color: var(--vip-gray); }
+        .flip-card-back h3 { color: var(--vip-gold); margin-bottom: 0.5vh; font-size: 1.1vw; }
+        .flip-card-back p { font-size: 0.9vw; color: var(--vip-white); line-height: 1.4; }
+        .flip-hint { font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; margin-top: auto; }
+        .slide-light .flip-card-front { background: var(--vip-off-white); border-color: var(--vip-gray-light); }
+        .slide-light .flip-card-front p { color: #666; }
+        .slide-light .flip-card-back { background: var(--vip-gold-light); }
+        .slide-light .flip-card-back h3 { color: var(--vip-gold-text); }
+        .slide-light .flip-card-back p { color: var(--vip-black); }
+
+        /* Collaborative editing mockup */
+        .editor-mockup { background: #1a1f25; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-top: 1.5vh; height: 40vh; position: relative; }
+        .editor-toolbar { display: flex; align-items: center; gap: 1vw; padding: 0.8vh 1.2vw; background: #12161b; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .editor-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .editor-dot-red { background: #ff5f57; }
+        .editor-dot-yellow { background: #febc2e; }
+        .editor-dot-green { background: #28c840; }
+        .editor-title { font-size: 0.8vw; color: var(--vip-gray); margin-left: 1vw; }
+        .editor-body { padding: 1.5vw; position: relative; font-size: 1vw; line-height: 1.8; color: rgba(255,255,255,0.8); }
+        .editor-line { padding: 0.3vh 0; position: relative; }
+        .cursor-indicator { display: inline-block; width: 2px; height: 1.2em; animation: blink 1s infinite; vertical-align: text-bottom; margin: 0 1px; }
+        .cursor-label { font-size: 0.55vw; padding: 0.15vw 0.4vw; border-radius: 3px; color: white; font-weight: 600; position: relative; top: -0.3em; margin-left: 2px; }
+        .avatar-bar { position: absolute; top: 0.8vh; right: 1.2vw; display: flex; gap: -0.3vw; }
+        .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65vw; font-weight: 700; color: white; border: 2px solid #1a1f25; margin-left: -6px; transition: transform 0.2s; cursor: pointer; }
+        .avatar:hover { transform: scale(1.2); z-index: 5; }
+        .avatar:first-child { margin-left: 0; }
+        .editor-comment { position: absolute; right: 1.5vw; background: rgba(216,164,95,0.15); border: 1px solid var(--vip-gold); border-radius: 6px; padding: 0.6vw 0.8vw; max-width: 14vw; opacity: 0; transition: opacity 0.4s, transform 0.4s; transform: translateX(10px); }
+        .editor-comment.visible { opacity: 1; transform: translateX(0); }
+        .editor-comment-author { font-size: 0.65vw; font-weight: 600; color: var(--vip-gold); margin-bottom: 0.2vh; }
+        .editor-comment-text { font-size: 0.7vw; color: var(--vip-gray); line-height: 1.3; }
+        .editor-status { position: absolute; bottom: 0.8vh; left: 1.2vw; display: flex; align-items: center; gap: 0.5vw; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #28c840; }
+        .status-text { font-size: 0.7vw; color: var(--vip-gray); }
+        .editor-interact-hint { position: absolute; bottom: 0.8vh; right: 1.2vw; font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* CDN Map */
+        .cdn-map { position: relative; width: 100%; height: 42vh; margin-top: 1.5vh; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+        .cdn-world { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70vw; height: 35vh; opacity: 0.15; }
+        .cdn-node { position: absolute; cursor: pointer; z-index: 5; transition: transform 0.2s; }
+        .cdn-node:hover { transform: scale(1.3); z-index: 10; }
+        .cdn-node-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--vip-turquoise); position: relative; }
+        .cdn-node-dot::after { content: ''; position: absolute; top: -4px; left: -4px; width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--vip-turquoise); opacity: 0; animation: ripple 2s infinite; }
+        .cdn-node.active .cdn-node-dot { background: var(--vip-gold); }
+        .cdn-node.active .cdn-node-dot::after { border-color: var(--vip-gold); }
+        .cdn-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--vip-black); border: 1px solid var(--vip-gold); border-radius: 6px; padding: 0.5vw 0.8vw; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; margin-bottom: 8px; }
+        .cdn-node:hover .cdn-tooltip, .cdn-node.active .cdn-tooltip { opacity: 1; }
+        .cdn-tooltip-title { font-size: 0.75vw; font-weight: 600; color: var(--vip-gold); }
+        .cdn-tooltip-stat { font-size: 0.65vw; color: var(--vip-gray); }
+        .cdn-legend { position: absolute; bottom: 1.5vh; left: 1.5vw; display: flex; gap: 1.5vw; }
+        .cdn-legend-item { display: flex; align-items: center; gap: 0.4vw; font-size: 0.7vw; color: var(--vip-gray); }
+        .cdn-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .cdn-interact-hint { position: absolute; bottom: 1.5vh; right: 1.5vw; font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; }
+        .cdn-stats-panel { position: absolute; top: 1.5vh; right: 1.5vw; background: rgba(19,25,30,0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1vw 1.2vw; min-width: 12vw; }
+        .cdn-stats-title { font-size: 0.75vw; font-weight: 600; color: var(--vip-gold); margin-bottom: 0.5vh; text-transform: uppercase; letter-spacing: 0.06em; }
+        .cdn-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.3vh 0; }
+        .cdn-stat-label { font-size: 0.7vw; color: var(--vip-gray); }
+        .cdn-stat-value { font-size: 0.8vw; font-weight: 600; color: var(--vip-white); }
+        .cdn-stat-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.3vh; overflow: hidden; }
+        .cdn-stat-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+
+        /* Parse.ly Dashboard Mockup */
+        .parsely-dash { background: #1a1f25; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-top: 1.5vh; height: 42vh; position: relative; }
+        .parsely-header { display: flex; align-items: center; justify-content: space-between; padding: 0.8vh 1.2vw; background: #12161b; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .parsely-logo { font-size: 0.9vw; font-weight: 700; color: var(--vip-turquoise); }
+        .parsely-tabs { display: flex; gap: 0.2vw; }
+        .parsely-tab { padding: 0.3vw 0.8vw; border-radius: 4px; font-size: 0.7vw; color: var(--vip-gray); cursor: pointer; transition: all 0.2s; font-family: inherit; background: none; border: none; }
+        .parsely-tab:hover { color: var(--vip-white); }
+        .parsely-tab.active { background: rgba(62,160,173,0.2); color: var(--vip-turquoise); }
+        .parsely-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; padding: 1vw; height: calc(100% - 4vh); }
+        .parsely-chart { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1vw; position: relative; }
+        .parsely-chart-title { font-size: 0.75vw; font-weight: 600; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.8vh; }
+        .parsely-bar-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 60%; padding-top: 1vh; }
+        .parsely-bar-col { display: flex; flex-direction: column; align-items: center; gap: 0.3vh; flex: 1; }
+        .parsely-bar { width: 60%; border-radius: 3px 3px 0 0; transition: height 0.8s ease, background 0.3s; cursor: pointer; min-height: 2px; position: relative; }
+        .parsely-bar:hover { filter: brightness(1.3); }
+        .parsely-bar-label { font-size: 0.55vw; color: var(--vip-gray); }
+        .parsely-bar-value { position: absolute; top: -1.5vh; left: 50%; transform: translateX(-50%); font-size: 0.6vw; color: var(--vip-white); font-weight: 600; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+        .parsely-bar:hover .parsely-bar-value { opacity: 1; }
+        .parsely-metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6vw; height: 70%; }
+        .parsely-metric { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.6vw; display: flex; flex-direction: column; justify-content: center; cursor: pointer; transition: border-color 0.3s, background 0.3s; }
+        .parsely-metric:hover { border-color: var(--vip-turquoise); background: rgba(62,160,173,0.05); }
+        .parsely-metric-value { font-size: 1.6vw; font-weight: 700; color: var(--vip-turquoise); }
+        .parsely-metric-label { font-size: 0.6vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.05em; }
+        .parsely-metric-change { font-size: 0.6vw; font-weight: 600; margin-top: 0.2vh; }
+        .parsely-up { color: #28c840; }
+        .parsely-down { color: var(--vip-red); }
+        .parsely-line-chart { position: relative; height: 55%; margin-top: 0.5vh; }
+        .parsely-line-svg { width: 100%; height: 100%; }
+        .parsely-interact-hint { position: absolute; bottom: 0.5vh; right: 0.8vw; font-size: 0.6vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; }
+        .parsely-top-list { margin-top: 0.5vh; }
+        .parsely-top-item { display: flex; align-items: center; gap: 0.5vw; padding: 0.4vh 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; transition: background 0.2s; border-radius: 3px; padding-left: 0.3vw; }
+        .parsely-top-item:hover { background: rgba(255,255,255,0.03); }
+        .parsely-top-rank { font-size: 0.65vw; font-weight: 700; color: var(--vip-gold); width: 1.2vw; }
+        .parsely-top-name { font-size: 0.7vw; color: var(--vip-white); flex: 1; }
+        .parsely-top-views { font-size: 0.65vw; color: var(--vip-turquoise); font-weight: 600; }
+
+        /* MCP Architecture Diagram */
+        .mcp-diagram { position: relative; width: 100%; height: 42vh; margin-top: 1.5vh; }
+        .mcp-layer { position: absolute; left: 50%; transform: translateX(-50%); width: 70%; border-radius: 10px; padding: 1vw 1.5vw; transition: all 0.4s ease; cursor: pointer; border: 1px solid transparent; }
+        .mcp-layer:hover { border-color: var(--vip-gold); }
+        .mcp-layer.expanded { z-index: 10; }
+        .mcp-layer-title { font-size: 0.9vw; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3vh; }
+        .mcp-layer-desc { font-size: 0.8vw; color: var(--vip-gray); transition: max-height 0.4s ease, opacity 0.3s; }
+        .mcp-layer-detail { max-height: 0; overflow: hidden; transition: max-height 0.5s ease, opacity 0.3s; opacity: 0; }
+        .mcp-layer.expanded .mcp-layer-detail { max-height: 20vh; opacity: 1; }
+        .mcp-layer-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8vw; margin-top: 0.8vh; }
+        .mcp-detail-item { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.6vw; text-align: center; }
+        .mcp-detail-item h4 { font-size: 0.75vw; color: var(--vip-gold); font-weight: 600; margin-bottom: 0.2vh; }
+        .mcp-detail-item p { font-size: 0.65vw; color: var(--vip-gray); }
+        .mcp-connector { position: absolute; left: 50%; width: 2px; background: linear-gradient(to bottom, var(--vip-gold), rgba(216,164,95,0.3)); transform: translateX(-50%); }
+        .mcp-interact-hint { position: absolute; bottom: 0; right: 0; font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* Calendar embed */
+        .calendar-container { width: 100%; max-width: 50vw; margin: 2vh auto 0; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: var(--vip-white); }
+        .calendar-container iframe { display: block; width: 100%; height: 38vh; border: 0; }
+        .cta-section { text-align: center; padding-top: 2vh; }
+        .cta-section h1 { margin-bottom: 1vh; }
+        .cta-section p { color: var(--vip-gray); max-width: 40vw; margin: 0 auto 2vh; }
 
         /* Print */
         @media print {
@@ -656,824 +305,1016 @@
             .slide { position: relative; page-break-after: always; opacity: 1; visibility: visible; height: auto; min-height: 100vh; }
         }
 
-        /* Slide-specific backgrounds */
-        .slide-turquoise-accent {
-            background: linear-gradient(135deg, var(--vip-black) 0%, var(--vip-turquoise-dark) 100%);
-            color: var(--vip-white);
-        }
-
-        /* Pillar icons using CSS shapes */
-        .pillar-icon {
-            width: 3.5vw;
-            height: 3.5vw;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.2vh;
-            font-size: 1.6vw;
-        }
-
-        .pillar-icon-gold {
-            background: rgba(216,164,95,0.15);
-            border: 1px solid rgba(216,164,95,0.25);
-        }
-
-        .pillar-icon-turquoise {
-            background: rgba(62,160,173,0.15);
-            border: 1px solid rgba(62,160,173,0.25);
-        }
-
-        /* Slide-specific: division spotlight */
-        .division-header {
-            display: flex;
-            align-items: center;
-            gap: 1.5vw;
-            margin-bottom: 2vh;
-        }
-
-        .division-icon-large {
-            width: 4.5vw;
-            height: 4.5vw;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.2vw;
-            flex-shrink: 0;
-        }
-
-        .bg-gold-subtle { background: rgba(216,164,95,0.12); border: 1px solid rgba(216,164,95,0.2); }
-        .bg-turquoise-subtle { background: rgba(62,160,173,0.12); border: 1px solid rgba(62,160,173,0.2); }
-        .bg-purple-subtle { background: rgba(156,92,225,0.12); border: 1px solid rgba(156,92,225,0.2); }
-        .bg-orange-subtle { background: rgba(251,144,47,0.12); border: 1px solid rgba(251,144,47,0.2); }
-
+        /* Utility */
         .text-gold { color: var(--vip-gold); }
         .text-turquoise { color: var(--vip-turquoise); }
         .text-purple { color: var(--vip-purple); }
         .text-orange { color: var(--vip-orange); }
 
-        .slide-light .text-gold { color: var(--vip-gold-text); }
-
-        /* Mini brand grid */
-        .brand-mini-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.8vw;
-            margin-top: 1.5vh;
-        }
-
-        .brand-mini-item {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 6px;
-            padding: 0.6vw 0.8vw;
-            font-size: 0.85vw;
-            font-weight: 500;
-            text-align: center;
-            transition: border-color 0.2s;
-        }
-
-        .brand-mini-item:hover {
-            border-color: var(--vip-gold);
-        }
-
-        /* Comparison layout */
-        .vs-layout {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 2vw;
-            align-items: start;
-            margin-top: 2vh;
-        }
-
-        .vs-divider {
-            width: 2px;
-            height: 100%;
-            min-height: 30vh;
-            background: linear-gradient(to bottom, transparent, var(--vip-gold), transparent);
-        }
-
-        .vs-column h3 {
-            margin-bottom: 1.5vh;
-        }
-
-        .vs-item {
-            padding: 1vh 0;
-            font-size: 1.1vw;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.6vw;
-        }
-
-        .vs-icon {
-            flex-shrink: 0;
-            margin-top: 0.2vh;
-        }
-
-        /* Next steps numbered list */
-        .steps-list {
-            list-style: none;
-            counter-reset: steps;
-            margin-top: 2vh;
-        }
-
-        .steps-list li {
-            counter-increment: steps;
-            display: flex;
-            align-items: flex-start;
-            gap: 1.2vw;
-            padding: 1.5vh 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .steps-list li:last-child { border-bottom: none; }
-
-        .steps-list li::before {
-            content: counter(steps);
-            flex-shrink: 0;
-            width: 2.5vw;
-            height: 2.5vw;
-            border-radius: 50%;
-            background: rgba(216,164,95,0.15);
-            border: 1px solid var(--vip-gold);
-            color: var(--vip-gold);
-            font-size: 1.1vw;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .step-content h3 {
-            font-size: 1.2vw;
-            margin-bottom: 0.3vh;
-        }
-
-        .step-content p {
-            font-size: 1vw;
-            color: var(--vip-gray);
-        }
-
-        /* Capability grid for platform slide */
-        .capability-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5vw;
-            margin-top: 2vh;
-        }
-
-        .capability-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 8px;
-            padding: 1.5vw;
-            transition: border-color 0.3s;
-        }
-
-        .capability-item:hover {
-            border-color: var(--vip-gold);
-        }
-
-        .capability-item .cap-icon {
-            font-size: 1.4vw;
-            margin-bottom: 0.8vh;
-        }
-
-        .capability-item h3 {
-            font-size: 1.1vw;
-            color: var(--vip-gold);
-            margin-bottom: 0.5vh;
-        }
-
-        .capability-item p {
-            font-size: 0.9vw;
-            color: var(--vip-gray);
-            line-height: 1.4;
-        }
-
-        /* CTA section */
-        .cta-section {
-            text-align: center;
-            padding-top: 2vh;
-        }
-
-        .cta-section h1 {
-            margin-bottom: 1vh;
-        }
-
-        .cta-section p {
-            color: var(--vip-gray);
-            max-width: 40vw;
-            margin: 0 auto 2vh;
-        }
+        /* Progress ring for stats */
+        .progress-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .progress-ring svg { transform: rotate(-90deg); }
+        .progress-ring-value { position: absolute; font-size: 1.4vw; font-weight: 700; color: var(--vip-gold); }
     </style>
 </head>
 <body>
 
-    <!-- Progress Bar -->
-    <div class="progress-bar" id="progressBar"></div>
+<div class="progress-bar" id="progressBar"></div>
 
-    <!-- Slide Deck -->
-    <div class="deck" id="deck">
+<div class="deck" id="deck">
 
-        <!-- SLIDE 1: Title -->
-        <div class="slide slide-dark active" id="slide-1">
-            <div class="geo-pattern geo-lines"></div>
-            <div class="corner-accent corner-tl"></div>
-            <div class="corner-accent corner-br"></div>
-            <div class="vip-logo animate-in delay-1">
+    <!-- SLIDE 1: Title -->
+    <div class="slide slide-dark active" id="slide-1">
+        <div class="geo-pattern geo-lines"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="vip-logo animate-in delay-1">
+            <span class="logo-wp">WordPress</span> <span class="logo-vip">VIP</span>
+        </div>
+        <div class="gold-line animate-in delay-2"></div>
+        <h1 class="animate-in delay-2" style="font-size: 3.8vw;">Active Interest Media</h1>
+        <p class="animate-in delay-3" style="font-size: 1.6vw; color: var(--vip-gray); margin-bottom: 1vh;">Enterprise Content Platform Partnership</p>
+        <div class="gold-line gold-line-wide animate-in delay-4"></div>
+        <p class="animate-in delay-5" style="font-size: 1vw; color: var(--vip-gray); margin-top: 2vh;">February 2026</p>
+    </div>
+
+    <!-- SLIDE 2: Agenda (clickable cards) -->
+    <div class="slide slide-dark" id="slide-2">
+        <div class="geo-pattern geo-circles"></div>
+        <div class="vip-logo animate-in delay-1"><span class="logo-wp">WordPress</span> <span class="logo-vip">VIP</span></div>
+        <h2 class="animate-in delay-1">Today's Conversation</h2>
+        <div class="gold-line animate-in delay-2"></div>
+        <div class="card-grid card-grid-4 animate-in delay-3" style="margin-top: 2vh;">
+            <div class="card agenda-card" data-goto="3">
+                <div style="font-size: 2vw; margin-bottom: 0.8vh; color: var(--vip-gold);">01</div>
+                <h3 style="font-size: 1.2vw;">Your World</h3>
+                <p>AIM's portfolio and audience across 29+ brands</p>
+            </div>
+            <div class="card agenda-card" data-goto="4">
+                <div style="font-size: 2vw; margin-bottom: 0.8vh; color: var(--vip-gold);">02</div>
+                <h3 style="font-size: 1.2vw;">Divisions</h3>
+                <p>Spotlights on each of your four divisions</p>
+            </div>
+            <div class="card agenda-card" data-goto="9">
+                <div style="font-size: 2vw; margin-bottom: 0.8vh; color: var(--vip-gold);">03</div>
+                <h3 style="font-size: 1.2vw;">VIP Platform</h3>
+                <p>Features built for media companies like AIM</p>
+            </div>
+            <div class="card agenda-card" data-goto="16">
+                <div style="font-size: 2vw; margin-bottom: 0.8vh; color: var(--vip-gold);">04</div>
+                <h3 style="font-size: 1.2vw;">Next Steps</h3>
+                <p>Book time to continue the conversation</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: AIM Universe (animated counters) -->
+    <div class="slide slide-dark" id="slide-3">
+        <div class="geo-pattern geo-grid"></div>
+        <div class="corner-accent corner-tr"></div>
+        <div class="corner-accent corner-bl"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Your World</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">The AIM Media Universe</h2>
+        <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 50vw; margin-bottom: 2vh;">
+            From Fine Woodworking to Writer's Digest, AIM inspires tens of millions of enthusiasts worldwide. After the Taunton Press acquisition, the portfolio has never been larger, or more complex to manage.
+        </p>
+        <div class="stats-row animate-in delay-3">
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3.8vw;" data-count="29" data-suffix="+">0</span>
+                <span class="stat-label">Brands</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3.8vw;" data-count="40" data-suffix="M+">0</span>
+                <span class="stat-label">Global Audience</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3.8vw;" data-count="85" data-suffix="">0</span>
+                <span class="stat-label">Countries</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3.8vw;" data-count="4" data-suffix="">0</span>
+                <span class="stat-label">Divisions</span>
+            </div>
+        </div>
+        <div class="gold-line gold-line-wide animate-in delay-4" style="margin-top: 3vh;"></div>
+        <p class="animate-in delay-5" style="font-size: 1vw; color: var(--vip-gray);">Media, events, e-commerce, online education, podcasts, TV, and marketing services</p>
+    </div>
+
+    <!-- SLIDE 4: Home Arts (tabbed) -->
+    <div class="slide slide-dark" id="slide-4">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="division-badge animate-in delay-1">Home Arts</div>
+        <div class="division-header animate-in delay-2">
+            <div class="division-icon-large bg-gold-subtle"><span style="font-size: 2vw;">&#9998;</span></div>
+            <div>
+                <h2 style="margin-bottom: 0.3vh;">Home Arts</h2>
+                <p style="color: var(--vip-gray); font-size: 1.05vw;">Where craftsmanship meets content mastery</p>
+            </div>
+        </div>
+        <div class="tab-bar animate-in delay-3" data-tabgroup="homearts">
+            <button class="tab-btn active" data-tab="ha-portfolio">Portfolio</button>
+            <button class="tab-btn" data-tab="ha-opportunity">Opportunity</button>
+            <button class="tab-btn" data-tab="ha-vipfit">VIP Fit</button>
+        </div>
+        <div class="animate-in delay-3">
+            <div class="tab-panel active" id="ha-portfolio">
+                <p style="color: var(--vip-gray); font-size: 0.95vw; margin-bottom: 1.5vh;">9 brands serving woodworkers, gardeners, sewers, and home cooks</p>
+                <div class="brand-mini-grid">
+                    <div class="brand-mini-item">Fine Woodworking</div>
+                    <div class="brand-mini-item">Fine Gardening</div>
+                    <div class="brand-mini-item">Popular Woodworking</div>
+                    <div class="brand-mini-item">Threads</div>
+                    <div class="brand-mini-item">Garden Gate</div>
+                    <div class="brand-mini-item">Woodsmith</div>
+                    <div class="brand-mini-item">Horticulture</div>
+                    <div class="brand-mini-item">Cuisine at Home</div>
+                    <div class="brand-mini-item">ShopNotes</div>
+                </div>
+            </div>
+            <div class="tab-panel" id="ha-opportunity">
+                <ul class="feature-list">
+                    <li>Unified platform for 9+ brands, each with distinct audiences and monetization</li>
+                    <li>Integrated e-commerce for plans, patterns, and project kits</li>
+                    <li>Video-rich instructional content at scale with enterprise-grade delivery</li>
+                    <li>Post-Taunton integration demands a modern, flexible CMS foundation</li>
+                </ul>
+            </div>
+            <div class="tab-panel" id="ha-vipfit">
+                <div class="card-grid card-grid-3">
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw;">Multisite</h3>
+                        <p style="font-size: 0.85vw;">Each brand gets its own site with shared infrastructure and cross-brand content</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw;">Commerce</h3>
+                        <p style="font-size: 0.85vw;">Sell plans, subscriptions, and project kits natively within the CMS</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw;">Video + Media</h3>
+                        <p style="font-size: 0.85vw;">Enterprise CDN delivers instructional video to millions without buffering</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: Collectibles (tabbed) -->
+    <div class="slide slide-gradient" id="slide-5">
+        <div class="geo-pattern geo-circles"></div>
+        <div class="division-badge animate-in delay-1" style="border-color: var(--vip-turquoise); color: var(--vip-turquoise);">Collectibles</div>
+        <div class="division-header animate-in delay-2">
+            <div class="division-icon-large bg-turquoise-subtle"><span style="font-size: 2vw;">&#9733;</span></div>
+            <div>
+                <h2 style="margin-bottom: 0.3vh;">Collectibles</h2>
+                <p style="color: var(--vip-gray); font-size: 1.05vw;">The trusted authority for collectors worldwide</p>
+            </div>
+        </div>
+        <div class="tab-bar animate-in delay-3" data-tabgroup="collectibles">
+            <button class="tab-btn active" data-tab="co-portfolio" style="--active-color: var(--vip-turquoise);">Portfolio</button>
+            <button class="tab-btn" data-tab="co-opportunity">Opportunity</button>
+            <button class="tab-btn" data-tab="co-vipfit">VIP Fit</button>
+        </div>
+        <div class="animate-in delay-3">
+            <div class="tab-panel active" id="co-portfolio">
+                <p style="color: var(--vip-gray); font-size: 0.95vw; margin-bottom: 1.5vh;">6 brands serving antique dealers, sports card collectors, numismatists, and car enthusiasts</p>
+                <div class="brand-mini-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="brand-mini-item">Antique Trader</div>
+                    <div class="brand-mini-item">Kovels</div>
+                    <div class="brand-mini-item">Sports Collectors Digest</div>
+                    <div class="brand-mini-item">Military Trader</div>
+                    <div class="brand-mini-item">Numismatics</div>
+                    <div class="brand-mini-item">Old Cars</div>
+                </div>
+            </div>
+            <div class="tab-panel" id="co-opportunity">
+                <ul class="feature-list">
+                    <li>Database-driven content: price guides, valuations, and marketplace listings demand dynamic publishing</li>
+                    <li>SEO at scale across niche verticals, each competing for high-intent search traffic</li>
+                    <li>Community features and member-gated content to grow subscriber revenue</li>
+                    <li>Real-time content for market trends, auction results, and collecting news</li>
+                </ul>
+            </div>
+            <div class="tab-panel" id="co-vipfit">
+                <div class="card-grid card-grid-3">
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-turquoise);">Dynamic Data</h3>
+                        <p style="font-size: 0.85vw;">REST + GraphQL APIs power price guides and valuations from any data source</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-turquoise);">SEO at Scale</h3>
+                        <p style="font-size: 0.85vw;">Structured data, fast page loads, and enterprise SEO tooling built in</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-turquoise);">Memberships</h3>
+                        <p style="font-size: 0.85vw;">Gate premium content, manage tiers, and grow subscriber revenue natively</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: Home Building (tabbed) -->
+    <div class="slide slide-dark" id="slide-6">
+        <div class="geo-pattern geo-grid"></div>
+        <div class="division-badge animate-in delay-1" style="border-color: var(--vip-purple); color: var(--vip-purple);">Home Building</div>
+        <div class="division-header animate-in delay-2">
+            <div class="division-icon-large bg-purple-subtle"><span style="font-size: 2vw;">&#9962;</span></div>
+            <div>
+                <h2 style="margin-bottom: 0.3vh;">Home Building</h2>
+                <p style="color: var(--vip-gray); font-size: 1.05vw;">From heritage restoration to modern builds</p>
+            </div>
+        </div>
+        <div class="tab-bar animate-in delay-3" data-tabgroup="homebuilding">
+            <button class="tab-btn active" data-tab="hb-portfolio">Portfolio</button>
+            <button class="tab-btn" data-tab="hb-opportunity">Opportunity</button>
+            <button class="tab-btn" data-tab="hb-vipfit">VIP Fit</button>
+        </div>
+        <div class="animate-in delay-3">
+            <div class="tab-panel active" id="hb-portfolio">
+                <p style="color: var(--vip-gray); font-size: 0.95vw; margin-bottom: 1.5vh;">6 brands for builders, restorers, and homeowners</p>
+                <div class="brand-mini-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="brand-mini-item">Fine Homebuilding</div>
+                    <div class="brand-mini-item">Old House Journal</div>
+                    <div class="brand-mini-item">Log &amp; Timber Home Living</div>
+                    <div class="brand-mini-item">Cabin Life</div>
+                    <div class="brand-mini-item">Arts &amp; Crafts Home</div>
+                    <div class="brand-mini-item">Traditional Building</div>
+                </div>
+            </div>
+            <div class="tab-panel" id="hb-opportunity">
+                <ul class="feature-list">
+                    <li>B2B and B2C audiences in one ecosystem, professionals and homeowners alike</li>
+                    <li>Rich media galleries, project plans, and interactive how-to content</li>
+                    <li>Lead generation for advertisers and sponsors needs reliable, fast infrastructure</li>
+                    <li>Trade events and digital marketing services powered by a unified content hub</li>
+                </ul>
+            </div>
+            <div class="tab-panel" id="hb-vipfit">
+                <div class="card-grid card-grid-3">
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-purple);">B2B + B2C</h3>
+                        <p style="font-size: 0.85vw;">Serve professional builders and homeowners from one platform with role-based content</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-purple);">Lead Gen</h3>
+                        <p style="font-size: 0.85vw;">Enterprise-grade forms, integrations, and analytics for advertiser value</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-purple);">Events Hub</h3>
+                        <p style="font-size: 0.85vw;">Promote and manage trade events alongside editorial in one CMS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: Writer's Digest (tabbed) -->
+    <div class="slide slide-gradient" id="slide-7">
+        <div class="geo-pattern geo-lines"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="division-badge animate-in delay-1" style="border-color: var(--vip-orange); color: var(--vip-orange);">Writer's Digest</div>
+        <div class="division-header animate-in delay-2">
+            <div class="division-icon-large bg-orange-subtle"><span style="font-size: 2vw;">&#9997;</span></div>
+            <div>
+                <h2 style="margin-bottom: 0.3vh;">Writer's Digest</h2>
+                <p style="color: var(--vip-gray); font-size: 1.05vw;">The most trusted name in writing since 1920</p>
+            </div>
+        </div>
+        <div class="tab-bar animate-in delay-3" data-tabgroup="writersdigest">
+            <button class="tab-btn active" data-tab="wd-ecosystem">Ecosystem</button>
+            <button class="tab-btn" data-tab="wd-opportunity">Opportunity</button>
+            <button class="tab-btn" data-tab="wd-vipfit">VIP Fit</button>
+        </div>
+        <div class="animate-in delay-3">
+            <div class="tab-panel active" id="wd-ecosystem">
+                <ul class="feature-list">
+                    <li>100+ years of editorial authority and brand equity</li>
+                    <li>Writer's Digest University with on-demand and instructor-led courses</li>
+                    <li>VIP Membership: archive of 1,000+ issues, 400+ video tutorials</li>
+                    <li>Annual competitions, conferences, and community events</li>
+                </ul>
+            </div>
+            <div class="tab-panel" id="wd-opportunity">
+                <ul class="feature-list">
+                    <li>Membership and subscription management at enterprise scale</li>
+                    <li>Integrated learning management alongside editorial content</li>
+                    <li>Seamless e-commerce for courses, workshops, and competition entries</li>
+                    <li>A platform worthy of a century-old legacy: fast, secure, always available</li>
+                </ul>
+            </div>
+            <div class="tab-panel" id="wd-vipfit">
+                <div class="card-grid card-grid-3">
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-orange);">Subscriptions</h3>
+                        <p style="font-size: 0.85vw;">Manage memberships, digital archives, and tiered access at any scale</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-orange);">Learning</h3>
+                        <p style="font-size: 0.85vw;">Integrate WD University courses and video alongside editorial content</p>
+                    </div>
+                    <div class="card" style="padding: 1.2vw;">
+                        <h3 style="font-size: 1vw; color: var(--vip-orange);">Legacy Worthy</h3>
+                        <p style="font-size: 0.85vw;">99.99% uptime, enterprise security, and 24/7 support for a century-old brand</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: Challenge (interactive slider) -->
+    <div class="slide slide-dark" id="slide-8">
+        <div class="geo-pattern geo-moire"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-turquoise);">The Challenge</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">Scale Creates Complexity</h2>
+        <div class="gold-line animate-in delay-2"></div>
+        <div class="slider-container animate-in delay-3" id="challengeSlider">
+            <div class="slider-left" id="sliderLeft">
+                <span class="slider-label slider-label-red">Current Reality</span>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>Multiple tech stacks across brands creates maintenance overhead</span></div>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>Post-Taunton integration adds technical debt</span></div>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>Fragmented systems limit digital product scaling</span></div>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>No cross-brand content sharing or unified analytics</span></div>
+            </div>
+            <div class="slider-right" id="sliderRight">
+                <span class="slider-label slider-label-teal">With WordPress VIP</span>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>One enterprise platform powering all 29+ brands</span></div>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Streamlined migration preserving SEO equity</span></div>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Native memberships, e-commerce, and learning</span></div>
+                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Cross-brand syndication and unified analytics</span></div>
+            </div>
+            <div class="slider-handle" id="sliderHandle"></div>
+            <div class="slider-hint">Drag to compare</div>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: VIP Solution Overview (flip cards) -->
+    <div class="slide slide-light" id="slide-9">
+        <span class="caption animate-in delay-1" style="color: var(--vip-gold-text);">The Solution</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">WordPress VIP for AIM</h2>
+        <div class="gold-line animate-in delay-2"></div>
+        <p class="animate-in delay-2" style="color: #555; max-width: 48vw; margin-bottom: 1vh; font-size: 1.1vw;">Click any card to learn more about how each capability maps to AIM's needs.</p>
+        <div class="card-grid card-grid-3 animate-in delay-3">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front"><h3>Multisite at Scale</h3><p>Run 29+ brands on one platform</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-back"><h3>For AIM</h3><p>Each division and brand gets its own site with unique themes, while sharing users, plugins, and infrastructure. Onboard acquired brands in days, not months.</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front"><h3>Performance</h3><p>99.99% uptime, global CDN</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-back"><h3>For AIM</h3><p>Your 40M+ audience across 85 countries gets sub-second page loads. Traffic spikes from viral woodworking videos or breaking collectibles news are handled automatically.</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front"><h3>Enterprise Security</h3><p>SOC 2 Type II, ISO 27001</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-back"><h3>For AIM</h3><p>Protect subscriber data, payment info, and member accounts across all divisions. Proactive threat monitoring and automated security patching included.</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front"><h3>Parse.ly Analytics</h3><p>Content intelligence, built in</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-back"><h3>For AIM</h3><p>See which Fine Woodworking articles drive subscriptions, which Kovels pages generate the most ad revenue, and how Writer's Digest content converts to course enrollments.</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front"><h3>Developer Experience</h3><p>Git-based, modern workflows</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-back"><h3>For AIM</h3><p>Your developers get Git-based deployments, staging environments, and CLI tools. Ship features across brands faster without risking production stability.</p></div>
+                </div>
+            </div>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front"><h3>Expert Support</h3><p>24/7 WordPress specialists</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-back"><h3>For AIM</h3><p>Not a generic helpdesk. Our support team includes engineers who've scaled enterprise media companies. They understand your editorial workflows and technical needs.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 10: Collaborative Editing -->
+    <div class="slide slide-dark" id="slide-10">
+        <div class="geo-pattern geo-circles"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Feature Spotlight</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">Collaborative Editing</h2>
+        <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 45vw; font-size: 1.05vw;">Multiple editors work on the same content simultaneously. Real-time presence, inline comments, and conflict-free collaboration across every AIM brand.</p>
+        <div class="editor-mockup animate-in delay-3" id="editorMockup">
+            <div class="editor-toolbar">
+                <div class="editor-dot editor-dot-red"></div>
+                <div class="editor-dot editor-dot-yellow"></div>
+                <div class="editor-dot editor-dot-green"></div>
+                <span class="editor-title">Fine Woodworking - "Dovetail Joinery Masterclass" - Draft</span>
+                <div class="avatar-bar">
+                    <div class="avatar" style="background: var(--vip-turquoise);" title="Sarah K.">SK</div>
+                    <div class="avatar" style="background: var(--vip-purple);" title="Mike R.">MR</div>
+                    <div class="avatar" style="background: var(--vip-orange);" title="Lisa T.">LT</div>
+                </div>
+            </div>
+            <div class="editor-body" id="editorBody">
+                <div class="editor-line">The art of dovetail joinery represents one of woodworking's most</div>
+                <div class="editor-line">enduring techniques. In this masterclass, we'll explore both<span class="cursor-indicator" style="background: var(--vip-turquoise);"></span><span class="cursor-label" style="background: var(--vip-turquoise);">Sarah K.</span></div>
+                <div class="editor-line">hand-cut and machine-cut approaches, helping you choose the</div>
+                <div class="editor-line">right method for<span class="cursor-indicator" style="background: var(--vip-purple);"></span><span class="cursor-label" style="background: var(--vip-purple);">Mike R.</span> your next project.</div>
+                <div class="editor-line" style="margin-top: 1.5vh;"><span style="color: var(--vip-gold); font-weight: 600;">Key Techniques Covered:</span></div>
+                <div class="editor-line">&bull; Through dovetails for drawer construction</div>
+                <div class="editor-line">&bull; Half-blind dovetails for case work</div>
+                <div class="editor-comment" id="editorComment" style="top: 2vh;">
+                    <div class="editor-comment-author">Lisa T.</div>
+                    <div class="editor-comment-text">Should we add a video embed for the hand-cut technique here? We have footage from the workshop.</div>
+                </div>
+                <div class="editor-status">
+                    <div class="status-dot"></div>
+                    <span class="status-text">3 editors active &bull; Auto-saving</span>
+                </div>
+                <div class="editor-interact-hint">Hover over avatars to see editors</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: MCP (Managed Cloud Platform) -->
+    <div class="slide slide-dark" id="slide-11">
+        <div class="geo-pattern geo-grid"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Feature Spotlight</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">Managed Cloud Platform</h2>
+        <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 45vw; font-size: 1.05vw;">Enterprise-grade infrastructure, fully managed. Your teams focus on content and revenue while we handle the complexity underneath.</p>
+        <div class="mcp-diagram animate-in delay-3" id="mcpDiagram">
+            <!-- Layer 1: Content -->
+            <div class="mcp-layer" id="mcp-content" style="top: 2%; background: rgba(216,164,95,0.08);" onclick="toggleMcpLayer(this)">
+                <div class="mcp-layer-title" style="color: var(--vip-gold);">Content Layer</div>
+                <div class="mcp-layer-desc">29+ AIM brand sites, editorial workflows, memberships, e-commerce</div>
+                <div class="mcp-layer-detail">
+                    <div class="mcp-layer-detail-grid">
+                        <div class="mcp-detail-item"><h4>Multisite</h4><p>Individual brand sites, shared infrastructure</p></div>
+                        <div class="mcp-detail-item"><h4>Block Editor</h4><p>Visual editing with brand-specific blocks</p></div>
+                        <div class="mcp-detail-item"><h4>Workflows</h4><p>Custom editorial approvals per division</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mcp-connector" style="top: 18%; height: 6%;"></div>
+            <!-- Layer 2: Application -->
+            <div class="mcp-layer" id="mcp-application" style="top: 25%; background: rgba(62,160,173,0.08);" onclick="toggleMcpLayer(this)">
+                <div class="mcp-layer-title" style="color: var(--vip-turquoise);">Application Layer</div>
+                <div class="mcp-layer-desc">PHP runtime, REST + GraphQL APIs, caching, plugin ecosystem</div>
+                <div class="mcp-layer-detail">
+                    <div class="mcp-layer-detail-grid">
+                        <div class="mcp-detail-item"><h4>APIs</h4><p>REST and GraphQL for headless front-ends</p></div>
+                        <div class="mcp-detail-item"><h4>Object Cache</h4><p>Redis-backed caching for sub-second responses</p></div>
+                        <div class="mcp-detail-item"><h4>Plugins</h4><p>Curated enterprise plugin ecosystem</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mcp-connector" style="top: 41%; height: 6%;"></div>
+            <!-- Layer 3: Platform -->
+            <div class="mcp-layer" id="mcp-platform" style="top: 48%; background: rgba(156,92,225,0.08);" onclick="toggleMcpLayer(this)">
+                <div class="mcp-layer-title" style="color: var(--vip-purple);">Platform Services</div>
+                <div class="mcp-layer-desc">Git deployments, staging environments, CLI tooling, CI/CD</div>
+                <div class="mcp-layer-detail">
+                    <div class="mcp-layer-detail-grid">
+                        <div class="mcp-detail-item"><h4>Git Deploy</h4><p>Push to deploy with automated builds</p></div>
+                        <div class="mcp-detail-item"><h4>Environments</h4><p>Dev, staging, and production per site</p></div>
+                        <div class="mcp-detail-item"><h4>VIP CLI</h4><p>Manage everything from the command line</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mcp-connector" style="top: 64%; height: 6%;"></div>
+            <!-- Layer 4: Infrastructure -->
+            <div class="mcp-layer" id="mcp-infra" style="top: 71%; background: rgba(251,144,47,0.08);" onclick="toggleMcpLayer(this)">
+                <div class="mcp-layer-title" style="color: var(--vip-orange);">Infrastructure</div>
+                <div class="mcp-layer-desc">Global CDN, auto-scaling, DDoS protection, SOC 2 + ISO 27001</div>
+                <div class="mcp-layer-detail">
+                    <div class="mcp-layer-detail-grid">
+                        <div class="mcp-detail-item"><h4>Global CDN</h4><p>Edge nodes on every continent</p></div>
+                        <div class="mcp-detail-item"><h4>Auto-Scale</h4><p>Handle traffic spikes automatically</p></div>
+                        <div class="mcp-detail-item"><h4>Security</h4><p>WAF, DDoS protection, automated patching</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mcp-interact-hint">Click each layer to explore</div>
+        </div>
+    </div>
+
+    <!-- SLIDE 12: Global CDN (interactive map) -->
+    <div class="slide slide-dark" id="slide-12">
+        <div class="geo-pattern geo-circles"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Feature Spotlight</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">Global Edge Network</h2>
+        <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 45vw; font-size: 1.05vw;">Content delivered from the edge closest to your readers. Sub-second page loads for AIM's 40M+ audience across 85 countries.</p>
+        <div class="cdn-map animate-in delay-3" id="cdnMap">
+            <!-- Simplified world outline via CSS -->
+            <svg class="cdn-world" viewBox="0 0 1000 500" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.5">
+                <ellipse cx="500" cy="250" rx="450" ry="220"/>
+                <line x1="50" y1="250" x2="950" y2="250"/>
+                <line x1="500" y1="30" x2="500" y2="470"/>
+                <ellipse cx="500" cy="250" rx="150" ry="220"/>
+                <ellipse cx="500" cy="250" rx="300" ry="220"/>
+            </svg>
+            <!-- CDN Nodes -->
+            <div class="cdn-node" style="top: 25%; left: 22%;" data-region="North America" data-latency="12ms" data-pop="8 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">North America</div><div class="cdn-tooltip-stat">8 PoPs &bull; 12ms avg</div></div>
+            </div>
+            <div class="cdn-node" style="top: 55%; left: 18%;" data-region="South America" data-latency="38ms" data-pop="3 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">South America</div><div class="cdn-tooltip-stat">3 PoPs &bull; 38ms avg</div></div>
+            </div>
+            <div class="cdn-node" style="top: 22%; left: 48%;" data-region="Europe" data-latency="18ms" data-pop="6 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">Europe</div><div class="cdn-tooltip-stat">6 PoPs &bull; 18ms avg</div></div>
+            </div>
+            <div class="cdn-node" style="top: 42%; left: 55%;" data-region="Middle East" data-latency="32ms" data-pop="2 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">Middle East</div><div class="cdn-tooltip-stat">2 PoPs &bull; 32ms avg</div></div>
+            </div>
+            <div class="cdn-node" style="top: 30%; left: 72%;" data-region="Asia Pacific" data-latency="24ms" data-pop="5 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">Asia Pacific</div><div class="cdn-tooltip-stat">5 PoPs &bull; 24ms avg</div></div>
+            </div>
+            <div class="cdn-node" style="top: 65%; left: 78%;" data-region="Australia" data-latency="28ms" data-pop="2 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">Australia</div><div class="cdn-tooltip-stat">2 PoPs &bull; 28ms avg</div></div>
+            </div>
+            <div class="cdn-node" style="top: 50%; left: 42%;" data-region="Africa" data-latency="45ms" data-pop="2 PoPs">
+                <div class="cdn-node-dot"></div>
+                <div class="cdn-tooltip"><div class="cdn-tooltip-title">Africa</div><div class="cdn-tooltip-stat">2 PoPs &bull; 45ms avg</div></div>
+            </div>
+            <!-- Stats panel -->
+            <div class="cdn-stats-panel" id="cdnStatsPanel">
+                <div class="cdn-stats-title">Network Overview</div>
+                <div class="cdn-stat-row"><span class="cdn-stat-label">Points of Presence</span><span class="cdn-stat-value">28</span></div>
+                <div class="cdn-stat-row"><span class="cdn-stat-label">Avg Latency</span><span class="cdn-stat-value">22ms</span></div>
+                <div class="cdn-stat-row"><span class="cdn-stat-label">Cache Hit Rate</span><span class="cdn-stat-value">98.7%</span></div>
+                <div class="cdn-stat-bar"><div class="cdn-stat-fill" style="width: 0%; background: var(--vip-turquoise);" data-target="98.7"></div></div>
+                <div class="cdn-stat-row" style="margin-top: 0.5vh;"><span class="cdn-stat-label">Uptime SLA</span><span class="cdn-stat-value">99.99%</span></div>
+                <div class="cdn-stat-bar"><div class="cdn-stat-fill" style="width: 0%; background: var(--vip-gold);" data-target="99.99"></div></div>
+            </div>
+            <div class="cdn-legend">
+                <div class="cdn-legend-item"><div class="cdn-legend-dot" style="background: var(--vip-turquoise);"></div>Edge Node</div>
+                <div class="cdn-legend-item"><div class="cdn-legend-dot" style="background: var(--vip-gold);"></div>Selected</div>
+            </div>
+            <div class="cdn-interact-hint">Click nodes to explore</div>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: Parse.ly Analytics (interactive dashboard) -->
+    <div class="slide slide-dark" id="slide-13">
+        <div class="geo-pattern geo-grid"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-turquoise);">Feature Spotlight</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">Parse.ly Content Analytics</h2>
+        <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 45vw; font-size: 1.05vw;">Real-time content intelligence included with every VIP plan. See what's working across all AIM brands in one dashboard.</p>
+        <div class="parsely-dash animate-in delay-3" id="parselyDash">
+            <div class="parsely-header">
+                <div class="parsely-logo">Parse.ly</div>
+                <div class="parsely-tabs">
+                    <button class="parsely-tab active" data-parsely-view="overview">Overview</button>
+                    <button class="parsely-tab" data-parsely-view="brands">By Brand</button>
+                    <button class="parsely-tab" data-parsely-view="content">Top Content</button>
+                </div>
+            </div>
+            <div class="parsely-body" id="parselyBody">
+                <!-- Left: Chart -->
+                <div class="parsely-chart" id="parselyChartArea">
+                    <div class="parsely-chart-title">Pageviews by Division (Last 30 Days)</div>
+                    <div class="parsely-bar-chart" id="parselyBarChart">
+                        <div class="parsely-bar-col">
+                            <div class="parsely-bar" style="height: 0%; background: var(--vip-gold);" data-target-height="75" data-value="2.4M"><span class="parsely-bar-value">2.4M</span></div>
+                            <div class="parsely-bar-label">Home Arts</div>
+                        </div>
+                        <div class="parsely-bar-col">
+                            <div class="parsely-bar" style="height: 0%; background: var(--vip-turquoise);" data-target-height="60" data-value="1.8M"><span class="parsely-bar-value">1.8M</span></div>
+                            <div class="parsely-bar-label">Collectibles</div>
+                        </div>
+                        <div class="parsely-bar-col">
+                            <div class="parsely-bar" style="height: 0%; background: var(--vip-purple);" data-target-height="55" data-value="1.6M"><span class="parsely-bar-value">1.6M</span></div>
+                            <div class="parsely-bar-label">Home Bldg</div>
+                        </div>
+                        <div class="parsely-bar-col">
+                            <div class="parsely-bar" style="height: 0%; background: var(--vip-orange);" data-target-height="85" data-value="3.1M"><span class="parsely-bar-value">3.1M</span></div>
+                            <div class="parsely-bar-label">Writer's Digest</div>
+                        </div>
+                    </div>
+                    <div class="parsely-interact-hint">Hover bars for details</div>
+                </div>
+                <!-- Right: Metrics -->
+                <div class="parsely-chart">
+                    <div class="parsely-chart-title">Key Metrics</div>
+                    <div class="parsely-metric-grid">
+                        <div class="parsely-metric" id="metricViews">
+                            <div class="parsely-metric-value" data-count-to="8.9" data-suffix="M">0</div>
+                            <div class="parsely-metric-label">Total Pageviews</div>
+                            <div class="parsely-metric-change parsely-up">+12.3% vs last month</div>
+                        </div>
+                        <div class="parsely-metric" id="metricEngaged">
+                            <div class="parsely-metric-value" data-count-to="4.2" data-suffix="min">0</div>
+                            <div class="parsely-metric-label">Avg Engaged Time</div>
+                            <div class="parsely-metric-change parsely-up">+8.1% vs last month</div>
+                        </div>
+                        <div class="parsely-metric" id="metricConversion">
+                            <div class="parsely-metric-value" data-count-to="3.4" data-suffix="%">0</div>
+                            <div class="parsely-metric-label">Sub Conversion</div>
+                            <div class="parsely-metric-change parsely-up">+1.2% vs last month</div>
+                        </div>
+                        <div class="parsely-metric" id="metricSocial">
+                            <div class="parsely-metric-value" data-count-to="142" data-suffix="K">0</div>
+                            <div class="parsely-metric-label">Social Referrals</div>
+                            <div class="parsely-metric-change parsely-up">+18.7% vs last month</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 14: Social Proof -->
+    <div class="slide slide-turquoise-accent" id="slide-14">
+        <div class="geo-pattern geo-lines"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-turquoise-light);">Proven at Scale</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">Trusted by Leading Media Brands</h2>
+        <div class="gold-line animate-in delay-2"></div>
+        <div style="position: relative; padding-left: 3vw; margin: 2vh 0;" class="animate-in delay-3">
+            <span style="position: absolute; left: 0; top: -0.5vh; font-size: 4vw; color: var(--vip-gold); font-family: Georgia, serif; line-height: 1;">"</span>
+            <p style="font-size: 1.6vw; font-style: italic; line-height: 1.4; max-width: 55vw;">Enterprise media companies choose WordPress VIP because it's the only platform that combines the flexibility of open source with the reliability, security, and support of a true enterprise partner.</p>
+            <!-- PLACEHOLDER: Replace with AIM-specific or industry-specific testimonial if available -->
+        </div>
+        <div class="stats-row animate-in delay-4" style="margin-top: 2vh;">
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">99.99%</span>
+                <span class="stat-label">Uptime SLA</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">SOC 2</span>
+                <span class="stat-label">Type II Certified</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">ISO</span>
+                <span class="stat-label">27001 Certified</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">24/7</span>
+                <span class="stat-label">Expert Support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 15: Why VIP -->
+    <div class="slide slide-dark" id="slide-15">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tr"></div>
+        <div class="corner-accent corner-bl"></div>
+        <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Why VIP</span>
+        <h2 class="animate-in delay-1" style="margin-top: 1vh;">The Right Platform for AIM's Next Chapter</h2>
+        <div class="gold-line animate-in delay-2"></div>
+        <div class="card-grid card-grid-2 animate-in delay-3" style="margin-top: 1.5vh;">
+            <div class="card">
+                <h3>Open Source Foundation</h3>
+                <p>WordPress powers 43% of the web. Your teams already know it. No vendor lock-in, massive ecosystem, and a global talent pool.</p>
+            </div>
+            <div class="card">
+                <h3>Enterprise Without the Overhead</h3>
+                <p>Fully managed infrastructure means your teams focus on content and revenue, not servers, security patches, and uptime monitoring.</p>
+            </div>
+            <div class="card">
+                <h3>Built for Acquisitions</h3>
+                <p>After Taunton Press and Kovels, AIM needs a platform that makes integration seamless. VIP multisite was designed for onboarding new brands fast.</p>
+            </div>
+            <div class="card">
+                <h3>Content Analytics Included</h3>
+                <p>Parse.ly comes with every VIP plan. Understand content performance across all 29+ brands, driving smarter editorial and monetization decisions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 16: CTA with Calendar -->
+    <div class="slide slide-dark" id="slide-16">
+        <div class="geo-pattern geo-circles"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-tr"></div>
+        <div class="corner-accent corner-bl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="cta-section">
+            <div class="vip-logo vip-logo-large animate-in delay-1" style="display: inline-block;">
                 <span class="logo-wp">WordPress</span> <span class="logo-vip">VIP</span>
             </div>
-            <div class="gold-line animate-in delay-2"></div>
-            <h1 class="animate-in delay-2" style="font-size: 3.8vw;">Active Interest Media</h1>
-            <p class="animate-in delay-3" style="font-size: 1.6vw; color: var(--vip-gray); margin-bottom: 1vh;">Enterprise Content Platform Partnership</p>
-            <div class="gold-line gold-line-wide animate-in delay-4"></div>
-            <p class="animate-in delay-5" style="font-size: 1vw; color: var(--vip-gray); margin-top: 2vh;">February 2026</p>
-        </div>
-
-        <!-- SLIDE 2: Agenda -->
-        <div class="slide slide-dark" id="slide-2">
-            <div class="geo-pattern geo-circles"></div>
-            <div class="vip-logo animate-in delay-1">
-                <span class="logo-wp">WordPress</span> <span class="logo-vip">VIP</span>
-            </div>
-            <h2 class="animate-in delay-1">Today's Conversation</h2>
-            <div class="gold-line animate-in delay-2"></div>
-            <div class="card-grid card-grid-2 animate-in delay-3" style="margin-top: 2vh;">
-                <div class="card">
-                    <div class="card-icon">01</div>
-                    <h3>Your World</h3>
-                    <p>Understanding AIM's portfolio, audience, and ambitions across 29+ brands</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">02</div>
-                    <h3>Division Spotlights</h3>
-                    <p>Home Arts, Collectibles, Home Building, and Writer's Digest, each with unique potential</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">03</div>
-                    <h3>The Opportunity</h3>
-                    <p>How a unified enterprise platform accelerates your digital transformation</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">04</div>
-                    <h3>Next Steps</h3>
-                    <p>A clear path forward to modernize your content infrastructure</p>
-                </div>
+            <h1 class="animate-in delay-2" style="font-size: 3vw; margin-top: 1vh;">Let's Build AIM's Future Together</h1>
+            <p class="animate-in delay-3" style="font-size: 1.2vw;">Book time to continue the conversation. We'll dive deeper into your technical requirements, migration path, and timeline.</p>
+            <div class="calendar-container animate-in delay-4">
+                <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border: 0" width="100%" height="100%" frameborder="0"></iframe>
             </div>
         </div>
-
-        <!-- SLIDE 3: Understanding AIM -->
-        <div class="slide slide-dark" id="slide-3">
-            <div class="geo-pattern geo-grid"></div>
-            <div class="corner-accent corner-tr"></div>
-            <div class="corner-accent corner-bl"></div>
-            <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Your World</span>
-            <h2 class="animate-in delay-1" style="margin-top: 1vh;">The AIM Media Universe</h2>
-            <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 50vw; margin-bottom: 2vh;">
-                From Fine Woodworking to Writer's Digest, AIM inspires tens of millions of enthusiasts worldwide. After the Taunton Press acquisition, the portfolio has never been larger, or more complex to manage.
-            </p>
-            <div class="stats-row animate-in delay-3">
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3.8vw;">29+</span>
-                    <span class="stat-label">Brands</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3.8vw;">40M+</span>
-                    <span class="stat-label">Global Audience</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3.8vw;">85</span>
-                    <span class="stat-label">Countries</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3.8vw;">4</span>
-                    <span class="stat-label">Divisions</span>
-                </div>
-            </div>
-            <div class="gold-line gold-line-wide animate-in delay-4" style="margin-top: 3vh;"></div>
-            <p class="animate-in delay-5" style="font-size: 1vw; color: var(--vip-gray);">Media, events, e-commerce, online education, podcasts, TV, and marketing services</p>
-        </div>
-
-        <!-- SLIDE 4: Home Arts Division -->
-        <div class="slide slide-dark" id="slide-4">
-            <div class="geo-pattern geo-moire"></div>
-            <div class="division-badge animate-in delay-1">Home Arts</div>
-            <div class="division-header animate-in delay-2">
-                <div class="division-icon-large bg-gold-subtle"><span style="font-size: 2vw;">&#9998;</span></div>
-                <div>
-                    <h2 style="margin-bottom: 0.3vh;">Home Arts</h2>
-                    <p style="color: var(--vip-gray); font-size: 1.1vw;">Where craftsmanship meets content mastery</p>
-                </div>
-            </div>
-            <div class="two-col animate-in delay-3">
-                <div>
-                    <h3 style="color: var(--vip-gold); font-size: 1.2vw; margin-bottom: 1.5vh;">The Portfolio</h3>
-                    <div class="brand-mini-grid">
-                        <div class="brand-mini-item">Fine Woodworking</div>
-                        <div class="brand-mini-item">Fine Gardening</div>
-                        <div class="brand-mini-item">Popular Woodworking</div>
-                        <div class="brand-mini-item">Threads</div>
-                        <div class="brand-mini-item">Garden Gate</div>
-                        <div class="brand-mini-item">Woodsmith</div>
-                        <div class="brand-mini-item">Horticulture</div>
-                        <div class="brand-mini-item">Cuisine at Home</div>
-                        <div class="brand-mini-item">ShopNotes</div>
-                    </div>
-                </div>
-                <div>
-                    <h3 style="color: var(--vip-gold); font-size: 1.2vw; margin-bottom: 1.5vh;">The Opportunity</h3>
-                    <ul class="feature-list">
-                        <li>Unified platform for 9+ brands, each with distinct audiences and monetization</li>
-                        <li>Integrated e-commerce for plans, patterns, and project kits</li>
-                        <li>Video-rich instructional content at scale with enterprise-grade delivery</li>
-                        <li>Post-Taunton integration demands a modern, flexible CMS foundation</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 5: Collectibles Division -->
-        <div class="slide slide-gradient" id="slide-5">
-            <div class="geo-pattern geo-circles"></div>
-            <div class="division-badge animate-in delay-1">Collectibles</div>
-            <div class="division-header animate-in delay-2">
-                <div class="division-icon-large bg-turquoise-subtle"><span style="font-size: 2vw;">&#9733;</span></div>
-                <div>
-                    <h2 style="margin-bottom: 0.3vh;">Collectibles</h2>
-                    <p style="color: var(--vip-gray); font-size: 1.1vw;">The trusted authority for collectors worldwide</p>
-                </div>
-            </div>
-            <div class="two-col animate-in delay-3">
-                <div>
-                    <h3 style="color: var(--vip-turquoise); font-size: 1.2vw; margin-bottom: 1.5vh;">The Portfolio</h3>
-                    <div class="brand-mini-grid" style="grid-template-columns: repeat(2, 1fr);">
-                        <div class="brand-mini-item">Antique Trader</div>
-                        <div class="brand-mini-item">Kovels</div>
-                        <div class="brand-mini-item">Sports Collectors Digest</div>
-                        <div class="brand-mini-item">Military Trader</div>
-                        <div class="brand-mini-item">Numismatics</div>
-                        <div class="brand-mini-item">Old Cars</div>
-                    </div>
-                </div>
-                <div>
-                    <h3 style="color: var(--vip-turquoise); font-size: 1.2vw; margin-bottom: 1.5vh;">The Opportunity</h3>
-                    <ul class="feature-list">
-                        <li>Database-driven content: price guides, valuations, and marketplace listings demand dynamic publishing</li>
-                        <li>SEO at scale across niche verticals, each competing for high-intent search traffic</li>
-                        <li>Community features and member-gated content to grow subscriber revenue</li>
-                        <li>Real-time content for market trends, auction results, and collecting news</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 6: Home Building Division -->
-        <div class="slide slide-dark" id="slide-6">
-            <div class="geo-pattern geo-grid"></div>
-            <div class="division-badge animate-in delay-1">Home Building</div>
-            <div class="division-header animate-in delay-2">
-                <div class="division-icon-large bg-purple-subtle"><span style="font-size: 2vw;">&#9962;</span></div>
-                <div>
-                    <h2 style="margin-bottom: 0.3vh;">Home Building</h2>
-                    <p style="color: var(--vip-gray); font-size: 1.1vw;">From heritage restoration to modern builds</p>
-                </div>
-            </div>
-            <div class="two-col animate-in delay-3">
-                <div>
-                    <h3 style="color: var(--vip-purple); font-size: 1.2vw; margin-bottom: 1.5vh;">The Portfolio</h3>
-                    <div class="brand-mini-grid" style="grid-template-columns: repeat(2, 1fr);">
-                        <div class="brand-mini-item">Fine Homebuilding</div>
-                        <div class="brand-mini-item">Old House Journal</div>
-                        <div class="brand-mini-item">Log &amp; Timber Home Living</div>
-                        <div class="brand-mini-item">Cabin Life</div>
-                        <div class="brand-mini-item">Arts &amp; Crafts Home</div>
-                        <div class="brand-mini-item">Traditional Building</div>
-                    </div>
-                </div>
-                <div>
-                    <h3 style="color: var(--vip-purple); font-size: 1.2vw; margin-bottom: 1.5vh;">The Opportunity</h3>
-                    <ul class="feature-list">
-                        <li>B2B and B2C audiences in one ecosystem, professionals and homeowners alike</li>
-                        <li>Rich media galleries, project plans, and interactive how-to content</li>
-                        <li>Lead generation for advertisers and sponsors needs reliable, fast infrastructure</li>
-                        <li>Trade events and digital marketing services powered by a unified content hub</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 7: Writer's Digest Division -->
-        <div class="slide slide-gradient" id="slide-7">
-            <div class="geo-pattern geo-lines"></div>
-            <div class="corner-accent corner-tl"></div>
-            <div class="corner-accent corner-br"></div>
-            <div class="division-badge animate-in delay-1">Writer's Digest</div>
-            <div class="division-header animate-in delay-2">
-                <div class="division-icon-large bg-orange-subtle"><span style="font-size: 2vw;">&#9997;</span></div>
-                <div>
-                    <h2 style="margin-bottom: 0.3vh;">Writer's Digest</h2>
-                    <p style="color: var(--vip-gray); font-size: 1.1vw;">The most trusted name in writing since 1920</p>
-                </div>
-            </div>
-            <div class="two-col animate-in delay-3">
-                <div>
-                    <h3 style="color: var(--vip-orange); font-size: 1.2vw; margin-bottom: 1.5vh;">The Ecosystem</h3>
-                    <ul class="feature-list">
-                        <li>100+ years of editorial authority and brand equity</li>
-                        <li>Writer's Digest University with on-demand and instructor-led courses</li>
-                        <li>VIP Membership: archive of 1,000+ issues, 400+ video tutorials</li>
-                        <li>Annual competitions, conferences, and community events</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 style="color: var(--vip-orange); font-size: 1.2vw; margin-bottom: 1.5vh;">The Opportunity</h3>
-                    <ul class="feature-list">
-                        <li>Membership and subscription management at enterprise scale</li>
-                        <li>Integrated learning management alongside editorial content</li>
-                        <li>Seamless e-commerce for courses, workshops, and competition entries</li>
-                        <li>A platform worthy of a century-old legacy: fast, secure, always available</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 8: The Challenge -->
-        <div class="slide slide-dark" id="slide-8">
-            <div class="geo-pattern geo-moire"></div>
-            <span class="caption animate-in delay-1" style="color: var(--vip-turquoise);">The Challenge</span>
-            <h2 class="animate-in delay-1" style="margin-top: 1vh;">Scale Creates Complexity</h2>
-            <div class="gold-line animate-in delay-2"></div>
-            <div class="vs-layout animate-in delay-3">
-                <div class="vs-column">
-                    <h3 style="color: var(--vip-red);">Current Reality</h3>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span>
-                        <span>Multiple technology stacks across brands creates maintenance overhead and inconsistent experiences</span>
-                    </div>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span>
-                        <span>Post-acquisition integration of Taunton Press infrastructure adds technical debt</span>
-                    </div>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span>
-                        <span>Scaling digital products, memberships, and e-commerce on fragmented systems</span>
-                    </div>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span>
-                        <span>Limited ability to share content, audiences, and learnings across divisions</span>
-                    </div>
-                </div>
-                <div class="vs-divider"></div>
-                <div class="vs-column">
-                    <h3 style="color: var(--vip-turquoise);">What's Possible</h3>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span>
-                        <span>One enterprise platform powering all 29+ brands with shared infrastructure</span>
-                    </div>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span>
-                        <span>Streamlined migration path that preserves SEO equity and editorial workflows</span>
-                    </div>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span>
-                        <span>Native support for memberships, e-commerce, and digital learning at scale</span>
-                    </div>
-                    <div class="vs-item">
-                        <span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span>
-                        <span>Cross-brand content syndication, unified analytics, and audience insights</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 9: WordPress VIP Solution -->
-        <div class="slide slide-light" id="slide-9">
-            <span class="caption animate-in delay-1 gold-accent" style="color: var(--vip-gold-text);">The Solution</span>
-            <h2 class="animate-in delay-1" style="margin-top: 1vh;">WordPress VIP for AIM</h2>
-            <div class="gold-line animate-in delay-2"></div>
-            <p class="animate-in delay-2" style="color: #555; max-width: 48vw; margin-bottom: 1.5vh;">
-                A single enterprise content platform built for exactly this: powering complex multi-brand media organizations at global scale.
-            </p>
-            <div class="card-grid card-grid-3 animate-in delay-3">
-                <div class="card">
-                    <div class="pillar-icon pillar-icon-gold">&#9881;</div>
-                    <h3>Multisite at Scale</h3>
-                    <p>Run all 29+ brands on one WordPress multisite, each with its own identity, editorial team, and monetization model.</p>
-                </div>
-                <div class="card">
-                    <div class="pillar-icon pillar-icon-gold">&#9889;</div>
-                    <h3>Performance</h3>
-                    <p>Global edge caching and CDN ensure every page loads fast for readers in all 85 countries. 99.99% uptime SLA.</p>
-                </div>
-                <div class="card">
-                    <div class="pillar-icon pillar-icon-gold">&#128274;</div>
-                    <h3>Enterprise Security</h3>
-                    <p>SOC 2 Type II and ISO 27001 certified. Proactive threat monitoring protects your brands and your audience data.</p>
-                </div>
-                <div class="card">
-                    <div class="pillar-icon pillar-icon-gold">&#128200;</div>
-                    <h3>Parse.ly Analytics</h3>
-                    <p>Content analytics built in. Understand what resonates across every division and optimize for engagement and revenue.</p>
-                </div>
-                <div class="card">
-                    <div class="pillar-icon pillar-icon-gold">&#128640;</div>
-                    <h3>Developer Experience</h3>
-                    <p>Modern development workflows with Git-based deployments, staging environments, and an ecosystem of enterprise plugins.</p>
-                </div>
-                <div class="card">
-                    <div class="pillar-icon pillar-icon-gold">&#128101;</div>
-                    <h3>Expert Support</h3>
-                    <p>24/7 access to WordPress experts who understand enterprise media. Hands-on support, not just a ticket queue.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 10: Platform Capabilities -->
-        <div class="slide slide-dark" id="slide-10">
-            <div class="geo-pattern geo-grid"></div>
-            <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Platform</span>
-            <h2 class="animate-in delay-1" style="margin-top: 1vh;">Built for Media Companies Like AIM</h2>
-            <div class="gold-line animate-in delay-2"></div>
-            <div class="capability-grid animate-in delay-3">
-                <div class="capability-item">
-                    <div class="cap-icon">&#128240;</div>
-                    <h3>Editorial Workflows</h3>
-                    <p>Custom roles, approval flows, and scheduling across distributed teams and divisions</p>
-                </div>
-                <div class="capability-item">
-                    <div class="cap-icon">&#127760;</div>
-                    <h3>Multi-Brand Network</h3>
-                    <p>WordPress multisite with shared users, cross-brand content syndication, and unified admin</p>
-                </div>
-                <div class="capability-item">
-                    <div class="cap-icon">&#128176;</div>
-                    <h3>Commerce + Memberships</h3>
-                    <p>Subscriptions, paywalls, digital product sales, and member-gated content natively supported</p>
-                </div>
-                <div class="capability-item">
-                    <div class="cap-icon">&#128187;</div>
-                    <h3>Headless + Decoupled</h3>
-                    <p>REST and GraphQL APIs power custom front-ends, apps, and third-party integrations</p>
-                </div>
-                <div class="capability-item">
-                    <div class="cap-icon">&#128270;</div>
-                    <h3>SEO + Performance</h3>
-                    <p>Enterprise search optimization, structured data, and sub-second page loads at global scale</p>
-                </div>
-                <div class="capability-item">
-                    <div class="cap-icon">&#128218;</div>
-                    <h3>Learning + Video</h3>
-                    <p>Integrate online courses, video libraries, and educational content alongside editorial</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 11: Social Proof / Case Study -->
-        <div class="slide slide-turquoise-accent" id="slide-11">
-            <div class="geo-pattern geo-lines"></div>
-            <span class="caption animate-in delay-1" style="color: var(--vip-turquoise-light);">Proven at Scale</span>
-            <h2 class="animate-in delay-1" style="margin-top: 1vh;">Trusted by the World's Leading Media Brands</h2>
-            <div class="gold-line animate-in delay-2"></div>
-            <div class="quote-block animate-in delay-3">
-                <p class="quote-text">Enterprise media companies choose WordPress VIP because it's the only platform that combines the flexibility of open source with the reliability, security, and support of a true enterprise partner.</p>
-                <!-- PLACEHOLDER: Replace with AIM-specific or industry-specific testimonial if available -->
-            </div>
-            <div class="stats-row animate-in delay-4" style="margin-top: 1vh;">
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">99.99%</span>
-                    <span class="stat-label">Uptime SLA</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">SOC 2</span>
-                    <span class="stat-label">Type II Certified</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">ISO</span>
-                    <span class="stat-label">27001 Certified</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">24/7</span>
-                    <span class="stat-label">Expert Support</span>
-                </div>
-            </div>
-            <p class="animate-in delay-5" style="font-size: 0.95vw; color: var(--vip-turquoise-light); margin-top: 2vh; opacity: 0.7;">
-                <!-- PLACEHOLDER: Add specific media company case studies relevant to AIM's profile -->
-                Powering enterprise media, publishing, and content organizations worldwide
-            </p>
-        </div>
-
-        <!-- SLIDE 12: Why WordPress VIP -->
-        <div class="slide slide-dark" id="slide-12">
-            <div class="geo-pattern geo-moire"></div>
-            <div class="corner-accent corner-tr"></div>
-            <div class="corner-accent corner-bl"></div>
-            <span class="caption animate-in delay-1" style="color: var(--vip-gold);">Why VIP</span>
-            <h2 class="animate-in delay-1" style="margin-top: 1vh;">The Right Platform for AIM's Next Chapter</h2>
-            <div class="gold-line animate-in delay-2"></div>
-            <div class="card-grid card-grid-2 animate-in delay-3" style="margin-top: 1.5vh;">
-                <div class="card">
-                    <h3 style="color: var(--vip-gold);">Open Source Foundation</h3>
-                    <p>WordPress powers 43% of the web. Your teams already know it. No vendor lock-in, massive ecosystem of plugins and integrations, and a global talent pool.</p>
-                </div>
-                <div class="card">
-                    <h3 style="color: var(--vip-gold);">Enterprise Without the Overhead</h3>
-                    <p>Fully managed infrastructure means your teams focus on content and revenue, not servers, security patches, and uptime monitoring.</p>
-                </div>
-                <div class="card">
-                    <h3 style="color: var(--vip-gold);">Built for Acquisitions</h3>
-                    <p>After Taunton Press and Kovels, AIM needs a platform that makes integration seamless. VIP multisite was designed for exactly this: onboarding new brands fast.</p>
-                </div>
-                <div class="card">
-                    <h3 style="color: var(--vip-gold);">Content Analytics Included</h3>
-                    <p>Parse.ly comes with every VIP plan. Understand content performance across all 29+ brands in one dashboard, driving smarter editorial and monetization decisions.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 13: Next Steps / CTA -->
-        <div class="slide slide-dark" id="slide-13">
-            <div class="geo-pattern geo-circles"></div>
-            <div class="corner-accent corner-tl"></div>
-            <div class="corner-accent corner-tr"></div>
-            <div class="corner-accent corner-bl"></div>
-            <div class="corner-accent corner-br"></div>
-            <div class="cta-section">
-                <div class="vip-logo vip-logo-large animate-in delay-1" style="display: inline-block;">
-                    <span class="logo-wp">WordPress</span> <span class="logo-vip">VIP</span>
-                </div>
-                <h1 class="animate-in delay-2" style="font-size: 3vw; margin-top: 1vh;">Let's Build AIM's Future Together</h1>
-                <p class="animate-in delay-3" style="font-size: 1.2vw;">Book time to continue the conversation. We'll dive deeper into your technical requirements, migration path, and timeline.</p>
-                <div class="calendar-container animate-in delay-4">
-                    <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border: 0" width="100%" height="100%" frameborder="0"></iframe>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Navigation Controls -->
-    <div class="nav-controls" id="navControls">
-        <button class="nav-btn" id="prevBtn" aria-label="Previous slide">&#8592;</button>
-        <span class="slide-counter" id="slideCounter" title="Press Escape for overview">1 / 13</span>
-        <button class="nav-btn" id="nextBtn" aria-label="Next slide">&#8594;</button>
-    </div>
+</div>
 
-    <!-- Overview Mode -->
-    <div class="overview-overlay" id="overviewOverlay">
-        <div class="overview-close" id="overviewClose">&#x2715;</div>
-        <div class="overview-grid" id="overviewGrid"></div>
-    </div>
+<!-- Navigation -->
+<div class="nav-controls" id="navControls">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous slide">&#8592;</button>
+    <span class="slide-counter" id="slideCounter" title="Press Escape for overview">1 / 16</span>
+    <button class="nav-btn" id="nextBtn" aria-label="Next slide">&#8594;</button>
+</div>
 
-    <script>
-        (function() {
-            const slides = document.querySelectorAll('.slide');
-            const totalSlides = slides.length;
-            let currentSlide = 0;
-            let overviewOpen = false;
+<!-- Overview -->
+<div class="overview-overlay" id="overviewOverlay">
+    <div class="overview-close" id="overviewClose">&#x2715;</div>
+    <div class="overview-grid" id="overviewGrid"></div>
+</div>
 
-            const progressBar = document.getElementById('progressBar');
-            const slideCounter = document.getElementById('slideCounter');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const overviewOverlay = document.getElementById('overviewOverlay');
-            const overviewGrid = document.getElementById('overviewGrid');
-            const overviewClose = document.getElementById('overviewClose');
+<script>
+(function() {
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let overviewOpen = false;
 
-            // Slide titles for overview
-            const slideTitles = [
-                'Active Interest Media',
-                'Today\'s Conversation',
-                'The AIM Media Universe',
-                'Home Arts',
-                'Collectibles',
-                'Home Building',
-                'Writer\'s Digest',
-                'Scale Creates Complexity',
-                'WordPress VIP for AIM',
-                'Platform Capabilities',
-                'Proven at Scale',
-                'Why WordPress VIP',
-                'Book a Meeting'
-            ];
+    const progressBar = document.getElementById('progressBar');
+    const slideCounter = document.getElementById('slideCounter');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const overviewOverlay = document.getElementById('overviewOverlay');
+    const overviewGrid = document.getElementById('overviewGrid');
+    const overviewClose = document.getElementById('overviewClose');
 
-            function goToSlide(index) {
-                if (index < 0 || index >= totalSlides) return;
-                slides[currentSlide].classList.remove('active');
-                currentSlide = index;
-                slides[currentSlide].classList.add('active');
-                updateUI();
-            }
+    const slideTitles = [
+        'Active Interest Media', "Today's Conversation", 'The AIM Media Universe',
+        'Home Arts', 'Collectibles', 'Home Building', "Writer's Digest",
+        'Scale Creates Complexity', 'WordPress VIP for AIM',
+        'Collaborative Editing', 'Managed Cloud Platform', 'Global Edge Network',
+        'Parse.ly Analytics', 'Proven at Scale', 'Why WordPress VIP', 'Book a Meeting'
+    ];
 
-            function nextSlide() {
-                if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
-            }
+    function goToSlide(index) {
+        if (index < 0 || index >= totalSlides) return;
+        slides[currentSlide].classList.remove('active');
+        currentSlide = index;
+        slides[currentSlide].classList.add('active');
+        updateUI();
+        onSlideEnter(index);
+    }
 
-            function prevSlide() {
-                if (currentSlide > 0) goToSlide(currentSlide - 1);
-            }
+    function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
 
-            function updateUI() {
-                const progress = ((currentSlide + 1) / totalSlides) * 100;
-                progressBar.style.width = progress + '%';
-                slideCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    function updateUI() {
+        progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+        slideCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+        document.querySelectorAll('.overview-thumb').forEach((t, i) => t.classList.toggle('current', i === currentSlide));
+    }
 
-                // Update overview current indicator
-                document.querySelectorAll('.overview-thumb').forEach((thumb, i) => {
-                    thumb.classList.toggle('current', i === currentSlide);
-                });
-            }
+    function toggleOverview() { overviewOpen = !overviewOpen; overviewOverlay.classList.toggle('active', overviewOpen); }
+    function closeOverview() { overviewOpen = false; overviewOverlay.classList.remove('active'); }
 
-            function toggleOverview() {
-                overviewOpen = !overviewOpen;
-                overviewOverlay.classList.toggle('active', overviewOpen);
-            }
+    function buildOverview() {
+        overviewGrid.innerHTML = '';
+        slideTitles.forEach((title, i) => {
+            const thumb = document.createElement('div');
+            thumb.className = 'overview-thumb' + (i === currentSlide ? ' current' : '');
+            thumb.style.background = i === 8 ? 'var(--vip-white)' : i === 13 ? 'var(--vip-turquoise-dark)' : 'var(--vip-black)';
+            const tc = i === 8 ? 'var(--vip-black)' : '#fff';
+            thumb.innerHTML = '<div class="overview-thumb-content"><span class="overview-thumb-title" style="color:' + tc + '">' + title + '</span></div><span class="overview-thumb-number">' + (i+1) + '</span>';
+            thumb.addEventListener('click', () => { goToSlide(i); closeOverview(); });
+            overviewGrid.appendChild(thumb);
+        });
+    }
 
-            function closeOverview() {
-                overviewOpen = false;
-                overviewOverlay.classList.remove('active');
-            }
+    // Keyboard
+    document.addEventListener('keydown', function(e) {
+        if (overviewOpen) { if (e.key === 'Escape') closeOverview(); return; }
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        else if (e.key === 'Escape') { buildOverview(); toggleOverview(); }
+    });
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+    slideCounter.addEventListener('click', () => { buildOverview(); toggleOverview(); });
+    overviewClose.addEventListener('click', closeOverview);
 
-            // Build overview grid
-            function buildOverview() {
-                overviewGrid.innerHTML = '';
-                slideTitles.forEach((title, i) => {
-                    const thumb = document.createElement('div');
-                    thumb.className = 'overview-thumb' + (i === currentSlide ? ' current' : '');
-                    const bgColors = [
-                        'var(--vip-black)', 'var(--vip-black)', 'var(--vip-black)',
-                        'var(--vip-black)', '#1c2530', 'var(--vip-black)',
-                        '#1c2530', 'var(--vip-black)', 'var(--vip-white)',
-                        'var(--vip-black)', 'var(--vip-turquoise-dark)', 'var(--vip-black)',
-                        'var(--vip-black)'
-                    ];
-                    const textColors = [
-                        '#fff', '#fff', '#fff', '#fff', '#fff', '#fff',
-                        '#fff', '#fff', 'var(--vip-black)', '#fff', '#fff', '#fff', '#fff'
-                    ];
-                    thumb.style.background = bgColors[i] || 'var(--vip-black)';
-                    thumb.innerHTML = '<div class="overview-thumb-content"><span class="overview-thumb-title" style="color:' + textColors[i] + '">' + title + '</span></div><span class="overview-thumb-number">' + (i + 1) + '</span>';
-                    thumb.addEventListener('click', function() {
-                        goToSlide(i);
-                        closeOverview();
+    // Touch
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+    }, { passive: true });
+
+    // === INTERACTIVE FEATURES ===
+
+    // Agenda card click-to-jump
+    document.querySelectorAll('.agenda-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const target = parseInt(card.dataset.goto) - 1;
+            if (!isNaN(target)) goToSlide(target);
+        });
+    });
+
+    // Tab system
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabGroup = btn.closest('.slide');
+            tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            tabGroup.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            const panel = document.getElementById(btn.dataset.tab);
+            if (panel) panel.classList.add('active');
+        });
+    });
+
+    // Animated counters
+    function animateCounters(slide) {
+        slide.querySelectorAll('[data-count]').forEach(el => {
+            const target = parseInt(el.dataset.count);
+            const suffix = el.dataset.suffix || '';
+            let current = 0;
+            const increment = Math.max(1, Math.floor(target / 40));
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) { current = target; clearInterval(timer); }
+                el.textContent = current + suffix;
+            }, 30);
+        });
+    }
+
+    // Parse.ly metric counters
+    function animateParselyMetrics(slide) {
+        slide.querySelectorAll('[data-count-to]').forEach(el => {
+            const target = parseFloat(el.dataset.countTo);
+            const suffix = el.dataset.suffix || '';
+            let current = 0;
+            const steps = 40;
+            const increment = target / steps;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) { current = target; clearInterval(timer); }
+                el.textContent = (target >= 10 ? Math.round(current) : current.toFixed(1)) + suffix;
+            }, 30);
+        });
+    }
+
+    // Bar chart animation
+    function animateBars(slide) {
+        slide.querySelectorAll('.parsely-bar[data-target-height]').forEach((bar, i) => {
+            setTimeout(() => {
+                bar.style.height = bar.dataset.targetHeight + '%';
+            }, i * 150);
+        });
+    }
+
+    // CDN stat bars
+    function animateCdnBars(slide) {
+        slide.querySelectorAll('.cdn-stat-fill[data-target]').forEach((bar, i) => {
+            setTimeout(() => { bar.style.width = bar.dataset.target + '%'; }, 300 + i * 200);
+        });
+    }
+
+    // CDN node click
+    document.querySelectorAll('.cdn-node').forEach(node => {
+        node.addEventListener('click', () => {
+            document.querySelectorAll('.cdn-node').forEach(n => n.classList.remove('active'));
+            node.classList.add('active');
+            const panel = document.getElementById('cdnStatsPanel');
+            const region = node.dataset.region;
+            const latency = node.dataset.latency;
+            const pop = node.dataset.pop;
+            panel.querySelector('.cdn-stats-title').textContent = region;
+            const rows = panel.querySelectorAll('.cdn-stat-row');
+            if (rows[0]) { rows[0].querySelector('.cdn-stat-label').textContent = 'Points of Presence'; rows[0].querySelector('.cdn-stat-value').textContent = pop; }
+            if (rows[1]) { rows[1].querySelector('.cdn-stat-label').textContent = 'Avg Latency'; rows[1].querySelector('.cdn-stat-value').textContent = latency; }
+        });
+    });
+
+    // Before/After slider
+    const slider = document.getElementById('challengeSlider');
+    if (slider) {
+        const handle = document.getElementById('sliderHandle');
+        const leftSide = document.getElementById('sliderLeft');
+        let isDragging = false;
+
+        function updateSlider(x) {
+            const rect = slider.getBoundingClientRect();
+            let pct = ((x - rect.left) / rect.width) * 100;
+            pct = Math.max(15, Math.min(85, pct));
+            handle.style.left = pct + '%';
+            leftSide.style.width = pct + '%';
+        }
+
+        handle.addEventListener('mousedown', e => { isDragging = true; e.preventDefault(); });
+        slider.addEventListener('mousedown', e => { isDragging = true; updateSlider(e.clientX); });
+        document.addEventListener('mousemove', e => { if (isDragging) updateSlider(e.clientX); });
+        document.addEventListener('mouseup', () => { isDragging = false; });
+        handle.addEventListener('touchstart', e => { isDragging = true; }, { passive: true });
+        slider.addEventListener('touchmove', e => { if (isDragging) updateSlider(e.touches[0].clientX); }, { passive: true });
+        document.addEventListener('touchend', () => { isDragging = false; });
+    }
+
+    // MCP layer expand/collapse
+    window.toggleMcpLayer = function(layer) {
+        const wasExpanded = layer.classList.contains('expanded');
+        document.querySelectorAll('.mcp-layer').forEach(l => l.classList.remove('expanded'));
+        if (!wasExpanded) layer.classList.add('expanded');
+    };
+
+    // Editor mockup interactivity
+    const editorMockup = document.getElementById('editorMockup');
+    if (editorMockup) {
+        const comment = document.getElementById('editorComment');
+        const avatars = editorMockup.querySelectorAll('.avatar');
+        avatars.forEach(avatar => {
+            avatar.addEventListener('mouseenter', () => {
+                if (comment) comment.classList.add('visible');
+            });
+            avatar.addEventListener('mouseleave', () => {
+                if (comment) comment.classList.remove('visible');
+            });
+        });
+        // Also show comment on click for touch devices
+        avatars.forEach(avatar => {
+            avatar.addEventListener('click', () => {
+                if (comment) comment.classList.toggle('visible');
+            });
+        });
+    }
+
+    // Parse.ly tab switching
+    document.querySelectorAll('.parsely-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.parsely-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            // Update chart area based on view
+            const view = tab.dataset.parselyView;
+            const chartArea = document.getElementById('parselyChartArea');
+            if (!chartArea) return;
+            const barChart = document.getElementById('parselyBarChart');
+            if (view === 'overview') {
+                chartArea.querySelector('.parsely-chart-title').textContent = 'Pageviews by Division (Last 30 Days)';
+                if (barChart) {
+                    const cols = barChart.querySelectorAll('.parsely-bar-col');
+                    const data = [{h:75,v:'2.4M',l:'Home Arts',c:'var(--vip-gold)'},{h:60,v:'1.8M',l:'Collectibles',c:'var(--vip-turquoise)'},{h:55,v:'1.6M',l:'Home Bldg',c:'var(--vip-purple)'},{h:85,v:'3.1M',l:"Writer's Digest",c:'var(--vip-orange)'}];
+                    cols.forEach((col, i) => {
+                        if (data[i]) {
+                            const bar = col.querySelector('.parsely-bar');
+                            bar.style.height = '0%';
+                            bar.style.background = data[i].c;
+                            bar.querySelector('.parsely-bar-value').textContent = data[i].v;
+                            col.querySelector('.parsely-bar-label').textContent = data[i].l;
+                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, i * 100);
+                        }
                     });
-                    overviewGrid.appendChild(thumb);
-                });
+                }
+            } else if (view === 'brands') {
+                chartArea.querySelector('.parsely-chart-title').textContent = 'Engagement by Brand (Top 4)';
+                if (barChart) {
+                    const cols = barChart.querySelectorAll('.parsely-bar-col');
+                    const data = [{h:90,v:'4.8min',l:'Fine Woodworking',c:'var(--vip-gold)'},{h:72,v:'3.9min',l:"Writer's Digest",c:'var(--vip-orange)'},{h:65,v:'3.5min',l:'Antique Trader',c:'var(--vip-turquoise)'},{h:58,v:'3.1min',l:'Fine Homebuilding',c:'var(--vip-purple)'}];
+                    cols.forEach((col, i) => {
+                        if (data[i]) {
+                            const bar = col.querySelector('.parsely-bar');
+                            bar.style.height = '0%';
+                            bar.style.background = data[i].c;
+                            bar.querySelector('.parsely-bar-value').textContent = data[i].v;
+                            col.querySelector('.parsely-bar-label').textContent = data[i].l;
+                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, i * 100);
+                        }
+                    });
+                }
+            } else if (view === 'content') {
+                chartArea.querySelector('.parsely-chart-title').textContent = 'Top Performing Content (This Week)';
+                if (barChart) {
+                    const cols = barChart.querySelectorAll('.parsely-bar-col');
+                    const data = [{h:95,v:'89K',l:'Dovetail Guide',c:'var(--vip-gold)'},{h:78,v:'72K',l:'2026 Coins',c:'var(--vip-turquoise)'},{h:68,v:'61K',l:'Query Letters',c:'var(--vip-orange)'},{h:52,v:'45K',l:'Cabin Plans',c:'var(--vip-purple)'}];
+                    cols.forEach((col, i) => {
+                        if (data[i]) {
+                            const bar = col.querySelector('.parsely-bar');
+                            bar.style.height = '0%';
+                            bar.style.background = data[i].c;
+                            bar.querySelector('.parsely-bar-value').textContent = data[i].v;
+                            col.querySelector('.parsely-bar-label').textContent = data[i].l;
+                            setTimeout(() => { bar.style.height = data[i].h + '%'; }, i * 100);
+                        }
+                    });
+                }
             }
+        });
+    });
 
-            // Keyboard navigation
-            document.addEventListener('keydown', function(e) {
-                if (overviewOpen) {
-                    if (e.key === 'Escape') closeOverview();
-                    return;
-                }
-                switch(e.key) {
-                    case 'ArrowRight':
-                    case ' ':
-                        e.preventDefault();
-                        nextSlide();
-                        break;
-                    case 'ArrowLeft':
-                        e.preventDefault();
-                        prevSlide();
-                        break;
-                    case 'Escape':
-                        buildOverview();
-                        toggleOverview();
-                        break;
-                }
-            });
+    // Slide enter triggers
+    function onSlideEnter(index) {
+        const slide = slides[index];
+        // Animated counters (slide 3)
+        if (index === 2) animateCounters(slide);
+        // CDN bars (slide 12)
+        if (index === 11) animateCdnBars(slide);
+        // Parse.ly (slide 13)
+        if (index === 12) { animateParselyMetrics(slide); animateBars(slide); }
+        // Show editor comment after delay (slide 10)
+        if (index === 9) {
+            const comment = document.getElementById('editorComment');
+            if (comment) { comment.classList.remove('visible'); setTimeout(() => comment.classList.add('visible'), 1500); }
+        }
+    }
 
-            // Button navigation
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-            slideCounter.addEventListener('click', function() {
-                buildOverview();
-                toggleOverview();
-            });
-            overviewClose.addEventListener('click', closeOverview);
-
-            // Touch / swipe support
-            let touchStartX = 0;
-            let touchEndX = 0;
-
-            document.addEventListener('touchstart', function(e) {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-
-            document.addEventListener('touchend', function(e) {
-                touchEndX = e.changedTouches[0].screenX;
-                const diff = touchStartX - touchEndX;
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0) nextSlide();
-                    else prevSlide();
-                }
-            }, { passive: true });
-
-            // Initialize
-            updateUI();
-        })();
-    </script>
+    // Init
+    updateUI();
+    onSlideEnter(0);
+})();
+</script>
 </body>
 </html>

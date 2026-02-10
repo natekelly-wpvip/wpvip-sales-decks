@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPR | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1a2230;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-purple: #9C5CE1;
+            --vip-purple-light: #E6D6F8;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --slide-width: 1280;
+            --slide-height: 720;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .deck-viewport {
+            width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .deck-scaler {
+            width: 1280px; height: 720px;
+            position: relative;
+            transform-origin: center center;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 1280px; height: 720px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ─── Progress Bar ─── */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: var(--vip-gold);
+            transition: width 0.4s ease;
+            z-index: 1000;
+        }
+
+        /* ─── Nav Controls ─── */
+        .nav-controls {
+            position: fixed; bottom: 24px;
+            left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            background: rgba(19,25,30,0.7);
+            backdrop-filter: blur(8px);
+            color: #fff; font-size: 18px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .nav-btn:hover { border-color: var(--vip-gold); color: var(--vip-gold); }
+        .nav-btn:disabled { opacity: 0.3; cursor: default; }
+        .nav-btn:disabled:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+
+        .slide-counter {
+            color: rgba(255,255,255,0.6);
+            font-size: 13px; font-weight: 500;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            user-select: none;
+            min-width: 50px; text-align: center;
+        }
+        .slide-counter:hover { color: var(--vip-gold); }
+
+        /* ─── Overview Mode ─── */
+        .overview-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 2000;
+            display: none;
+            overflow-y: auto;
+            padding: 40px;
+        }
+        .overview-overlay.visible { display: block; }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .overview-thumb {
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            background: var(--vip-black);
+        }
+        .overview-thumb:hover { border-color: var(--vip-gold); transform: scale(1.03); }
+        .overview-thumb.current { border-color: var(--vip-gold); }
+        .overview-thumb-inner {
+            width: 1280px; height: 720px;
+            transform-origin: top left;
+            pointer-events: none;
+        }
+        .overview-thumb-label {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 6px 10px;
+            background: rgba(0,0,0,0.7);
+            color: #fff; font-size: 11px; font-weight: 500;
+        }
+
+        /* ─── Common Slide Styles ─── */
+        .slide-dark {
+            background: var(--vip-black);
+            color: var(--vip-white);
+        }
+        .slide-light {
+            background: var(--vip-white);
+            color: var(--vip-black);
+        }
+        .slide-gradient {
+            background: linear-gradient(135deg, var(--vip-black) 0%, var(--vip-black-light) 100%);
+            color: var(--vip-white);
+        }
+
+        .vip-logo {
+            font-size: 16px; font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+        .vip-logo .logo-vip {
+            font-weight: 700; color: var(--vip-gold);
+            margin-left: 2px;
+        }
+
+        .gold-line {
+            width: 60px; height: 2px;
+            background: var(--vip-gold);
+        }
+
+        .gold-line-long {
+            width: 120px; height: 2px;
+            background: var(--vip-gold);
+        }
+
+        /* Geometric background pattern */
+        .geo-pattern {
+            position: absolute; inset: 0;
+            overflow: hidden; pointer-events: none;
+        }
+        .geo-pattern::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background:
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(216,164,95,0.03) 40px, rgba(216,164,95,0.03) 41px),
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(216,164,95,0.03) 40px, rgba(216,164,95,0.03) 41px);
+            transform: rotate(15deg);
+        }
+
+        .geo-circles {
+            position: absolute; inset: 0;
+            overflow: hidden; pointer-events: none;
+        }
+        .geo-circles::before {
+            content: '';
+            position: absolute;
+            right: -200px; top: -200px;
+            width: 800px; height: 800px;
+            border-radius: 50%;
+            border: 1px solid rgba(216,164,95,0.05);
+        }
+        .geo-circles::after {
+            content: '';
+            position: absolute;
+            right: -100px; top: -100px;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            border: 1px solid rgba(216,164,95,0.04);
+        }
+
+        /* Corner accents */
+        .corner-accent-tl, .corner-accent-br {
+            position: absolute;
+            width: 30px; height: 30px;
+        }
+        .corner-accent-tl {
+            top: 30px; left: 30px;
+            border-top: 2px solid var(--vip-gold);
+            border-left: 2px solid var(--vip-gold);
+        }
+        .corner-accent-br {
+            bottom: 30px; right: 30px;
+            border-bottom: 2px solid var(--vip-gold);
+            border-right: 2px solid var(--vip-gold);
+        }
+
+        /* ─── Slide-Specific Styles ─── */
+
+        /* Slide 1: Title */
+        .title-slide {
+            padding: 80px;
+            justify-content: center;
+            position: relative;
+        }
+        .title-slide .vip-logo { position: absolute; top: 40px; left: 80px; }
+        .title-slide h1 {
+            font-size: 52px; font-weight: 700;
+            letter-spacing: -0.03em; line-height: 1.05;
+            margin-bottom: 16px;
+        }
+        .title-slide .subtitle {
+            font-size: 22px; font-weight: 400;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+        }
+        .title-slide .date {
+            font-size: 14px; font-weight: 500;
+            color: var(--vip-gold);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Slide 2: We Know NPR */
+        .know-slide {
+            padding: 60px 80px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .know-slide h2 {
+            font-size: 38px; font-weight: 700;
+            letter-spacing: -0.02em; line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        .know-slide p {
+            font-size: 17px; line-height: 1.6;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 12px;
+        }
+        .npr-values {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .npr-value-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .npr-value-card:hover {
+            border-color: var(--vip-gold);
+            background: rgba(216,164,95,0.06);
+        }
+        .npr-value-card .icon {
+            font-size: 24px; margin-bottom: 8px;
+        }
+        .npr-value-card h4 {
+            font-size: 14px; font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .npr-value-card p {
+            font-size: 12px; color: rgba(255,255,255,0.5);
+            margin: 0;
+        }
+
+        /* Slide 3: Content Landscape */
+        .landscape-slide {
+            padding: 60px 80px;
+        }
+        .landscape-slide h2 {
+            font-size: 38px; font-weight: 700;
+            letter-spacing: -0.02em; line-height: 1.1;
+            margin-bottom: 8px;
+        }
+        .landscape-slide .sub {
+            font-size: 16px; color: rgba(255,255,255,0.5);
+            margin-bottom: 40px;
+        }
+        .trend-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+        .trend-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.4s ease;
+            cursor: default;
+        }
+        .trend-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--vip-gold);
+            box-shadow: 0 8px 32px rgba(216,164,95,0.1);
+        }
+        .trend-card .number {
+            font-size: 42px; font-weight: 700;
+            color: var(--vip-gold);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .trend-card h4 {
+            font-size: 16px; font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .trend-card p {
+            font-size: 13px; line-height: 1.5;
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* Slide 4: Brightspot Limitations */
+        .limitations-slide {
+            padding: 60px 80px;
+        }
+        .limitations-slide h2 {
+            font-size: 36px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .limitations-slide .sub {
+            font-size: 16px; color: rgba(255,255,255,0.5);
+            margin-bottom: 36px;
+        }
+        .limitation-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .limitation-item {
+            background: rgba(255,89,94,0.04);
+            border: 1px solid rgba(255,89,94,0.15);
+            border-radius: 10px;
+            padding: 22px 24px;
+            display: flex; gap: 16px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+        .limitation-item:hover {
+            background: rgba(255,89,94,0.08);
+            border-color: rgba(255,89,94,0.3);
+        }
+        .limitation-item .lim-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: rgba(255,89,94,0.12);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .limitation-item h4 {
+            font-size: 15px; font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .limitation-item p {
+            font-size: 12.5px; line-height: 1.5;
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* Slide 5: VIP Intro */
+        .vip-intro-slide {
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .vip-intro-slide .big-logo {
+            font-size: 20px; margin-bottom: 32px;
+        }
+        .vip-intro-slide h2 {
+            font-size: 44px; font-weight: 700;
+            letter-spacing: -0.03em; line-height: 1.1;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        .vip-intro-slide p {
+            font-size: 18px; line-height: 1.6;
+            color: rgba(255,255,255,0.65);
+            max-width: 680px;
+            margin-bottom: 36px;
+        }
+        .vip-pillars {
+            display: flex; gap: 32px;
+        }
+        .vip-pillar {
+            text-align: center; padding: 16px 24px;
+        }
+        .vip-pillar .pillar-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: rgba(216,164,95,0.1);
+            border: 1px solid rgba(216,164,95,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 10px;
+        }
+        .vip-pillar h4 {
+            font-size: 13px; font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        /* Slide 6: Collaborative Editing */
+        .collab-slide {
+            padding: 50px 80px;
+        }
+        .collab-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .collab-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 24px;
+        }
+        .collab-demo {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+            min-height: 0;
+        }
+        .editor-panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-toolbar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+        }
+        .toolbar-btn {
+            width: 28px; height: 28px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px; font-weight: 700;
+            cursor: default;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .toolbar-sep {
+            width: 1px; height: 20px;
+            background: rgba(255,255,255,0.08);
+            margin: 0 4px;
+        }
+        .editor-avatars {
+            margin-left: auto;
+            display: flex; gap: -4px;
+        }
+        .editor-avatar {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            font-size: 11px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--vip-black);
+            margin-left: -6px;
+        }
+        .editor-avatar:first-child { margin-left: 0; }
+        .editor-content {
+            padding: 20px;
+            flex: 1;
+            font-size: 14px; line-height: 1.7;
+            color: rgba(255,255,255,0.8);
+            position: relative;
+        }
+        .editor-content .headline-text {
+            font-size: 22px; font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .cursor-indicator {
+            display: inline-block;
+            width: 2px; height: 1.2em;
+            animation: cursor-blink 1s infinite;
+            vertical-align: text-bottom;
+            position: relative;
+        }
+        .cursor-indicator::before {
+            content: attr(data-name);
+            position: absolute;
+            top: -18px; left: 0;
+            font-size: 9px; font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
+            color: #fff;
+        }
+        .cursor-sarah { background: var(--vip-turquoise); }
+        .cursor-sarah::before { background: var(--vip-turquoise); }
+        .cursor-marcus { background: var(--vip-purple); }
+        .cursor-marcus::before { background: var(--vip-purple); }
+        .cursor-elena { background: var(--vip-orange); }
+        .cursor-elena::before { background: var(--vip-orange); }
+        @keyframes cursor-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .collab-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .collab-feature {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .collab-feature:hover, .collab-feature.active {
+            border-color: var(--vip-turquoise);
+            background: rgba(62,160,173,0.06);
+        }
+        .collab-feature h4 {
+            font-size: 13px; font-weight: 600;
+            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .collab-feature .feat-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--vip-turquoise);
+        }
+        .collab-feature p {
+            font-size: 11.5px; line-height: 1.5;
+            color: rgba(255,255,255,0.45);
+            display: none;
+        }
+        .collab-feature.active p { display: block; }
+
+        /* Slide 7: MCP */
+        .mcp-slide {
+            padding: 50px 80px;
+        }
+        .mcp-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .mcp-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 24px;
+        }
+        .mcp-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            flex: 1;
+        }
+        .mcp-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .mcp-card:hover {
+            border-color: var(--vip-purple);
+            background: rgba(156,92,225,0.05);
+            transform: translateY(-2px);
+        }
+        .mcp-card .mcp-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+        .mcp-card h4 {
+            font-size: 15px; font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .mcp-card p {
+            font-size: 12.5px; line-height: 1.5;
+            color: rgba(255,255,255,0.5);
+        }
+        .mcp-card .mcp-detail {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 11.5px; line-height: 1.5;
+            color: rgba(255,255,255,0.4);
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s ease, margin 0.3s ease, padding 0.3s ease;
+            margin-top: 0; padding-top: 0;
+        }
+        .mcp-card.expanded .mcp-detail {
+            max-height: 200px;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+        .mcp-card .expand-hint {
+            font-size: 10px; color: rgba(255,255,255,0.25);
+            margin-top: 10px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .mcp-card.expanded .expand-hint { display: none; }
+
+        /* Slide 8: CDN */
+        .cdn-slide {
+            padding: 50px 80px;
+        }
+        .cdn-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .cdn-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 20px;
+        }
+        .cdn-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+            min-height: 0;
+        }
+        .cdn-map-container {
+            position: relative;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cdn-map-svg {
+            width: 100%; height: 100%;
+        }
+        .cdn-node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .cdn-node circle.node-dot {
+            fill: var(--vip-turquoise);
+            transition: all 0.3s ease;
+        }
+        .cdn-node:hover circle.node-dot {
+            fill: var(--vip-gold);
+            r: 6;
+        }
+        .cdn-node circle.node-pulse {
+            fill: var(--vip-turquoise);
+            opacity: 0;
+            animation: cdn-pulse 2s infinite;
+        }
+        @keyframes cdn-pulse {
+            0% { opacity: 0.4; r: 4; }
+            100% { opacity: 0; r: 16; }
+        }
+        .cdn-tooltip {
+            position: absolute;
+            background: var(--vip-black);
+            border: 1px solid var(--vip-gold);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            min-width: 160px;
+        }
+        .cdn-tooltip.visible { opacity: 1; }
+        .cdn-tooltip h5 {
+            font-size: 13px; font-weight: 600;
+            margin-bottom: 6px; color: var(--vip-gold);
+        }
+        .cdn-tooltip .tt-row {
+            display: flex; justify-content: space-between;
+            margin-bottom: 3px; gap: 16px;
+        }
+        .cdn-tooltip .tt-label { color: rgba(255,255,255,0.5); }
+        .cdn-tooltip .tt-value { color: #fff; font-weight: 600; }
+
+        .cdn-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .cdn-stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .cdn-stat-card:hover {
+            border-color: var(--vip-turquoise);
+        }
+        .cdn-stat-card .stat-num {
+            font-size: 32px; font-weight: 700;
+            color: var(--vip-turquoise);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .cdn-stat-card .stat-label {
+            font-size: 11px; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* Slide 9: Comparison */
+        .compare-slide {
+            padding: 50px 80px;
+        }
+        .compare-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .compare-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 20px;
+        }
+        .compare-tabs {
+            display: flex; gap: 6px; margin-bottom: 16px;
+        }
+        .compare-tab {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-size: 13px; font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .compare-tab:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+        .compare-tab.active {
+            background: var(--vip-gold);
+            border-color: var(--vip-gold);
+            color: var(--vip-black);
+        }
+        .compare-table-container {
+            flex: 1;
+            overflow: hidden;
+        }
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .compare-table thead th {
+            padding: 12px 16px;
+            font-size: 13px; font-weight: 600;
+            text-align: left;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.03em;
+        }
+        .compare-table thead th:first-child { width: 36%; }
+        .compare-table thead th.bs-col {
+            color: rgba(255,255,255,0.4);
+            width: 32%;
+        }
+        .compare-table thead th.vip-col {
+            color: var(--vip-gold);
+            width: 32%;
+        }
+        .compare-table tbody td {
+            padding: 10px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: top;
+        }
+        .compare-table tbody td:first-child {
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+        }
+        .compare-table tbody td.bs-cell {
+            color: rgba(255,255,255,0.4);
+        }
+        .compare-table tbody td.vip-cell {
+            color: var(--vip-turquoise);
+        }
+        .compare-check { color: var(--vip-turquoise); font-weight: 700; }
+        .compare-x { color: var(--vip-red); opacity: 0.6; }
+        .compare-partial { color: var(--vip-orange); }
+        .compare-category { display: none; }
+        .compare-category.active { display: contents; }
+
+        /* Slide 10: Case Studies */
+        .cases-slide {
+            padding: 50px 80px;
+        }
+        .cases-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .cases-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 24px;
+        }
+        .cases-carousel {
+            flex: 1;
+            display: flex;
+            gap: 16px;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .case-card {
+            min-width: 360px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 28px;
+            transition: all 0.4s ease;
+            cursor: default;
+            display: flex;
+            flex-direction: column;
+        }
+        .case-card:hover {
+            border-color: var(--vip-gold);
+            background: rgba(216,164,95,0.04);
+        }
+        .case-card .case-logo {
+            font-size: 22px; font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .case-card .case-type {
+            font-size: 11px; color: var(--vip-gold);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .case-card .case-quote {
+            font-size: 14px; line-height: 1.6;
+            color: rgba(255,255,255,0.65);
+            font-style: italic;
+            flex: 1;
+            margin-bottom: 16px;
+            position: relative;
+            padding-left: 16px;
+            border-left: 2px solid rgba(216,164,95,0.3);
+        }
+        .case-card .case-metrics {
+            display: flex; gap: 20px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .case-metric .metric-num {
+            font-size: 22px; font-weight: 700;
+            color: var(--vip-gold);
+        }
+        .case-metric .metric-label {
+            font-size: 10px; color: rgba(255,255,255,0.4);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .cases-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .cases-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .cases-dot.active {
+            background: var(--vip-gold);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* Slide 11: Trust & Security */
+        .trust-slide {
+            padding: 60px 80px;
+        }
+        .trust-slide h2 {
+            font-size: 36px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .trust-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 32px;
+        }
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .trust-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .trust-card:hover {
+            border-color: var(--vip-gold);
+            transform: translateY(-3px);
+        }
+        .trust-card .trust-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .trust-card .trust-value {
+            font-size: 28px; font-weight: 700;
+            color: var(--vip-gold);
+            margin-bottom: 4px;
+        }
+        .trust-card .trust-label {
+            font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+        }
+        .trust-card .trust-desc {
+            font-size: 11px; line-height: 1.4;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* Slide 12: ROI Calculator */
+        .roi-slide {
+            padding: 50px 80px;
+        }
+        .roi-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .roi-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 20px;
+        }
+        .roi-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            min-height: 0;
+        }
+        .roi-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .roi-input-group label {
+            display: block;
+            font-size: 12px; font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .roi-input-group .slider-row {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .roi-input-group input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+        }
+        .roi-input-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--vip-gold);
+            cursor: pointer;
+            border: 2px solid var(--vip-black);
+        }
+        .roi-input-group .slider-val {
+            min-width: 60px;
+            font-size: 18px; font-weight: 700;
+            color: var(--vip-gold);
+            text-align: right;
+        }
+        .roi-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-content: center;
+        }
+        .roi-result-card {
+            background: rgba(216,164,95,0.05);
+            border: 1px solid rgba(216,164,95,0.15);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .roi-result-card .roi-num {
+            font-size: 30px; font-weight: 700;
+            color: var(--vip-gold);
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+        .roi-result-card .roi-label {
+            font-size: 11px; color: rgba(255,255,255,0.45);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .roi-result-card.featured {
+            grid-column: 1 / -1;
+            background: rgba(216,164,95,0.08);
+            border-color: rgba(216,164,95,0.25);
+        }
+        .roi-result-card.featured .roi-num {
+            font-size: 42px;
+        }
+
+        /* Slide 13: Next Steps */
+        .steps-slide {
+            padding: 60px 80px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .steps-slide h2 {
+            font-size: 38px; font-weight: 700;
+            letter-spacing: -0.02em; line-height: 1.1;
+            margin-bottom: 12px;
+        }
+        .steps-slide > div:first-child p {
+            font-size: 16px; line-height: 1.6;
+            color: rgba(255,255,255,0.6);
+        }
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .step-item {
+            display: flex; gap: 16px;
+            align-items: flex-start;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .step-item:hover {
+            border-color: var(--vip-gold);
+            background: rgba(216,164,95,0.04);
+        }
+        .step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(216,164,95,0.12);
+            color: var(--vip-gold);
+            font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .step-item h4 {
+            font-size: 14px; font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .step-item p {
+            font-size: 12px; color: rgba(255,255,255,0.45);
+        }
+
+        /* Slide 14: Contact / CTA with Calendar */
+        .contact-slide {
+            padding: 50px 80px;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .contact-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .contact-left .vip-logo {
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+        .contact-left h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em; line-height: 1.1;
+            margin-bottom: 12px;
+        }
+        .contact-left p {
+            font-size: 15px; line-height: 1.6;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 24px;
+        }
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .contact-detail {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+        .contact-detail strong {
+            color: var(--vip-gold);
+        }
+        .calendar-embed {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .calendar-embed .cal-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 12px; font-weight: 600;
+            color: var(--vip-gold);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .calendar-embed iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* ─── Animations ─── */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .slide.active .fade-in-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .slide.active .fade-in-up:nth-child(2) { transition-delay: 0.1s; }
+        .slide.active .fade-in-up:nth-child(3) { transition-delay: 0.2s; }
+        .slide.active .fade-in-up:nth-child(4) { transition-delay: 0.3s; }
+        .slide.active .fade-in-up:nth-child(5) { transition-delay: 0.4s; }
+        .slide.active .fade-in-up:nth-child(6) { transition-delay: 0.5s; }
+
+        .stagger-children > * {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .slide.active .stagger-children > *:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
+        .slide.active .stagger-children > *:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
+        .slide.active .stagger-children > *:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.35s; }
+        .slide.active .stagger-children > *:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.45s; }
+        .slide.active .stagger-children > *:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.55s; }
+        .slide.active .stagger-children > *:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.65s; }
+
+        /* Counter animation */
+        .count-up {
+            display: inline-block;
+        }
+
+        /* ─── Print ─── */
+        @media print {
+            .nav-controls, .progress-bar, .overview-overlay { display: none !important; }
+            .slide { opacity: 1 !important; position: relative !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="deck-viewport">
+        <div class="deck-scaler" id="deckScaler">
+
+            <!-- ═══════════ SLIDE 1: TITLE ═══════════ -->
+            <div class="slide slide-dark title-slide active" id="slide-1">
+                <div class="geo-pattern"></div>
+                <div class="geo-circles"></div>
+                <div class="corner-accent-tl"></div>
+                <div class="corner-accent-br"></div>
+                <div class="vip-logo fade-in-up">
+                    <span class="logo-wp">WordPress</span><span class="logo-vip"> VIP</span>
+                </div>
+                <div style="position:relative;z-index:1;">
+                    <div class="gold-line fade-in-up" style="margin-bottom:24px;"></div>
+                    <h1 class="fade-in-up">NPR &times; WordPress VIP</h1>
+                    <div class="subtitle fade-in-up">A Platform Partnership for the Future of Public Media</div>
+                    <div class="date fade-in-up">February 2026</div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 2: WE KNOW NPR ═══════════ -->
+            <div class="slide slide-dark know-slide" id="slide-2">
+                <div class="geo-pattern"></div>
+                <div>
+                    <div class="gold-line" style="margin-bottom:20px;"></div>
+                    <h2>We Know NPR</h2>
+                    <p>For over 50 years, NPR has set the standard for trusted journalism, reaching tens of millions of Americans across radio, podcasts, and digital platforms every week.</p>
+                    <p>Your mission to inform, educate, and inspire demands a content platform that moves at the speed of news while upholding the quality your audience expects.</p>
+                </div>
+                <div class="npr-values stagger-children">
+                    <div class="npr-value-card">
+                        <div class="icon">&#127897;</div>
+                        <h4>Multi-Platform Reach</h4>
+                        <p>Radio, podcasts, web, and mobile serving 60M+ weekly</p>
+                    </div>
+                    <div class="npr-value-card">
+                        <div class="icon">&#9997;</div>
+                        <h4>Editorial Excellence</h4>
+                        <p>900+ member stations, thousands of content creators</p>
+                    </div>
+                    <div class="npr-value-card">
+                        <div class="icon">&#127760;</div>
+                        <h4>Digital Growth</h4>
+                        <p>Growing digital audience with complex content needs</p>
+                    </div>
+                    <div class="npr-value-card">
+                        <div class="icon">&#128279;</div>
+                        <h4>Trust &amp; Integrity</h4>
+                        <p>America's most trusted news source, year after year</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 3: CONTENT LANDSCAPE ═══════════ -->
+            <div class="slide slide-gradient landscape-slide" id="slide-3">
+                <div class="geo-circles"></div>
+                <h2>The Content Landscape Is Shifting</h2>
+                <div class="sub">Media organizations face a new set of demands. Standing still is falling behind.</div>
+                <div class="trend-cards stagger-children">
+                    <div class="trend-card">
+                        <div class="number count-up" data-target="73">0</div>
+                        <h4>% of publishers</h4>
+                        <p>are re-evaluating their CMS in 2025-2026, citing performance and flexibility gaps.</p>
+                        <!-- PLACEHOLDER: Replace with verified industry statistic -->
+                    </div>
+                    <div class="trend-card">
+                        <div class="number">AI</div>
+                        <h4>is reshaping workflows</h4>
+                        <p>Newsrooms need CMS platforms that integrate AI natively, not as an afterthought bolted on later.</p>
+                    </div>
+                    <div class="trend-card">
+                        <div class="number count-up" data-target="4.2">0</div>
+                        <h4>second threshold</h4>
+                        <p>Average page load time where bounce rates spike 40%. Speed is audience retention.</p>
+                        <!-- PLACEHOLDER: Replace with verified performance data -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 4: BRIGHTSPOT LIMITATIONS ═══════════ -->
+            <div class="slide slide-dark limitations-slide" id="slide-4">
+                <div class="geo-pattern"></div>
+                <h2>Where Brightspot Falls Short</h2>
+                <div class="sub">An honest look at the platform constraints holding NPR back.</div>
+                <div class="limitation-items stagger-children">
+                    <div class="limitation-item">
+                        <div class="lim-icon">&#128274;</div>
+                        <div>
+                            <h4>Proprietary Lock-in</h4>
+                            <p>Java-based, closed-source architecture limits customization and ties you to a single vendor's roadmap and timeline.</p>
+                        </div>
+                    </div>
+                    <div class="limitation-item">
+                        <div class="lim-icon">&#128101;</div>
+                        <div>
+                            <h4>Limited Ecosystem</h4>
+                            <p>A fraction of WordPress's 60,000+ plugins and massive developer community. Fewer integrations, fewer solutions out of the box.</p>
+                        </div>
+                    </div>
+                    <div class="limitation-item">
+                        <div class="lim-icon">&#9889;</div>
+                        <div>
+                            <h4>No Native AI Integration</h4>
+                            <p>AI capabilities require third-party bolt-ons. No native Model Context Protocol (MCP) support for intelligent content workflows.</p>
+                        </div>
+                    </div>
+                    <div class="limitation-item">
+                        <div class="lim-icon">&#128200;</div>
+                        <div>
+                            <h4>Scaling Complexity</h4>
+                            <p>Handling traffic spikes during breaking news requires significant custom infrastructure work vs. a managed global CDN.</p>
+                        </div>
+                    </div>
+                    <div class="limitation-item">
+                        <div class="lim-icon">&#128221;</div>
+                        <div>
+                            <h4>Rigid Editing Experience</h4>
+                            <p>No real-time collaborative editing. Editors work in silos, creating version conflicts and slowing editorial velocity.</p>
+                        </div>
+                    </div>
+                    <div class="limitation-item">
+                        <div class="lim-icon">&#128176;</div>
+                        <div>
+                            <h4>Higher Total Cost</h4>
+                            <p>Licensing, specialized Java developers, and custom infrastructure drive up TCO compared to an open-source managed platform.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 5: VIP INTRO ═══════════ -->
+            <div class="slide slide-gradient vip-intro-slide" id="slide-5">
+                <div class="geo-pattern"></div>
+                <div class="geo-circles"></div>
+                <div class="corner-accent-tl"></div>
+                <div class="corner-accent-br"></div>
+                <div class="big-logo vip-logo fade-in-up">
+                    <span class="logo-wp">WordPress</span><span class="logo-vip"> VIP</span>
+                </div>
+                <h2 class="fade-in-up">The Enterprise Content Platform Built for Media</h2>
+                <p class="fade-in-up">WordPress VIP combines the world's most popular CMS with enterprise-grade security, performance, and AI-powered workflows. Purpose-built for organizations like NPR.</p>
+                <div class="gold-line-long fade-in-up" style="margin: 0 auto 32px;"></div>
+                <div class="vip-pillars fade-in-up">
+                    <div class="vip-pillar">
+                        <div class="pillar-icon">&#9997;</div>
+                        <h4>Collaborative Editing</h4>
+                    </div>
+                    <div class="vip-pillar">
+                        <div class="pillar-icon">&#129302;</div>
+                        <h4>MCP / AI Workflows</h4>
+                    </div>
+                    <div class="vip-pillar">
+                        <div class="pillar-icon">&#127760;</div>
+                        <h4>Global CDN</h4>
+                    </div>
+                    <div class="vip-pillar">
+                        <div class="pillar-icon">&#128274;</div>
+                        <h4>Enterprise Security</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 6: COLLABORATIVE EDITING ═══════════ -->
+            <div class="slide slide-dark collab-slide" id="slide-6">
+                <h2>Real-Time Collaborative Editing</h2>
+                <div class="sub">Your newsroom, working together in real time. No version conflicts. No waiting.</div>
+                <div class="collab-demo">
+                    <div class="editor-panel">
+                        <div class="editor-toolbar">
+                            <div class="toolbar-btn">B</div>
+                            <div class="toolbar-btn"><i>I</i></div>
+                            <div class="toolbar-btn" style="text-decoration:underline;">U</div>
+                            <div class="toolbar-sep"></div>
+                            <div class="toolbar-btn">H1</div>
+                            <div class="toolbar-btn">H2</div>
+                            <div class="toolbar-sep"></div>
+                            <div class="toolbar-btn">&#128279;</div>
+                            <div class="toolbar-btn">&#128247;</div>
+                            <div class="editor-avatars">
+                                <div class="editor-avatar" style="background:var(--vip-turquoise);">SJ</div>
+                                <div class="editor-avatar" style="background:var(--vip-purple);">MR</div>
+                                <div class="editor-avatar" style="background:var(--vip-orange);">ET</div>
+                            </div>
+                        </div>
+                        <div class="editor-content" id="editorContent">
+                            <div class="headline-text">
+                                <span id="headline-typed"></span><span class="cursor-indicator cursor-sarah" data-name="Sarah J."></span>
+                            </div>
+                            <p id="body-text" style="margin-bottom:12px;"></p>
+                            <p id="body-text-2" style="color:rgba(255,255,255,0.5);font-style:italic;font-size:13px;"></p>
+                        </div>
+                    </div>
+                    <div class="collab-features" id="collabFeatures">
+                        <div class="collab-feature active" data-feature="realtime">
+                            <h4><span class="feat-dot"></span> Real-Time Cursors</h4>
+                            <p>See every editor's cursor, selections, and changes as they happen. No save conflicts, no lost work.</p>
+                        </div>
+                        <div class="collab-feature" data-feature="blocks">
+                            <h4><span class="feat-dot"></span> Block-Level Locking</h4>
+                            <p>Editors can lock specific content blocks while others continue working elsewhere on the same article.</p>
+                        </div>
+                        <div class="collab-feature" data-feature="comments">
+                            <h4><span class="feat-dot"></span> Inline Comments</h4>
+                            <p>Leave contextual comments directly on text selections. Resolve threads without leaving the editor.</p>
+                        </div>
+                        <div class="collab-feature" data-feature="revisions">
+                            <h4><span class="feat-dot"></span> Revision History</h4>
+                            <p>Full version history with author attribution. Compare and restore any previous version instantly.</p>
+                        </div>
+                        <div class="collab-feature" data-feature="workflow">
+                            <h4><span class="feat-dot"></span> Editorial Workflows</h4>
+                            <p>Custom approval chains, scheduled publishing, and role-based permissions for your newsroom's process.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 7: MCP / AI ═══════════ -->
+            <div class="slide slide-dark mcp-slide" id="slide-7">
+                <h2>AI-Powered Content with MCP</h2>
+                <div class="sub">Model Context Protocol integration brings intelligent automation directly into your editorial workflows.</div>
+                <div class="mcp-grid stagger-children">
+                    <div class="mcp-card" onclick="this.classList.toggle('expanded')">
+                        <div class="mcp-icon" style="background:rgba(156,92,225,0.12);">&#129302;</div>
+                        <h4>Content Assistance</h4>
+                        <p>AI-powered drafting, summarization, and headline generation that understands your editorial voice.</p>
+                        <div class="mcp-detail">MCP connects your CMS directly to AI models with full context awareness. Generate article summaries, social posts, SEO metadata, and translations, all from within the editor. The AI learns NPR's style guide and tone.</div>
+                        <div class="expand-hint">Click to explore</div>
+                    </div>
+                    <div class="mcp-card" onclick="this.classList.toggle('expanded')">
+                        <div class="mcp-icon" style="background:rgba(62,160,173,0.12);">&#128269;</div>
+                        <h4>Smart Search &amp; Discovery</h4>
+                        <p>Semantic search across your entire content library. Find related stories, assets, and context instantly.</p>
+                        <div class="mcp-detail">Go beyond keyword matching. MCP enables natural language queries like "stories about climate policy in the midwest from the last 6 months" and surfaces relevant content, data, and multimedia assets.</div>
+                        <div class="expand-hint">Click to explore</div>
+                    </div>
+                    <div class="mcp-card" onclick="this.classList.toggle('expanded')">
+                        <div class="mcp-icon" style="background:rgba(216,164,95,0.12);">&#128196;</div>
+                        <h4>Automated Tagging</h4>
+                        <p>AI-powered taxonomy and metadata enrichment that keeps your content organized at scale.</p>
+                        <div class="mcp-detail">Automatically categorize, tag, and cross-reference content as it's published. Reduce manual taxonomy work by up to 80% while improving content discoverability and recommendation accuracy.</div>
+                        <div class="expand-hint">Click to explore</div>
+                    </div>
+                    <div class="mcp-card" onclick="this.classList.toggle('expanded')">
+                        <div class="mcp-icon" style="background:rgba(56,88,233,0.12);">&#128202;</div>
+                        <h4>Audience Insights</h4>
+                        <p>Parse.ly analytics integrated with AI to surface what resonates and predict content performance.</p>
+                        <div class="mcp-detail">Parse.ly (included with VIP) provides real-time content analytics. Combined with MCP, editors get AI-powered recommendations on optimal publish times, headline variations, and content gaps in your coverage.</div>
+                        <div class="expand-hint">Click to explore</div>
+                    </div>
+                    <div class="mcp-card" onclick="this.classList.toggle('expanded')">
+                        <div class="mcp-icon" style="background:rgba(255,89,94,0.12);">&#127911;</div>
+                        <h4>Audio/Podcast Integration</h4>
+                        <p>Transcribe, summarize, and cross-publish podcast content with AI-assisted workflows.</p>
+                        <div class="mcp-detail">Automatically generate show notes, article versions of audio content, and social clips from podcast episodes. Perfect for NPR's extensive podcast library, enabling multi-format publishing from a single source.</div>
+                        <div class="expand-hint">Click to explore</div>
+                    </div>
+                    <div class="mcp-card" onclick="this.classList.toggle('expanded')">
+                        <div class="mcp-icon" style="background:rgba(251,144,47,0.12);">&#128640;</div>
+                        <h4>Workflow Automation</h4>
+                        <p>Automate repetitive editorial tasks, from fact-check flags to distribution across member stations.</p>
+                        <div class="mcp-detail">Build custom AI-powered workflows: auto-flag content for legal review, generate multi-format distributions for member stations, queue social media posts, and trigger notifications. All configurable, no code required.</div>
+                        <div class="expand-hint">Click to explore</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 8: GLOBAL CDN ═══════════ -->
+            <div class="slide slide-dark cdn-slide" id="slide-8">
+                <h2>Global Edge Network</h2>
+                <div class="sub">Your content, cached at the edge, delivered in milliseconds. Hover over nodes to explore.</div>
+                <div class="cdn-content">
+                    <div class="cdn-map-container" id="cdnMapContainer">
+                        <svg class="cdn-map-svg" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Simplified world map outline -->
+                            <g opacity="0.12" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.8">
+                                <!-- North America -->
+                                <path d="M120,120 L180,100 L220,105 L245,130 L240,160 L220,180 L190,200 L170,210 L150,200 L130,180 L115,155 Z"/>
+                                <!-- South America -->
+                                <path d="M190,230 L210,225 L230,250 L235,290 L220,330 L200,360 L185,340 L180,300 L175,260 Z"/>
+                                <!-- Europe -->
+                                <path d="M370,100 L390,95 L420,100 L430,115 L420,135 L400,145 L380,140 L365,125 Z"/>
+                                <!-- Africa -->
+                                <path d="M380,160 L410,155 L430,170 L435,210 L420,260 L400,280 L385,260 L375,220 L370,180 Z"/>
+                                <!-- Asia -->
+                                <path d="M450,80 L520,75 L580,90 L620,105 L640,130 L630,160 L600,170 L550,165 L500,150 L460,130 L445,110 Z"/>
+                                <!-- Australia -->
+                                <path d="M600,280 L640,275 L660,290 L655,315 L630,325 L605,310 L595,295 Z"/>
+                            </g>
+                            <!-- Connection lines -->
+                            <g class="cdn-connections" stroke="rgba(62,160,173,0.15)" stroke-width="0.5" fill="none">
+                                <line x1="160" y1="145" x2="390" y2="120"/>
+                                <line x1="160" y1="145" x2="240" y2="155"/>
+                                <line x1="390" y1="120" x2="500" y2="130"/>
+                                <line x1="500" y1="130" x2="620" y2="140"/>
+                                <line x1="390" y1="120" x2="400" y2="200"/>
+                                <line x1="620" y1="140" x2="630" y2="295"/>
+                                <line x1="160" y1="145" x2="195" y2="270"/>
+                            </g>
+                            <!-- CDN Nodes -->
+                            <g class="cdn-node" data-city="Ashburn, VA" data-latency="12ms" data-pop="Primary" data-capacity="100 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="215" cy="145" r="4"/>
+                                <circle class="node-dot" cx="215" cy="145" r="4"/>
+                            </g>
+                            <g class="cdn-node" data-city="San Francisco" data-latency="18ms" data-pop="Primary" data-capacity="80 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="130" cy="148" r="4" style="animation-delay:0.3s"/>
+                                <circle class="node-dot" cx="130" cy="148" r="4"/>
+                            </g>
+                            <g class="cdn-node" data-city="Chicago" data-latency="15ms" data-pop="Primary" data-capacity="60 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="180" cy="135" r="4" style="animation-delay:0.6s"/>
+                                <circle class="node-dot" cx="180" cy="135" r="4"/>
+                            </g>
+                            <g class="cdn-node" data-city="London" data-latency="22ms" data-pop="Primary" data-capacity="80 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="380" cy="115" r="4" style="animation-delay:0.9s"/>
+                                <circle class="node-dot" cx="380" cy="115" r="4"/>
+                            </g>
+                            <g class="cdn-node" data-city="Frankfurt" data-latency="25ms" data-pop="Primary" data-capacity="60 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="400" cy="120" r="3.5" style="animation-delay:1.2s"/>
+                                <circle class="node-dot" cx="400" cy="120" r="3.5"/>
+                            </g>
+                            <g class="cdn-node" data-city="Tokyo" data-latency="35ms" data-pop="Secondary" data-capacity="40 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="640" cy="140" r="3.5" style="animation-delay:1.5s"/>
+                                <circle class="node-dot" cx="640" cy="140" r="3.5"/>
+                            </g>
+                            <g class="cdn-node" data-city="Singapore" data-latency="42ms" data-pop="Secondary" data-capacity="40 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="580" cy="205" r="3.5" style="animation-delay:1.8s"/>
+                                <circle class="node-dot" cx="580" cy="205" r="3.5"/>
+                            </g>
+                            <g class="cdn-node" data-city="Sydney" data-latency="48ms" data-pop="Secondary" data-capacity="30 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="640" cy="310" r="3" style="animation-delay:2.1s"/>
+                                <circle class="node-dot" cx="640" cy="310" r="3"/>
+                            </g>
+                            <g class="cdn-node" data-city="S&#xE3;o Paulo" data-latency="55ms" data-pop="Secondary" data-capacity="30 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="225" cy="310" r="3" style="animation-delay:2.4s"/>
+                                <circle class="node-dot" cx="225" cy="310" r="3"/>
+                            </g>
+                            <g class="cdn-node" data-city="Mumbai" data-latency="38ms" data-pop="Secondary" data-capacity="40 Gbps" onmouseenter="showCdnTooltip(evt)" onmouseleave="hideCdnTooltip()">
+                                <circle class="node-pulse" cx="520" cy="185" r="3.5" style="animation-delay:0.4s"/>
+                                <circle class="node-dot" cx="520" cy="185" r="3.5"/>
+                            </g>
+                        </svg>
+                        <div class="cdn-tooltip" id="cdnTooltip">
+                            <h5 id="ttCity">City</h5>
+                            <div class="tt-row"><span class="tt-label">Latency</span><span class="tt-value" id="ttLatency">--</span></div>
+                            <div class="tt-row"><span class="tt-label">Type</span><span class="tt-value" id="ttPop">--</span></div>
+                            <div class="tt-row"><span class="tt-label">Capacity</span><span class="tt-value" id="ttCapacity">--</span></div>
+                        </div>
+                    </div>
+                    <div class="cdn-stats stagger-children">
+                        <div class="cdn-stat-card">
+                            <div class="stat-num">20+</div>
+                            <div class="stat-label">Global Edge Locations</div>
+                        </div>
+                        <div class="cdn-stat-card">
+                            <div class="stat-num">&lt;50ms</div>
+                            <div class="stat-label">Global TTFB</div>
+                        </div>
+                        <div class="cdn-stat-card">
+                            <div class="stat-num">99.99%</div>
+                            <div class="stat-label">Uptime SLA</div>
+                        </div>
+                        <div class="cdn-stat-card">
+                            <div class="stat-num">&#8734;</div>
+                            <div class="stat-label">Auto-Scaling</div>
+                        </div>
+                        <div class="cdn-stat-card">
+                            <div class="stat-num">10B+</div>
+                            <div class="stat-label">Pages Served Monthly</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 9: COMPARISON ═══════════ -->
+            <div class="slide slide-dark compare-slide" id="slide-9">
+                <h2>Brightspot vs. WordPress VIP</h2>
+                <div class="sub">A side-by-side look at what matters for NPR. Click categories to explore.</div>
+                <div class="compare-tabs" id="compareTabs">
+                    <button class="compare-tab active" data-cat="platform">Platform</button>
+                    <button class="compare-tab" data-cat="editing">Editing</button>
+                    <button class="compare-tab" data-cat="performance">Performance</button>
+                    <button class="compare-tab" data-cat="ecosystem">Ecosystem</button>
+                    <button class="compare-tab" data-cat="ai">AI / MCP</button>
+                </div>
+                <div class="compare-table-container">
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th>Capability</th>
+                                <th class="bs-col">Brightspot</th>
+                                <th class="vip-col">WordPress VIP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Platform -->
+                            <tr class="compare-category active" data-cat="platform">
+                                <td>Architecture</td>
+                                <td class="bs-cell">Proprietary Java monolith</td>
+                                <td class="vip-cell">Open-source PHP, headless-ready</td>
+                            </tr>
+                            <tr class="compare-category active" data-cat="platform">
+                                <td>Source Code Access</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> Closed source</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Fully open source</td>
+                            </tr>
+                            <tr class="compare-category active" data-cat="platform">
+                                <td>Vendor Independence</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> Vendor lock-in</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Portable, your code</td>
+                            </tr>
+                            <tr class="compare-category active" data-cat="platform">
+                                <td>Managed Hosting</td>
+                                <td class="bs-cell"><span class="compare-partial">&#9679;</span> Available at cost</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Fully managed, included</td>
+                            </tr>
+                            <!-- Editing -->
+                            <tr class="compare-category" data-cat="editing">
+                                <td>Real-Time Collaboration</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> Not available</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Google Docs-style editing</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="editing">
+                                <td>Block Editor</td>
+                                <td class="bs-cell"><span class="compare-partial">&#9679;</span> Proprietary modules</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Gutenberg (industry standard)</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="editing">
+                                <td>Revision History</td>
+                                <td class="bs-cell"><span class="compare-check">&#10003;</span> Basic revisions</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Full history + diff view</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="editing">
+                                <td>Editorial Workflows</td>
+                                <td class="bs-cell"><span class="compare-check">&#10003;</span> Built-in</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Flexible, customizable</td>
+                            </tr>
+                            <!-- Performance -->
+                            <tr class="compare-category" data-cat="performance">
+                                <td>Global CDN</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> BYO CDN</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> 20+ PoPs, included</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="performance">
+                                <td>Auto-Scaling</td>
+                                <td class="bs-cell"><span class="compare-partial">&#9679;</span> Manual scaling</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Automatic, zero-config</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="performance">
+                                <td>Uptime SLA</td>
+                                <td class="bs-cell">99.9%</td>
+                                <td class="vip-cell">99.99%</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="performance">
+                                <td>Breaking News Readiness</td>
+                                <td class="bs-cell"><span class="compare-partial">&#9679;</span> Requires planning</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Always ready</td>
+                            </tr>
+                            <!-- Ecosystem -->
+                            <tr class="compare-category" data-cat="ecosystem">
+                                <td>Plugin Ecosystem</td>
+                                <td class="bs-cell">Limited proprietary</td>
+                                <td class="vip-cell">60,000+ WordPress plugins</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="ecosystem">
+                                <td>Developer Community</td>
+                                <td class="bs-cell">Niche (hundreds)</td>
+                                <td class="vip-cell">Massive (millions)</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="ecosystem">
+                                <td>Hiring Pool</td>
+                                <td class="bs-cell">Java/Brightspot specialists</td>
+                                <td class="vip-cell">WordPress devs everywhere</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="ecosystem">
+                                <td>Content Analytics</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> Third-party required</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Parse.ly included</td>
+                            </tr>
+                            <!-- AI -->
+                            <tr class="compare-category" data-cat="ai">
+                                <td>Native AI / MCP</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> No native support</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Built-in MCP</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="ai">
+                                <td>AI Content Assist</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> Not available</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Drafting, summaries, SEO</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="ai">
+                                <td>Automated Tagging</td>
+                                <td class="bs-cell"><span class="compare-partial">&#9679;</span> Basic rules</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> AI-powered taxonomy</td>
+                            </tr>
+                            <tr class="compare-category" data-cat="ai">
+                                <td>Predictive Analytics</td>
+                                <td class="bs-cell"><span class="compare-x">&#10007;</span> Not available</td>
+                                <td class="vip-cell"><span class="compare-check">&#10003;</span> Parse.ly + AI insights</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 10: CASE STUDIES ═══════════ -->
+            <div class="slide slide-gradient cases-slide" id="slide-10">
+                <div class="geo-circles"></div>
+                <h2>Trusted by the World's Top Media</h2>
+                <div class="sub">WordPress VIP powers the most demanding content operations on the planet.</div>
+                <div class="cases-carousel" id="casesCarousel">
+                    <div class="case-card">
+                        <div class="case-logo">TechCrunch</div>
+                        <div class="case-type">Technology Media</div>
+                        <div class="case-quote">"WordPress VIP gives us the speed and reliability we need to break news. Our editorial team can publish at the pace of the tech industry without worrying about infrastructure."</div>
+                        <!-- PLACEHOLDER: Replace with actual TechCrunch quote -->
+                        <div class="case-metrics">
+                            <div class="case-metric">
+                                <div class="metric-num">50M+</div>
+                                <div class="metric-label">Monthly Visitors</div>
+                            </div>
+                            <div class="case-metric">
+                                <div class="metric-num">40%</div>
+                                <div class="metric-label">Faster Load Times</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-logo">CNN</div>
+                        <div class="case-type">Global News Network</div>
+                        <div class="case-quote">"The scale and reliability of WordPress VIP allows us to deliver breaking news to a global audience with confidence, even during peak traffic events."</div>
+                        <!-- PLACEHOLDER: Replace with actual CNN quote -->
+                        <div class="case-metrics">
+                            <div class="case-metric">
+                                <div class="metric-num">200M+</div>
+                                <div class="metric-label">Monthly Visitors</div>
+                            </div>
+                            <div class="case-metric">
+                                <div class="metric-num">99.99%</div>
+                                <div class="metric-label">Uptime</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-logo">USA Today</div>
+                        <div class="case-type">National News</div>
+                        <div class="case-quote">"Migrating to WordPress VIP transformed our content operations. Our team publishes faster, collaborates better, and we have eliminated performance concerns."</div>
+                        <!-- PLACEHOLDER: Replace with actual USA Today quote -->
+                        <div class="case-metrics">
+                            <div class="case-metric">
+                                <div class="metric-num">100M+</div>
+                                <div class="metric-label">Monthly Visitors</div>
+                            </div>
+                            <div class="case-metric">
+                                <div class="metric-num">3x</div>
+                                <div class="metric-label">Content Velocity</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cases-nav" id="casesNav">
+                    <div class="cases-dot active" data-index="0"></div>
+                    <div class="cases-dot" data-index="1"></div>
+                    <div class="cases-dot" data-index="2"></div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 11: TRUST & SECURITY ═══════════ -->
+            <div class="slide slide-dark trust-slide" id="slide-11">
+                <div class="geo-pattern"></div>
+                <h2>Enterprise Trust &amp; Security</h2>
+                <div class="sub">The security posture that NPR's audience and stakeholders demand.</div>
+                <div class="trust-grid stagger-children">
+                    <div class="trust-card">
+                        <div class="trust-icon">&#128737;</div>
+                        <div class="trust-value">SOC 2</div>
+                        <div class="trust-label">Type II Certified</div>
+                        <div class="trust-desc">Independently audited security controls and processes</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#127757;</div>
+                        <div class="trust-value">ISO 27001</div>
+                        <div class="trust-label">Certified</div>
+                        <div class="trust-desc">International standard for information security management</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#128272;</div>
+                        <div class="trust-value">24/7</div>
+                        <div class="trust-label">Expert Support</div>
+                        <div class="trust-desc">Dedicated WordPress experts available around the clock</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#128170;</div>
+                        <div class="trust-value">DDoS</div>
+                        <div class="trust-label">Protection</div>
+                        <div class="trust-desc">Automatic mitigation with zero downtime during attacks</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#128736;</div>
+                        <div class="trust-value">Auto</div>
+                        <div class="trust-label">Security Patches</div>
+                        <div class="trust-desc">Core and plugin updates managed and tested automatically</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#128221;</div>
+                        <div class="trust-value">Code</div>
+                        <div class="trust-label">Review</div>
+                        <div class="trust-desc">Every line of custom code reviewed by VIP engineers before deploy</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#128203;</div>
+                        <div class="trust-value">GDPR</div>
+                        <div class="trust-label">Compliant</div>
+                        <div class="trust-desc">Full compliance with global privacy regulations</div>
+                    </div>
+                    <div class="trust-card">
+                        <div class="trust-icon">&#9201;</div>
+                        <div class="trust-value">99.99%</div>
+                        <div class="trust-label">Uptime SLA</div>
+                        <div class="trust-desc">Contractual uptime guarantee backed by infrastructure</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 12: ROI CALCULATOR ═══════════ -->
+            <div class="slide slide-dark roi-slide" id="slide-12">
+                <div class="geo-pattern"></div>
+                <h2>Estimated Impact for NPR</h2>
+                <div class="sub">Adjust the sliders to see projected savings and gains from switching to WordPress VIP.</div>
+                <div class="roi-layout">
+                    <div class="roi-inputs">
+                        <div class="roi-input-group">
+                            <label>Monthly articles published</label>
+                            <div class="slider-row">
+                                <input type="range" min="100" max="5000" value="1500" step="100" id="roiArticles" oninput="updateROI()">
+                                <span class="slider-val" id="roiArticlesVal">1,500</span>
+                            </div>
+                        </div>
+                        <div class="roi-input-group">
+                            <label>Editorial team size</label>
+                            <div class="slider-row">
+                                <input type="range" min="10" max="500" value="150" step="10" id="roiTeam" oninput="updateROI()">
+                                <span class="slider-val" id="roiTeamVal">150</span>
+                            </div>
+                        </div>
+                        <div class="roi-input-group">
+                            <label>Average article production time (hours)</label>
+                            <div class="slider-row">
+                                <input type="range" min="1" max="12" value="4" step="0.5" id="roiTime" oninput="updateROI()">
+                                <span class="slider-val" id="roiTimeVal">4.0h</span>
+                            </div>
+                        </div>
+                        <div class="roi-input-group">
+                            <label>Monthly infrastructure cost ($K)</label>
+                            <div class="slider-row">
+                                <input type="range" min="5" max="200" value="50" step="5" id="roiInfra" oninput="updateROI()">
+                                <span class="slider-val" id="roiInfraVal">$50K</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="roi-results">
+                        <div class="roi-result-card">
+                            <div class="roi-num" id="roiTimeSaved">450</div>
+                            <div class="roi-label">Hours Saved / Month</div>
+                        </div>
+                        <div class="roi-result-card">
+                            <div class="roi-num" id="roiArticlesGain">+38%</div>
+                            <div class="roi-label">Content Velocity</div>
+                        </div>
+                        <div class="roi-result-card">
+                            <div class="roi-num" id="roiInfraSave">$15K</div>
+                            <div class="roi-label">Infrastructure Savings / Mo</div>
+                        </div>
+                        <div class="roi-result-card">
+                            <div class="roi-num" id="roiSpeedGain">2.3x</div>
+                            <div class="roi-label">Page Speed Improvement</div>
+                        </div>
+                        <div class="roi-result-card featured">
+                            <div class="roi-num" id="roiAnnual">$312K</div>
+                            <div class="roi-label">Estimated Annual Savings</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 13: NEXT STEPS ═══════════ -->
+            <div class="slide slide-gradient steps-slide" id="slide-13">
+                <div class="geo-circles"></div>
+                <div>
+                    <div class="gold-line" style="margin-bottom:20px;"></div>
+                    <h2>Let's Build the Future of NPR Digital</h2>
+                    <p>A clear path from conversation to partnership.</p>
+                </div>
+                <div class="steps-list stagger-children">
+                    <div class="step-item">
+                        <div class="step-num">1</div>
+                        <div>
+                            <h4>Discovery Workshop</h4>
+                            <p>Deep dive into NPR's technical landscape, editorial workflows, and strategic priorities. 2-hour session with your team.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">2</div>
+                        <div>
+                            <h4>Technical Assessment</h4>
+                            <p>Our solutions architects map your current Brightspot environment and design a migration strategy with zero downtime.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">3</div>
+                        <div>
+                            <h4>Proof of Concept</h4>
+                            <p>Stand up a working WordPress VIP environment with your content, your integrations, and your editorial team.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">4</div>
+                        <div>
+                            <h4>Executive Review</h4>
+                            <p>Present findings, ROI analysis, and proposed partnership model to NPR leadership for final alignment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 14: CONTACT / CTA ═══════════ -->
+            <div class="slide slide-dark contact-slide" id="slide-14">
+                <div class="geo-pattern"></div>
+                <div class="corner-accent-tl"></div>
+                <div class="corner-accent-br"></div>
+                <div class="contact-left">
+                    <div class="vip-logo">
+                        <span class="logo-wp">WordPress</span><span class="logo-vip"> VIP</span>
+                    </div>
+                    <h2>Ready to<br>Get Started?</h2>
+                    <div class="gold-line" style="margin-bottom:16px;"></div>
+                    <p>Book a time that works for you. We will walk through NPR's specific needs and explore what a WordPress VIP partnership looks like.</p>
+                    <div class="contact-details">
+                        <!-- PLACEHOLDER: Replace with actual contact details -->
+                        <div class="contact-detail"><strong>Nate Kelly</strong></div>
+                        <div class="contact-detail">WordPress VIP</div>
+                    </div>
+                </div>
+                <div class="calendar-embed">
+                    <div class="cal-header">Book a Conversation</div>
+                    <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" width="100%" height="100%" frameborder="0" style="border:0;min-height:500px;"></iframe>
+                </div>
+            </div>
+
+        </div><!-- /deck-scaler -->
+    </div><!-- /deck-viewport -->
+
+    <!-- ─── Navigation ─── -->
+    <div class="nav-controls" id="navControls">
+        <button class="nav-btn" id="prevBtn" onclick="goToSlide(currentSlide - 1)">&#8592;</button>
+        <span class="slide-counter" id="slideCounter" onclick="toggleOverview()">1 / 14</span>
+        <button class="nav-btn" id="nextBtn" onclick="goToSlide(currentSlide + 1)">&#8594;</button>
+    </div>
+
+    <!-- ─── Overview ─── -->
+    <div class="overview-overlay" id="overviewOverlay">
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════
+        // SLIDE ENGINE
+        // ═══════════════════════════════
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+        let overviewOpen = false;
+
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+            slides[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('slideCounter').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+            document.getElementById('progressBar').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            // Trigger count-up animations
+            if (slides[currentSlide].querySelectorAll('.count-up').length) {
+                slides[currentSlide].querySelectorAll('.count-up').forEach(animateCount);
+            }
+        }
+
+        // Keyboard
+        document.addEventListener('keydown', function(e) {
+            if (overviewOpen) {
+                if (e.key === 'Escape') toggleOverview();
+                return;
+            }
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goToSlide(currentSlide + 1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); goToSlide(currentSlide - 1); }
+            if (e.key === 'Escape') toggleOverview();
+        });
+
+        // Touch
+        let touchStartX = 0;
+        document.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', function(e) {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) goToSlide(currentSlide + 1);
+                else goToSlide(currentSlide - 1);
+            }
+        });
+
+        // Scale
+        function scaleDeck() {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const scale = Math.min(vw / 1280, vh / 720);
+            document.getElementById('deckScaler').style.transform = 'scale(' + scale + ')';
+        }
+        window.addEventListener('resize', scaleDeck);
+        scaleDeck();
+
+        // Overview
+        function toggleOverview() {
+            const overlay = document.getElementById('overviewOverlay');
+            overviewOpen = !overviewOpen;
+            overlay.classList.toggle('visible', overviewOpen);
+            if (overviewOpen) buildOverview();
+        }
+
+        function buildOverview() {
+            const grid = document.getElementById('overviewGrid');
+            grid.innerHTML = '';
+            slides.forEach(function(slide, i) {
+                const thumb = document.createElement('div');
+                thumb.className = 'overview-thumb' + (i === currentSlide ? ' current' : '');
+                const inner = document.createElement('div');
+                inner.className = 'overview-thumb-inner';
+                inner.innerHTML = slide.innerHTML;
+                const scaleVal = thumb.offsetWidth ? thumb.offsetWidth / 1280 : 0.2;
+                inner.style.transform = 'scale(0.2)';
+                inner.style.width = '1280px';
+                inner.style.height = '720px';
+                thumb.appendChild(inner);
+                const label = document.createElement('div');
+                label.className = 'overview-thumb-label';
+                label.textContent = 'Slide ' + (i + 1);
+                thumb.appendChild(label);
+                thumb.addEventListener('click', function() {
+                    goToSlide(i);
+                    toggleOverview();
+                });
+                grid.appendChild(thumb);
+            });
+        }
+
+        // Count-up animation
+        function animateCount(el) {
+            if (el.dataset.animated) return;
+            el.dataset.animated = '1';
+            const target = parseFloat(el.dataset.target);
+            const isFloat = String(target).includes('.');
+            const duration = 1200;
+            const start = performance.now();
+            function step(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = eased * target;
+                el.textContent = isFloat ? current.toFixed(1) : Math.round(current);
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // ═══════════════════════════════
+        // COLLABORATIVE EDITING DEMO
+        // ═══════════════════════════════
+        const headlineText = "Breaking: Federal Reserve Signals Rate Cuts Amid Economic Uncertainty";
+        const bodyText = "The Federal Reserve indicated today that interest rate reductions could begin as early as March, marking a significant shift in monetary policy. Markets responded positively to the announcement.";
+        const bodyText2 = "Editor's note: Awaiting confirmation from Fed spokesperson. Expected press conference at 2:30 PM ET.";
+
+        let headlineIndex = 0;
+        let bodyIndex = 0;
+        let body2Index = 0;
+        let typingPhase = 0;
+
+        function typeWriter() {
+            const activeSlide = slides[currentSlide];
+            if (activeSlide.id !== 'slide-6') return;
+
+            if (typingPhase === 0 && headlineIndex <= headlineText.length) {
+                document.getElementById('headline-typed').textContent = headlineText.substring(0, headlineIndex);
+                headlineIndex++;
+                setTimeout(typeWriter, 35);
+                if (headlineIndex > headlineText.length) { typingPhase = 1; setTimeout(typeWriter, 400); }
+            } else if (typingPhase === 1 && bodyIndex <= bodyText.length) {
+                document.getElementById('body-text').textContent = bodyText.substring(0, bodyIndex);
+                bodyIndex++;
+                setTimeout(typeWriter, 18);
+                if (bodyIndex > bodyText.length) { typingPhase = 2; setTimeout(typeWriter, 600); }
+            } else if (typingPhase === 2 && body2Index <= bodyText2.length) {
+                document.getElementById('body-text-2').textContent = bodyText2.substring(0, body2Index);
+                body2Index++;
+                setTimeout(typeWriter, 25);
+            }
+        }
+
+        // Observe when slide 6 becomes active
+        const collabObserver = new MutationObserver(function() {
+            if (slides[5].classList.contains('active')) {
+                headlineIndex = 0; bodyIndex = 0; body2Index = 0; typingPhase = 0;
+                document.getElementById('headline-typed').textContent = '';
+                document.getElementById('body-text').textContent = '';
+                document.getElementById('body-text-2').textContent = '';
+                setTimeout(typeWriter, 500);
+            }
+        });
+        collabObserver.observe(slides[5], { attributes: true, attributeFilter: ['class'] });
+
+        // Collab feature toggles
+        document.querySelectorAll('.collab-feature').forEach(function(feat) {
+            feat.addEventListener('click', function() {
+                document.querySelectorAll('.collab-feature').forEach(function(f) { f.classList.remove('active'); });
+                feat.classList.add('active');
+            });
+        });
+
+        // ═══════════════════════════════
+        // CDN MAP TOOLTIP
+        // ═══════════════════════════════
+        function showCdnTooltip(evt) {
+            const node = evt.currentTarget;
+            const tooltip = document.getElementById('cdnTooltip');
+            document.getElementById('ttCity').textContent = node.dataset.city;
+            document.getElementById('ttLatency').textContent = node.dataset.latency;
+            document.getElementById('ttPop').textContent = node.dataset.pop;
+            document.getElementById('ttCapacity').textContent = node.dataset.capacity;
+
+            const container = document.getElementById('cdnMapContainer');
+            const rect = container.getBoundingClientRect();
+            const circle = node.querySelector('.node-dot');
+            const cx = parseFloat(circle.getAttribute('cx'));
+            const cy = parseFloat(circle.getAttribute('cy'));
+            const svg = container.querySelector('svg');
+            const svgRect = svg.getBoundingClientRect();
+            const scaleX = svgRect.width / 800;
+            const scaleY = svgRect.height / 450;
+
+            tooltip.style.left = (cx * scaleX + svgRect.left - rect.left + 10) + 'px';
+            tooltip.style.top = (cy * scaleY + svgRect.top - rect.top - 40) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideCdnTooltip() {
+            document.getElementById('cdnTooltip').classList.remove('visible');
+        }
+
+        // ═══════════════════════════════
+        // COMPARISON TABS
+        // ═══════════════════════════════
+        document.querySelectorAll('.compare-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.compare-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                const cat = tab.dataset.cat;
+                document.querySelectorAll('.compare-category').forEach(function(row) {
+                    row.classList.toggle('active', row.dataset.cat === cat);
+                });
+            });
+        });
+
+        // ═══════════════════════════════
+        // CASE STUDY CAROUSEL
+        // ═══════════════════════════════
+        let caseIndex = 0;
+        const carousel = document.getElementById('casesCarousel');
+        const caseDots = document.querySelectorAll('.cases-dot');
+
+        function scrollCases(index) {
+            caseIndex = index;
+            const cardWidth = 376; // 360 + 16 gap
+            carousel.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
+            caseDots.forEach(function(d, i) { d.classList.toggle('active', i === index); });
+        }
+
+        caseDots.forEach(function(dot) {
+            dot.addEventListener('click', function() { scrollCases(parseInt(dot.dataset.index)); });
+        });
+
+        // Auto-advance carousel
+        let caseTimer = setInterval(function() {
+            if (slides[currentSlide].id === 'slide-10') {
+                caseIndex = (caseIndex + 1) % 3;
+                scrollCases(caseIndex);
+            }
+        }, 4000);
+
+        // ═══════════════════════════════
+        // ROI CALCULATOR
+        // ═══════════════════════════════
+        function updateROI() {
+            const articles = parseInt(document.getElementById('roiArticles').value);
+            const team = parseInt(document.getElementById('roiTeam').value);
+            const time = parseFloat(document.getElementById('roiTime').value);
+            const infra = parseInt(document.getElementById('roiInfra').value);
+
+            document.getElementById('roiArticlesVal').textContent = articles.toLocaleString();
+            document.getElementById('roiTeamVal').textContent = team;
+            document.getElementById('roiTimeVal').textContent = time.toFixed(1) + 'h';
+            document.getElementById('roiInfraVal').textContent = '$' + infra + 'K';
+
+            // Calculations (estimates)
+            const timeSaved = Math.round(articles * time * 0.20); // 20% efficiency gain
+            const velocityGain = Math.round(20 + (team / 500) * 25); // 20-45% depending on team size
+            const infraSavings = Math.round(infra * 0.30); // 30% infra savings
+            const speedImprovement = (1.5 + (infra / 200) * 1.5).toFixed(1); // 1.5x - 3.0x
+            const annualSavings = Math.round((timeSaved * 75 + infraSavings * 1000) * 12 / 1000); // $75/hr labor + infra
+
+            document.getElementById('roiTimeSaved').textContent = timeSaved.toLocaleString();
+            document.getElementById('roiArticlesGain').textContent = '+' + velocityGain + '%';
+            document.getElementById('roiInfraSave').textContent = '$' + infraSavings + 'K';
+            document.getElementById('roiSpeedGain').textContent = speedImprovement + 'x';
+            document.getElementById('roiAnnual').textContent = '$' + annualSavings + 'K';
+        }
+
+        // ═══════════════════════════════
+        // INIT
+        // ═══════════════════════════════
+        updateUI();
+        updateROI();
+    </script>
+</body>
+</html>

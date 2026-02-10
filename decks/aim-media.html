@@ -251,9 +251,9 @@
         .parsely-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1vw; padding: 1vw; height: calc(100% - 4vh); }
         .parsely-chart { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1vw; position: relative; }
         .parsely-chart-title { font-size: 0.75vw; font-weight: 600; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.8vh; }
-        .parsely-bar-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 60%; padding-top: 1vh; }
-        .parsely-bar-col { display: flex; flex-direction: column; align-items: center; gap: 0.3vh; flex: 1; }
-        .parsely-bar { width: 60%; border-radius: 3px 3px 0 0; transition: height 0.8s ease, background 0.3s; cursor: pointer; min-height: 2px; position: relative; }
+        .parsely-bar-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 65%; padding-top: 1vh; }
+        .parsely-bar-col { display: flex; flex-direction: column; align-items: center; gap: 0.5vh; flex: 1; }
+        .parsely-bar { width: 3.5vw; border-radius: 4px 4px 0 0; transition: height 0.8s ease, background 0.3s; cursor: pointer; min-height: 4px; position: relative; }
         .parsely-bar:hover { filter: brightness(1.3); }
         .parsely-bar-label { font-size: 0.55vw; color: var(--vip-gray); }
         .parsely-bar-value { position: absolute; top: -1.5vh; left: 50%; transform: translateX(-50%); font-size: 0.6vw; color: var(--vip-white); font-weight: 600; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
@@ -277,20 +277,19 @@
         .parsely-top-views { font-size: 0.65vw; color: var(--vip-turquoise); font-weight: 600; }
 
         /* MCP Architecture Diagram */
-        .mcp-diagram { position: relative; width: 100%; height: 42vh; margin-top: 1.5vh; }
-        .mcp-layer { position: absolute; left: 50%; transform: translateX(-50%); width: 70%; border-radius: 10px; padding: 1vw 1.5vw; transition: all 0.4s ease; cursor: pointer; border: 1px solid transparent; }
+        .mcp-diagram { width: 70%; margin: 1.5vh auto 0; display: flex; flex-direction: column; gap: 0; }
+        .mcp-layer { border-radius: 10px; padding: 1vw 1.5vw; transition: all 0.4s ease; cursor: pointer; border: 1px solid transparent; }
         .mcp-layer:hover { border-color: var(--vip-gold); }
-        .mcp-layer.expanded { z-index: 10; }
         .mcp-layer-title { font-size: 0.9vw; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3vh; }
-        .mcp-layer-desc { font-size: 0.8vw; color: var(--vip-gray); transition: max-height 0.4s ease, opacity 0.3s; }
+        .mcp-layer-desc { font-size: 0.8vw; color: var(--vip-gray); }
         .mcp-layer-detail { max-height: 0; overflow: hidden; transition: max-height 0.5s ease, opacity 0.3s; opacity: 0; }
         .mcp-layer.expanded .mcp-layer-detail { max-height: 20vh; opacity: 1; }
         .mcp-layer-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8vw; margin-top: 0.8vh; }
         .mcp-detail-item { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.6vw; text-align: center; }
         .mcp-detail-item h4 { font-size: 0.75vw; color: var(--vip-gold); font-weight: 600; margin-bottom: 0.2vh; }
         .mcp-detail-item p { font-size: 0.65vw; color: var(--vip-gray); }
-        .mcp-connector { position: absolute; left: 50%; width: 2px; background: linear-gradient(to bottom, var(--vip-gold), rgba(216,164,95,0.3)); transform: translateX(-50%); }
-        .mcp-interact-hint { position: absolute; bottom: 0; right: 0; font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; }
+        .mcp-connector { width: 2px; height: 2vh; background: linear-gradient(to bottom, var(--vip-gold), rgba(216,164,95,0.3)); margin: 0 auto; flex-shrink: 0; }
+        .mcp-interact-hint { text-align: right; font-size: 0.7vw; color: var(--vip-gray); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.5vh; }
 
         /* Calendar embed */
         .calendar-container { width: 100%; max-width: 50vw; margin: 2vh auto 0; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: var(--vip-white); }
@@ -622,29 +621,28 @@
         </div>
     </div>
 
-    <!-- SLIDE 8: Challenge (interactive slider) -->
+    <!-- SLIDE 8: Challenge -->
     <div class="slide slide-dark" id="slide-8">
         <div class="geo-pattern geo-moire"></div>
         <span class="caption animate-in delay-1" style="color: var(--vip-turquoise);">The Challenge</span>
         <h2 class="animate-in delay-1" style="margin-top: 1vh;">Scale Creates Complexity</h2>
         <div class="gold-line animate-in delay-2"></div>
-        <div class="slider-container animate-in delay-3" id="challengeSlider">
-            <div class="slider-left" id="sliderLeft">
-                <span class="slider-label slider-label-red">Current Reality</span>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>Multiple tech stacks across brands creates maintenance overhead</span></div>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>Post-Taunton integration adds technical debt</span></div>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>Fragmented systems limit digital product scaling</span></div>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-red);">&#x2717;</span><span>No cross-brand content sharing or unified analytics</span></div>
+        <div class="vs-layout animate-in delay-3">
+            <div class="vs-column">
+                <h3 style="color: var(--vip-red); font-size: 1.3vw; margin-bottom: 1.5vh;">Current Reality</h3>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span><span>Multiple tech stacks across brands creates maintenance overhead and inconsistent experiences</span></div>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span><span>Post-Taunton integration of infrastructure adds technical debt</span></div>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span><span>Scaling digital products, memberships, and e-commerce on fragmented systems</span></div>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-red);">&#x2717;</span><span>Limited ability to share content, audiences, and learnings across divisions</span></div>
             </div>
-            <div class="slider-right" id="sliderRight">
-                <span class="slider-label slider-label-teal">With WordPress VIP</span>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>One enterprise platform powering all 29+ brands</span></div>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Streamlined migration preserving SEO equity</span></div>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Native memberships, e-commerce, and learning</span></div>
-                <div class="slider-point"><span class="slider-point-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Cross-brand syndication and unified analytics</span></div>
+            <div class="vs-divider"></div>
+            <div class="vs-column">
+                <h3 style="color: var(--vip-turquoise); font-size: 1.3vw; margin-bottom: 1.5vh;">With WordPress VIP</h3>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>One enterprise platform powering all 29+ brands with shared infrastructure</span></div>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Streamlined migration path that preserves SEO equity and editorial workflows</span></div>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Native support for memberships, e-commerce, and digital learning at scale</span></div>
+                <div class="vs-item"><span class="vs-icon" style="color: var(--vip-turquoise);">&#x2713;</span><span>Cross-brand content syndication, unified analytics, and audience insights</span></div>
             </div>
-            <div class="slider-handle" id="sliderHandle"></div>
-            <div class="slider-hint">Drag to compare</div>
         </div>
     </div>
 
@@ -669,7 +667,7 @@
             </div>
             <div class="flip-card" onclick="this.classList.toggle('flipped')">
                 <div class="flip-card-inner">
-                    <div class="flip-card-front"><h3>Enterprise Security</h3><p>SOC 2 Type II, ISO 27001</p><span class="flip-hint">Click to flip</span></div>
+                    <div class="flip-card-front"><h3>Enterprise Security</h3><p>SOC Type I, ISO 27001</p><span class="flip-hint">Click to flip</span></div>
                     <div class="flip-card-back"><h3>For AIM</h3><p>Protect subscriber data, payment info, and member accounts across all divisions. Proactive threat monitoring and automated security patching included.</p></div>
                 </div>
             </div>
@@ -740,8 +738,7 @@
         <h2 class="animate-in delay-1" style="margin-top: 1vh;">Managed Cloud Platform</h2>
         <p class="animate-in delay-2" style="color: var(--vip-gray); max-width: 45vw; font-size: 1.05vw;">Enterprise-grade infrastructure, fully managed. Your teams focus on content and revenue while we handle the complexity underneath.</p>
         <div class="mcp-diagram animate-in delay-3" id="mcpDiagram">
-            <!-- Layer 1: Content -->
-            <div class="mcp-layer" id="mcp-content" style="top: 2%; background: rgba(216,164,95,0.08);" onclick="toggleMcpLayer(this)">
+            <div class="mcp-layer" id="mcp-content" style="background: rgba(216,164,95,0.08);" onclick="toggleMcpLayer(this)">
                 <div class="mcp-layer-title" style="color: var(--vip-gold);">Content Layer</div>
                 <div class="mcp-layer-desc">29+ AIM brand sites, editorial workflows, memberships, e-commerce</div>
                 <div class="mcp-layer-detail">
@@ -752,9 +749,8 @@
                     </div>
                 </div>
             </div>
-            <div class="mcp-connector" style="top: 18%; height: 6%;"></div>
-            <!-- Layer 2: Application -->
-            <div class="mcp-layer" id="mcp-application" style="top: 25%; background: rgba(62,160,173,0.08);" onclick="toggleMcpLayer(this)">
+            <div class="mcp-connector"></div>
+            <div class="mcp-layer" id="mcp-application" style="background: rgba(62,160,173,0.08);" onclick="toggleMcpLayer(this)">
                 <div class="mcp-layer-title" style="color: var(--vip-turquoise);">Application Layer</div>
                 <div class="mcp-layer-desc">PHP runtime, REST + GraphQL APIs, caching, plugin ecosystem</div>
                 <div class="mcp-layer-detail">
@@ -765,9 +761,8 @@
                     </div>
                 </div>
             </div>
-            <div class="mcp-connector" style="top: 41%; height: 6%;"></div>
-            <!-- Layer 3: Platform -->
-            <div class="mcp-layer" id="mcp-platform" style="top: 48%; background: rgba(156,92,225,0.08);" onclick="toggleMcpLayer(this)">
+            <div class="mcp-connector"></div>
+            <div class="mcp-layer" id="mcp-platform" style="background: rgba(156,92,225,0.08);" onclick="toggleMcpLayer(this)">
                 <div class="mcp-layer-title" style="color: var(--vip-purple);">Platform Services</div>
                 <div class="mcp-layer-desc">Git deployments, staging environments, CLI tooling, CI/CD</div>
                 <div class="mcp-layer-detail">
@@ -778,11 +773,10 @@
                     </div>
                 </div>
             </div>
-            <div class="mcp-connector" style="top: 64%; height: 6%;"></div>
-            <!-- Layer 4: Infrastructure -->
-            <div class="mcp-layer" id="mcp-infra" style="top: 71%; background: rgba(251,144,47,0.08);" onclick="toggleMcpLayer(this)">
+            <div class="mcp-connector"></div>
+            <div class="mcp-layer" id="mcp-infra" style="background: rgba(251,144,47,0.08);" onclick="toggleMcpLayer(this)">
                 <div class="mcp-layer-title" style="color: var(--vip-orange);">Infrastructure</div>
-                <div class="mcp-layer-desc">Global CDN, auto-scaling, DDoS protection, SOC 2 + ISO 27001</div>
+                <div class="mcp-layer-desc">Global CDN, auto-scaling, DDoS protection, SOC Type I + ISO 27001</div>
                 <div class="mcp-layer-detail">
                     <div class="mcp-layer-detail-grid">
                         <div class="mcp-detail-item"><h4>Global CDN</h4><p>Edge nodes on every continent</p></div>
@@ -943,8 +937,8 @@
                 <span class="stat-label">Uptime SLA</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">SOC 2</span>
-                <span class="stat-label">Type II Certified</span>
+                <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">SOC</span>
+                <span class="stat-label">Type I Certified</span>
             </div>
             <div class="stat-item">
                 <span class="stat-number" style="font-size: 3vw; color: var(--vip-turquoise-light);">ISO</span>
@@ -1180,30 +1174,6 @@
             if (rows[1]) { rows[1].querySelector('.cdn-stat-label').textContent = 'Avg Latency'; rows[1].querySelector('.cdn-stat-value').textContent = latency; }
         });
     });
-
-    // Before/After slider
-    const slider = document.getElementById('challengeSlider');
-    if (slider) {
-        const handle = document.getElementById('sliderHandle');
-        const leftSide = document.getElementById('sliderLeft');
-        let isDragging = false;
-
-        function updateSlider(x) {
-            const rect = slider.getBoundingClientRect();
-            let pct = ((x - rect.left) / rect.width) * 100;
-            pct = Math.max(15, Math.min(85, pct));
-            handle.style.left = pct + '%';
-            leftSide.style.width = pct + '%';
-        }
-
-        handle.addEventListener('mousedown', e => { isDragging = true; e.preventDefault(); });
-        slider.addEventListener('mousedown', e => { isDragging = true; updateSlider(e.clientX); });
-        document.addEventListener('mousemove', e => { if (isDragging) updateSlider(e.clientX); });
-        document.addEventListener('mouseup', () => { isDragging = false; });
-        handle.addEventListener('touchstart', e => { isDragging = true; }, { passive: true });
-        slider.addEventListener('touchmove', e => { if (isDragging) updateSlider(e.touches[0].clientX); }, { passive: true });
-        document.addEventListener('touchend', () => { isDragging = false; });
-    }
 
     // MCP layer expand/collapse
     window.toggleMcpLayer = function(layer) {

@@ -584,7 +584,199 @@
         }
         .collab-feature.active p { display: block; }
 
-        /* Slide 7: MCP */
+        /* Slide 7: Parse.ly Analytics */
+        .parsely-slide {
+            padding: 50px 80px;
+        }
+        .parsely-slide h2 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+        .parsely-slide .sub {
+            font-size: 15px; color: rgba(255,255,255,0.5);
+            margin-bottom: 20px;
+        }
+        .parsely-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            min-height: 0;
+        }
+        .parsely-dashboard {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .parsely-dash-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+        }
+        .parsely-dash-header .parsely-logo {
+            font-size: 15px; font-weight: 700;
+            color: #70AC1C;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .parsely-dash-header .parsely-logo span {
+            font-weight: 400; color: rgba(255,255,255,0.4);
+            font-size: 12px;
+        }
+        .parsely-time-tabs {
+            display: flex; gap: 4px;
+        }
+        .parsely-time-tab {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px; font-weight: 500;
+            color: rgba(255,255,255,0.35);
+            cursor: pointer;
+            border: none; background: transparent;
+            transition: all 0.2s ease;
+        }
+        .parsely-time-tab:hover { color: rgba(255,255,255,0.6); }
+        .parsely-time-tab.active {
+            background: rgba(112,172,28,0.15);
+            color: #70AC1C;
+        }
+        .parsely-dash-body {
+            flex: 1;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .parsely-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .parsely-kpi {
+            text-align: center;
+            padding: 10px 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+        }
+        .parsely-kpi .kpi-num {
+            font-size: 22px; font-weight: 700;
+            color: #70AC1C;
+            line-height: 1;
+            margin-bottom: 3px;
+        }
+        .parsely-kpi .kpi-label {
+            font-size: 10px; color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .parsely-kpi .kpi-change {
+            font-size: 10px; font-weight: 600;
+            margin-top: 2px;
+        }
+        .kpi-up { color: #70AC1C; }
+        .kpi-down { color: var(--vip-red); }
+        .parsely-chart {
+            flex: 1;
+            position: relative;
+            min-height: 140px;
+        }
+        .parsely-chart svg {
+            width: 100%; height: 100%;
+        }
+        .parsely-chart-label {
+            position: absolute;
+            bottom: 4px;
+            font-size: 9px;
+            color: rgba(255,255,255,0.25);
+            letter-spacing: 0.03em;
+        }
+        .parsely-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .parsely-top-content {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 18px;
+            flex: 1;
+        }
+        .parsely-top-content h4 {
+            font-size: 12px; font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .parsely-top-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .parsely-top-item:last-child { border-bottom: none; }
+        .parsely-top-rank {
+            font-size: 11px; font-weight: 700;
+            color: rgba(255,255,255,0.2);
+            min-width: 16px;
+            padding-top: 2px;
+        }
+        .parsely-top-item .top-title {
+            font-size: 12.5px; font-weight: 500;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.3;
+            flex: 1;
+        }
+        .parsely-top-item .top-views {
+            font-size: 12px; font-weight: 600;
+            color: #70AC1C;
+            white-space: nowrap;
+        }
+        .parsely-sources {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .parsely-sources h4 {
+            font-size: 12px; font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .source-bar-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 8px;
+        }
+        .source-bar-row:last-child { margin-bottom: 0; }
+        .source-label {
+            font-size: 11px; color: rgba(255,255,255,0.5);
+            min-width: 60px;
+        }
+        .source-bar-track {
+            flex: 1; height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .source-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
+        }
+        .source-pct {
+            font-size: 11px; font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            min-width: 32px;
+            text-align: right;
+        }
+
+        /* Slide 8: MCP */
         .mcp-slide {
             padding: 50px 80px;
         }
@@ -1481,8 +1673,133 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 7: MCP / AI ═══════════ -->
-            <div class="slide slide-dark mcp-slide" id="slide-7">
+            <!-- ═══════════ SLIDE 7: PARSE.LY ANALYTICS ═══════════ -->
+            <div class="slide slide-dark parsely-slide" id="slide-7">
+                <h2>Content Intelligence with <span style="color:#70AC1C;">Parse.ly</span></h2>
+                <div class="sub">Real-time analytics included with every WordPress VIP account. Know what resonates, the moment it happens.</div>
+                <div class="parsely-layout">
+                    <div class="parsely-dashboard">
+                        <div class="parsely-dash-header">
+                            <div class="parsely-logo">&#9679; Parse.ly <span>Dashboard</span></div>
+                            <div class="parsely-time-tabs">
+                                <button class="parsely-time-tab" data-range="1h">1H</button>
+                                <button class="parsely-time-tab active" data-range="24h">24H</button>
+                                <button class="parsely-time-tab" data-range="7d">7D</button>
+                                <button class="parsely-time-tab" data-range="30d">30D</button>
+                            </div>
+                        </div>
+                        <div class="parsely-dash-body">
+                            <div class="parsely-kpi-row">
+                                <div class="parsely-kpi">
+                                    <div class="kpi-num" id="parselyVisitors">2.4M</div>
+                                    <div class="kpi-label">Visitors</div>
+                                    <div class="kpi-change kpi-up">+12.3%</div>
+                                </div>
+                                <div class="parsely-kpi">
+                                    <div class="kpi-num" id="parselyViews">8.1M</div>
+                                    <div class="kpi-label">Page Views</div>
+                                    <div class="kpi-change kpi-up">+8.7%</div>
+                                </div>
+                                <div class="parsely-kpi">
+                                    <div class="kpi-num" id="parselyEngaged">3:42</div>
+                                    <div class="kpi-label">Avg. Engaged</div>
+                                    <div class="kpi-change kpi-up">+15.1%</div>
+                                </div>
+                                <div class="parsely-kpi">
+                                    <div class="kpi-num" id="parselyRecirculation">34%</div>
+                                    <div class="kpi-label">Recirculation</div>
+                                    <div class="kpi-change kpi-up">+4.2%</div>
+                                </div>
+                            </div>
+                            <!-- PLACEHOLDER: Replace KPI values with NPR-relevant benchmarks -->
+                            <div class="parsely-chart" id="parselyChart">
+                                <svg viewBox="0 0 600 140" preserveAspectRatio="none">
+                                    <defs>
+                                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#70AC1C" stop-opacity="0.25"/>
+                                            <stop offset="100%" stop-color="#70AC1C" stop-opacity="0"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- Area fill -->
+                                    <path d="M0,120 C30,115 50,100 80,95 C110,90 130,80 160,60 C190,40 210,50 240,45 C270,40 290,55 320,50 C350,45 370,25 400,20 C430,15 450,30 480,28 C510,26 530,15 560,18 C580,20 595,22 600,22 L600,140 L0,140 Z"
+                                          fill="url(#chartGrad)"/>
+                                    <!-- Line -->
+                                    <path d="M0,120 C30,115 50,100 80,95 C110,90 130,80 160,60 C190,40 210,50 240,45 C270,40 290,55 320,50 C350,45 370,25 400,20 C430,15 450,30 480,28 C510,26 530,15 560,18 C580,20 595,22 600,22"
+                                          fill="none" stroke="#70AC1C" stroke-width="2.5"/>
+                                    <!-- Current value dot -->
+                                    <circle cx="560" cy="18" r="4" fill="#70AC1C"/>
+                                    <circle cx="560" cy="18" r="7" fill="none" stroke="#70AC1C" stroke-width="1" opacity="0.4"/>
+                                    <!-- Axis labels -->
+                                    <text x="0" y="138" fill="rgba(255,255,255,0.2)" font-size="8">12am</text>
+                                    <text x="100" y="138" fill="rgba(255,255,255,0.2)" font-size="8">4am</text>
+                                    <text x="200" y="138" fill="rgba(255,255,255,0.2)" font-size="8">8am</text>
+                                    <text x="300" y="138" fill="rgba(255,255,255,0.2)" font-size="8">12pm</text>
+                                    <text x="400" y="138" fill="rgba(255,255,255,0.2)" font-size="8">4pm</text>
+                                    <text x="500" y="138" fill="rgba(255,255,255,0.2)" font-size="8">8pm</text>
+                                    <text x="575" y="138" fill="rgba(255,255,255,0.2)" font-size="8">Now</text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parsely-sidebar">
+                        <div class="parsely-top-content">
+                            <h4>Trending Now</h4>
+                            <div class="parsely-top-item">
+                                <span class="parsely-top-rank">1</span>
+                                <span class="top-title">Supreme Court Weighs Landmark Digital Privacy Case</span>
+                                <span class="top-views">142K</span>
+                            </div>
+                            <div class="parsely-top-item">
+                                <span class="parsely-top-rank">2</span>
+                                <span class="top-title">Federal Reserve Signals Policy Shift on Interest Rates</span>
+                                <span class="top-views">98K</span>
+                            </div>
+                            <div class="parsely-top-item">
+                                <span class="parsely-top-rank">3</span>
+                                <span class="top-title">Inside the Fight to Save Rural Hospitals</span>
+                                <span class="top-views">87K</span>
+                            </div>
+                            <div class="parsely-top-item">
+                                <span class="parsely-top-rank">4</span>
+                                <span class="top-title">Tiny Desk Concert: Rising Stars of Jazz</span>
+                                <span class="top-views">76K</span>
+                            </div>
+                            <div class="parsely-top-item">
+                                <span class="parsely-top-rank">5</span>
+                                <span class="top-title">Climate Report: What the New Data Means</span>
+                                <span class="top-views">61K</span>
+                            </div>
+                            <!-- PLACEHOLDER: Replace with actual NPR-style headlines -->
+                        </div>
+                        <div class="parsely-sources">
+                            <h4>Traffic Sources</h4>
+                            <div class="source-bar-row">
+                                <span class="source-label">Direct</span>
+                                <div class="source-bar-track"><div class="source-bar-fill" style="width:42%;background:#70AC1C;"></div></div>
+                                <span class="source-pct">42%</span>
+                            </div>
+                            <div class="source-bar-row">
+                                <span class="source-label">Search</span>
+                                <div class="source-bar-track"><div class="source-bar-fill" style="width:28%;background:var(--vip-turquoise);"></div></div>
+                                <span class="source-pct">28%</span>
+                            </div>
+                            <div class="source-bar-row">
+                                <span class="source-label">Social</span>
+                                <div class="source-bar-track"><div class="source-bar-fill" style="width:18%;background:var(--vip-purple);"></div></div>
+                                <span class="source-pct">18%</span>
+                            </div>
+                            <div class="source-bar-row">
+                                <span class="source-label">Referral</span>
+                                <div class="source-bar-track"><div class="source-bar-fill" style="width:12%;background:var(--vip-orange);"></div></div>
+                                <span class="source-pct">12%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════ SLIDE 8: MCP / AI ═══════════ -->
+            <div class="slide slide-dark mcp-slide" id="slide-8">
                 <h2>AI-Powered Content with MCP</h2>
                 <div class="sub">Model Context Protocol integration brings intelligent automation directly into your editorial workflows.</div>
                 <div class="mcp-grid stagger-children">
@@ -1531,8 +1848,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 8: GLOBAL CDN ═══════════ -->
-            <div class="slide slide-dark cdn-slide" id="slide-8">
+            <!-- ═══════════ SLIDE 9: GLOBAL CDN ═══════════ -->
+            <div class="slide slide-dark cdn-slide" id="slide-9">
                 <h2>Global Edge Network</h2>
                 <div class="sub">Your content, cached at the edge, delivered in milliseconds. Hover over nodes to explore.</div>
                 <div class="cdn-content">
@@ -1657,8 +1974,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 9: COMPARISON ═══════════ -->
-            <div class="slide slide-dark compare-slide" id="slide-9">
+            <!-- ═══════════ SLIDE 10: COMPARISON ═══════════ -->
+            <div class="slide slide-dark compare-slide" id="slide-10">
                 <h2>Brightspot vs. WordPress VIP</h2>
                 <div class="sub">A side-by-side look at what matters for NPR. Click categories to explore.</div>
                 <div class="compare-tabs" id="compareTabs">
@@ -1788,8 +2105,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 10: CASE STUDIES ═══════════ -->
-            <div class="slide slide-gradient cases-slide" id="slide-10">
+            <!-- ═══════════ SLIDE 11: CASE STUDIES ═══════════ -->
+            <div class="slide slide-gradient cases-slide" id="slide-11">
                 <div class="geo-circles"></div>
                 <h2>Trusted by the World's Top Media</h2>
                 <div class="sub">WordPress VIP powers the most demanding content operations on the planet.</div>
@@ -1850,8 +2167,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 11: TRUST & SECURITY ═══════════ -->
-            <div class="slide slide-dark trust-slide" id="slide-11">
+            <!-- ═══════════ SLIDE 12: TRUST & SECURITY ═══════════ -->
+            <div class="slide slide-dark trust-slide" id="slide-12">
                 <div class="geo-pattern"></div>
                 <h2>Enterprise Trust &amp; Security</h2>
                 <div class="sub">The security posture that NPR's audience and stakeholders demand.</div>
@@ -1907,8 +2224,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 12: ROI CALCULATOR ═══════════ -->
-            <div class="slide slide-dark roi-slide" id="slide-12">
+            <!-- ═══════════ SLIDE 13: ROI CALCULATOR ═══════════ -->
+            <div class="slide slide-dark roi-slide" id="slide-13">
                 <div class="geo-pattern"></div>
                 <h2>Estimated Impact for NPR</h2>
                 <div class="sub">Adjust the sliders to see projected savings and gains from switching to WordPress VIP.</div>
@@ -1968,8 +2285,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 13: NEXT STEPS ═══════════ -->
-            <div class="slide slide-gradient steps-slide" id="slide-13">
+            <!-- ═══════════ SLIDE 14: NEXT STEPS ═══════════ -->
+            <div class="slide slide-gradient steps-slide" id="slide-14">
                 <div class="geo-circles"></div>
                 <div>
                     <div class="gold-line" style="margin-bottom:20px;"></div>
@@ -2008,8 +2325,8 @@
                 </div>
             </div>
 
-            <!-- ═══════════ SLIDE 14: CONTACT / CTA ═══════════ -->
-            <div class="slide slide-dark contact-slide" id="slide-14">
+            <!-- ═══════════ SLIDE 15: CONTACT / CTA ═══════════ -->
+            <div class="slide slide-dark contact-slide" id="slide-15">
                 <div class="geo-pattern"></div>
                 <div class="corner-accent-tl"></div>
                 <div class="corner-accent-br"></div>
@@ -2038,7 +2355,7 @@
     <!-- ─── Navigation ─── -->
     <div class="nav-controls" id="navControls">
         <button class="nav-btn" id="prevBtn" onclick="goToSlide(currentSlide - 1)">&#8592;</button>
-        <span class="slide-counter" id="slideCounter" onclick="toggleOverview()">1 / 14</span>
+        <span class="slide-counter" id="slideCounter" onclick="toggleOverview()">1 / 15</span>
         <button class="nav-btn" id="nextBtn" onclick="goToSlide(currentSlide + 1)">&#8594;</button>
     </div>
 
@@ -2272,6 +2589,34 @@
         }
 
         // ═══════════════════════════════
+        // PARSE.LY TIME TABS
+        // ═══════════════════════════════
+        var parselyData = {
+            '1h':  { visitors: '184K', views: '612K', engaged: '4:11', recirc: '37%', vChg: '+3.1%', pChg: '+2.8%', eChg: '+6.4%', rChg: '+1.9%' },
+            '24h': { visitors: '2.4M', views: '8.1M', engaged: '3:42', recirc: '34%', vChg: '+12.3%', pChg: '+8.7%', eChg: '+15.1%', rChg: '+4.2%' },
+            '7d':  { visitors: '14.7M', views: '52M', engaged: '3:28', recirc: '31%', vChg: '+9.8%', pChg: '+7.1%', eChg: '+11.3%', rChg: '+2.8%' },
+            '30d': { visitors: '58M', views: '198M', engaged: '3:15', recirc: '29%', vChg: '+6.2%', pChg: '+4.5%', eChg: '+8.9%', rChg: '+1.4%' }
+        };
+        document.querySelectorAll('.parsely-time-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.parsely-time-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                var d = parselyData[tab.dataset.range];
+                if (d) {
+                    var kpis = document.querySelectorAll('.parsely-kpi');
+                    kpis[0].querySelector('.kpi-num').textContent = d.visitors;
+                    kpis[0].querySelector('.kpi-change').textContent = d.vChg;
+                    kpis[1].querySelector('.kpi-num').textContent = d.views;
+                    kpis[1].querySelector('.kpi-change').textContent = d.pChg;
+                    kpis[2].querySelector('.kpi-num').textContent = d.engaged;
+                    kpis[2].querySelector('.kpi-change').textContent = d.eChg;
+                    kpis[3].querySelector('.kpi-num').textContent = d.recirc;
+                    kpis[3].querySelector('.kpi-change').textContent = d.rChg;
+                }
+            });
+        });
+
+        // ═══════════════════════════════
         // COMPARISON TABS
         // ═══════════════════════════════
         document.querySelectorAll('.compare-tab').forEach(function(tab) {
@@ -2305,7 +2650,7 @@
 
         // Auto-advance carousel
         let caseTimer = setInterval(function() {
-            if (slides[currentSlide].id === 'slide-10') {
+            if (slides[currentSlide].id === 'slide-11') {
                 caseIndex = (caseIndex + 1) % 3;
                 scrollCases(caseIndex);
             }

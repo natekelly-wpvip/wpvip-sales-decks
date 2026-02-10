@@ -681,7 +681,7 @@
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 12px;
-            overflow: visible;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2224,40 +2224,41 @@
             document.getElementById('ttPop').textContent = node.dataset.pop;
             document.getElementById('ttCapacity').textContent = node.dataset.capacity;
 
+            // Use SVG viewBox ratios to position within the container.
+            // This avoids getBoundingClientRect issues caused by the deck's
+            // CSS scale() transform.
             const container = document.getElementById('cdnMapContainer');
-            const rect = container.getBoundingClientRect();
             const circle = node.querySelector('.node-dot');
             const cx = parseFloat(circle.getAttribute('cx'));
             const cy = parseFloat(circle.getAttribute('cy'));
-            const svg = container.querySelector('svg');
-            const svgRect = svg.getBoundingClientRect();
-            const scaleX = svgRect.width / 800;
-            const scaleY = svgRect.height / 450;
 
-            // Calculate position relative to container
-            var ttLeft = cx * scaleX + svgRect.left - rect.left + 14;
-            var ttTop = cy * scaleY + svgRect.top - rect.top - 50;
+            // SVG viewBox is 800x450; convert node coords to % of container
+            const containerW = container.offsetWidth;
+            const containerH = container.offsetHeight;
+            const nodeX = (cx / 800) * containerW;
+            const nodeY = (cy / 450) * containerH;
 
-            // Clamp: keep tooltip inside the container
-            var ttWidth = 190;
-            var ttHeight = 100;
-            var containerW = rect.width;
-            var containerH = rect.height;
+            var ttWidth = 195;
+            var ttHeight = 108;
 
-            // If tooltip would overflow right, flip to left side
-            if (ttLeft + ttWidth > containerW) {
-                ttLeft = cx * scaleX + svgRect.left - rect.left - ttWidth - 14;
+            // Default: position to the right and above the node
+            var ttLeft = nodeX + 16;
+            var ttTop = nodeY - ttHeight - 4;
+
+            // Flip right -> left if it overflows the right edge
+            if (ttLeft + ttWidth > containerW - 8) {
+                ttLeft = nodeX - ttWidth - 16;
             }
-            // If tooltip would overflow top, flip below the node
-            if (ttTop < 0) {
-                ttTop = cy * scaleY + svgRect.top - rect.top + 20;
+            // Flip above -> below if it overflows the top
+            if (ttTop < 8) {
+                ttTop = nodeY + 24;
             }
-            // If tooltip would overflow bottom, push up
-            if (ttTop + ttHeight > containerH) {
+            // Push up if it overflows the bottom
+            if (ttTop + ttHeight > containerH - 8) {
                 ttTop = containerH - ttHeight - 8;
             }
-            // If tooltip would overflow left, push right
-            if (ttLeft < 0) {
+            // Push right if it overflows the left
+            if (ttLeft < 8) {
                 ttLeft = 8;
             }
 

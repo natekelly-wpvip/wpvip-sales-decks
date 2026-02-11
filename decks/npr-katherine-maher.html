@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPR | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1c2330;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --parsely-green: #70AC1C;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%; overflow: hidden; background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .deck-viewport {
+            width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .deck-scaler {
+            width: 1280px; height: 720px; position: relative;
+            transform-origin: center center;
+        }
+        .slide {
+            position: absolute; top: 0; left: 0; width: 1280px; height: 720px;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease;
+            overflow: hidden; padding: 60px 80px;
+            background: var(--vip-black); color: var(--vip-white);
+        }
+        .slide.active { opacity: 1; pointer-events: auto; }
+
+        /* Progress bar */
+        .progress-bar {
+            position: absolute; top: 0; left: 0; height: 3px; z-index: 100;
+            background: var(--vip-gold); transition: width 0.4s ease;
+        }
+        /* Nav */
+        .nav-controls {
+            position: absolute; bottom: 24px; right: 30px; z-index: 90;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .nav-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.6); cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .slide-counter {
+            font-size: 13px; color: rgba(255,255,255,0.4);
+            cursor: pointer; letter-spacing: 0.05em; user-select: none;
+        }
+        .slide-counter:hover { color: rgba(255,255,255,0.7); }
+
+        /* Overview mode */
+        .overview-grid {
+            position: absolute; top: 0; left: 0; width: 1280px; height: 720px;
+            background: rgba(0,0,0,0.95); z-index: 200;
+            display: none; padding: 40px;
+            grid-template-columns: repeat(4, 1fr); gap: 20px;
+            overflow-y: auto;
+        }
+        .overview-grid.active { display: grid; }
+        .overview-thumb {
+            aspect-ratio: 16/9; background: var(--vip-black);
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 6px;
+            cursor: pointer; transition: all 0.2s; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: rgba(255,255,255,0.5); padding: 8px;
+            text-align: center;
+        }
+        .overview-thumb:hover { border-color: var(--vip-gold); transform: scale(1.03); }
+        .overview-thumb.current { border-color: var(--vip-gold); }
+
+        /* Typography */
+        .slide h1 { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+        .slide h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+        .slide h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; }
+        .slide p { font-size: 17px; font-weight: 400; line-height: 1.55; }
+        .slide .caption { font-size: 12px; font-weight: 500; letter-spacing: 0.05em; line-height: 1.4; }
+        .slide .stat-number { font-size: 54px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.0; }
+        .gold { color: var(--vip-gold); }
+        .gold-text { color: var(--vip-gold-text); }
+        .turquoise { color: var(--vip-turquoise); }
+        .muted { color: rgba(255,255,255,0.5); }
+        .accent-line { width: 60px; height: 2px; background: var(--vip-gold); }
+
+        /* VIP Logo */
+        .vip-logo { font-size: 15px; letter-spacing: 0.02em; }
+        .vip-logo .logo-wp { font-weight: 400; color: var(--vip-white); }
+        .vip-logo .logo-vip { font-weight: 700; color: var(--vip-gold); margin-left: 4px; }
+
+        /* Geometric BG pattern - radio waves */
+        .bg-waves {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; opacity: 0.04;
+        }
+
+        /* Fade-in-up animation */
+        .fade-in { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .slide.active .fade-in { opacity: 1; transform: translateY(0); }
+        .slide.active .fade-in:nth-child(2) { transition-delay: 0.1s; }
+        .slide.active .fade-in:nth-child(3) { transition-delay: 0.2s; }
+        .slide.active .fade-in:nth-child(4) { transition-delay: 0.3s; }
+        .slide.active .fade-in:nth-child(5) { transition-delay: 0.4s; }
+        .slide.active .fade-in:nth-child(6) { transition-delay: 0.5s; }
+
+        /* --- SLIDE-SPECIFIC STYLES --- */
+
+        /* Slide 1: Title */
+        .title-slide { display: flex; flex-direction: column; justify-content: center; padding: 80px 100px; }
+        .title-slide .customer-name { font-size: 72px; font-weight: 700; letter-spacing: -0.04em; line-height: 0.95; }
+        .title-slide .tagline { font-size: 28px; font-weight: 300; color: rgba(255,255,255,0.7); margin-top: 16px; letter-spacing: -0.01em; }
+        .title-slide .meeting-context { font-size: 15px; color: var(--vip-gold); margin-top: 32px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+        .title-slide .date-line { font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 8px; }
+
+        /* Slide 2: Stats grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 36px; }
+        .stat-card { padding: 24px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+        .stat-card .stat-number { color: var(--vip-turquoise); font-size: 44px; }
+        .stat-card .stat-label { font-size: 14px; color: rgba(255,255,255,0.55); margin-top: 6px; line-height: 1.3; }
+
+        /* Slide 3: Two-column with quote */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 32px; }
+        .timeline-item { margin-bottom: 18px; }
+        .timeline-item .year { font-size: 12px; color: var(--vip-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+        .timeline-item .role { font-size: 15px; color: rgba(255,255,255,0.85); margin-top: 3px; line-height: 1.4; }
+        .pull-quote {
+            font-size: 20px; font-style: italic; line-height: 1.5;
+            color: rgba(255,255,255,0.8);
+            border-left: 3px solid var(--vip-gold); padding-left: 24px;
+            margin-top: 20px;
+        }
+
+        /* Slide 4: Risk cards */
+        .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
+        .risk-card {
+            padding: 24px; border-radius: 8px;
+            background: rgba(255,77,85,0.04); border: 1px solid rgba(255,77,85,0.12);
+        }
+        .risk-card h3 { font-size: 16px; color: var(--vip-red); margin-bottom: 10px; font-weight: 600; }
+        .risk-card p { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.55; }
+        .risk-card .data-point { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 8px; font-style: italic; }
+
+        /* Slide 5: Ecosystem stats */
+        .eco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 36px; }
+        .eco-card { text-align: center; padding: 28px 16px; border-radius: 8px; background: rgba(255,255,255,0.03); }
+        .eco-card .stat-number { color: var(--vip-gold); font-size: 46px; }
+        .eco-card .stat-label { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 8px; }
+
+        /* Slide 6: Platform capabilities */
+        .cap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 28px; }
+        .cap-item {
+            padding: 20px 24px; border-radius: 8px;
+            background: rgba(62,160,173,0.06); border: 1px solid rgba(62,160,173,0.12);
+            display: flex; gap: 14px; align-items: flex-start;
+        }
+        .cap-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+        .cap-item h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .cap-item p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.45; }
+
+        /* Slide 7: Comparison Matrix */
+        .matrix-tabs { display: flex; gap: 8px; margin-bottom: 20px; margin-top: 24px; flex-wrap: wrap; }
+        .matrix-tab {
+            padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s;
+        }
+        .matrix-tab.active { background: var(--vip-gold); color: var(--vip-black); border-color: var(--vip-gold); }
+        .matrix-table {
+            width: 100%; border-collapse: collapse;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden;
+        }
+        .matrix-table th {
+            padding: 12px 16px; font-size: 12px; text-transform: uppercase;
+            letter-spacing: 0.06em; font-weight: 600;
+            background: rgba(255,255,255,0.04); text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .matrix-table th:nth-child(2) { color: rgba(255,255,255,0.35); }
+        .matrix-table th:nth-child(3) { color: var(--vip-turquoise); }
+        .matrix-table td {
+            padding: 11px 16px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .matrix-table tr:nth-child(odd) td { background: rgba(255,255,255,0.015); }
+        .matrix-table tr { display: none; }
+        .matrix-table tr.matrix-header { display: table-row; }
+        .matrix-table tr.visible { display: table-row; }
+        .check { color: var(--vip-turquoise); }
+        .cross { color: var(--vip-red); opacity: 0.6; }
+        .partial { color: var(--vip-orange); }
+
+        /* Slide 8: TCO */
+        .tco-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 28px; }
+        .tco-col { padding: 28px; border-radius: 10px; }
+        .tco-col.competitor { background: rgba(255,77,85,0.04); border: 1px solid rgba(255,77,85,0.1); }
+        .tco-col.vip { background: rgba(62,160,173,0.06); border: 1px solid rgba(62,160,173,0.15); }
+        .tco-col h3 { font-size: 18px; margin-bottom: 20px; }
+        .tco-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 14px; }
+        .tco-row .label { color: rgba(255,255,255,0.6); }
+        .tco-row .value { font-weight: 600; }
+
+        /* Slide 9: ROI Calculator */
+        .roi-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 24px; }
+        .roi-sliders { display: flex; flex-direction: column; gap: 20px; }
+        .slider-group label { font-size: 13px; color: rgba(255,255,255,0.55); display: block; margin-bottom: 6px; }
+        .slider-group .slider-value { float: right; color: var(--vip-gold); font-weight: 600; }
+        .slider-group input[type="range"] {
+            width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.1); border-radius: 2px; outline: none;
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: var(--vip-gold); cursor: pointer;
+        }
+        .roi-results { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .roi-card {
+            padding: 20px; border-radius: 8px;
+            background: rgba(62,160,173,0.06); border: 1px solid rgba(62,160,173,0.1);
+            text-align: center;
+        }
+        .roi-card .roi-number { font-size: 32px; font-weight: 700; color: var(--vip-turquoise); }
+        .roi-card .roi-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        .roi-card.featured {
+            grid-column: 1 / -1;
+            background: rgba(216,164,95,0.08); border-color: rgba(216,164,95,0.2);
+        }
+        .roi-card.featured .roi-number { font-size: 42px; color: var(--vip-gold); }
+
+        /* Slide 10: Parse.ly Dashboard */
+        .parsely-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 30px; margin-top: 20px; }
+        .parsely-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .parsely-brand { font-size: 18px; font-weight: 700; color: var(--parsely-green); }
+        .parsely-tabs { display: flex; gap: 4px; }
+        .parsely-tab {
+            padding: 5px 12px; border-radius: 4px; font-size: 11px; font-weight: 600;
+            background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4);
+            cursor: pointer; transition: all 0.2s; border: none;
+        }
+        .parsely-tab.active { background: var(--parsely-green); color: #fff; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .kpi-card { padding: 12px; border-radius: 6px; background: rgba(255,255,255,0.03); }
+        .kpi-card .kpi-value { font-size: 22px; font-weight: 700; color: #fff; }
+        .kpi-card .kpi-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .kpi-card .kpi-change { font-size: 11px; margin-top: 4px; }
+        .kpi-change.up { color: var(--parsely-green); }
+        .kpi-change.down { color: var(--vip-red); }
+        .trending-list { list-style: none; }
+        .trending-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 13px;
+        }
+        .trending-rank { color: var(--parsely-green); font-weight: 700; margin-right: 10px; min-width: 18px; }
+        .trending-title { color: rgba(255,255,255,0.7); flex: 1; }
+        .trending-views { color: rgba(255,255,255,0.4); font-size: 12px; margin-left: 12px; }
+        .source-bars { margin-top: 16px; }
+        .source-bar-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 12px; }
+        .source-bar-label { width: 70px; color: rgba(255,255,255,0.5); }
+        .source-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 0 10px; overflow: hidden; }
+        .source-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .source-bar-pct { width: 36px; text-align: right; color: rgba(255,255,255,0.5); }
+
+        /* Slide 11: Customer Carousel */
+        .carousel-container { position: relative; margin-top: 28px; overflow: hidden; }
+        .carousel-track {
+            display: flex; gap: 24px; transition: transform 0.5s ease;
+            padding: 0 4px;
+        }
+        .carousel-card {
+            min-width: 350px; padding: 32px; border-radius: 10px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+        .carousel-card .cc-type { font-size: 11px; color: var(--vip-gold); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+        .carousel-card .cc-name { font-size: 26px; font-weight: 700; margin-top: 6px; }
+        .carousel-card .cc-quote {
+            font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.55;
+            border-left: 2px solid var(--vip-gold); padding-left: 16px;
+            margin: 16px 0; font-style: italic;
+        }
+        .carousel-card .cc-metrics { display: flex; gap: 24px; margin-top: 16px; }
+        .cc-metric .cc-metric-val { font-size: 22px; font-weight: 700; color: var(--vip-turquoise); }
+        .cc-metric .cc-metric-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .carousel-dot {
+            width: 8px; height: 8px; border-radius: 4px;
+            background: rgba(255,255,255,0.15); cursor: pointer; transition: all 0.3s;
+        }
+        .carousel-dot.active { width: 24px; background: var(--vip-gold); }
+
+        /* Slide 12: Vision */
+        .vision-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 32px; }
+        .vision-item {
+            padding: 22px 24px; border-radius: 8px;
+            background: rgba(216,164,95,0.04); border: 1px solid rgba(216,164,95,0.1);
+        }
+        .vision-item h3 { font-size: 16px; color: var(--vip-gold); margin-bottom: 6px; }
+        .vision-item p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+        /* Slide 13: Next steps */
+        .steps-list { margin-top: 36px; }
+        .step-item { display: flex; gap: 24px; margin-bottom: 28px; align-items: flex-start; }
+        .step-num {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+            background: rgba(216,164,95,0.1); border: 1px solid rgba(216,164,95,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700; color: var(--vip-gold);
+        }
+        .step-content h3 { font-size: 17px; font-weight: 600; }
+        .step-content p { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        .step-timeline { font-size: 12px; color: var(--vip-turquoise); font-weight: 600; margin-top: 4px; }
+
+        /* Slide 14: CTA */
+        .cta-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 40px; }
+        .cta-left h2 { font-size: 36px; line-height: 1.1; }
+        .cta-contact { margin-top: 32px; }
+        .cta-contact .contact-line { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+        .cta-right {
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.03); border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06); padding: 40px;
+            text-align: center;
+        }
+        .cta-right p { font-size: 15px; color: rgba(255,255,255,0.5); }
+
+        /* Print */
+        @media print {
+            .nav-controls, .progress-bar, .overview-grid { display: none !important; }
+            .slide { position: relative !important; opacity: 1 !important; pointer-events: auto !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+<div class="deck-viewport">
+<div class="deck-scaler">
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- ========== SLIDE 1: TITLE ========== -->
+    <div class="slide title-slide active" id="slide-1">
+        <svg class="bg-waves" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="900" cy="360" r="120" fill="none" stroke="white" stroke-width="0.5"/>
+            <circle cx="900" cy="360" r="200" fill="none" stroke="white" stroke-width="0.4"/>
+            <circle cx="900" cy="360" r="280" fill="none" stroke="white" stroke-width="0.3"/>
+            <circle cx="900" cy="360" r="360" fill="none" stroke="white" stroke-width="0.25"/>
+            <circle cx="900" cy="360" r="440" fill="none" stroke="white" stroke-width="0.2"/>
+            <circle cx="900" cy="360" r="520" fill="none" stroke="white" stroke-width="0.15"/>
+        </svg>
+        <div class="vip-logo fade-in" style="margin-bottom: 60px;">
+            <span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span>
+        </div>
+        <div class="customer-name fade-in">NPR</div>
+        <div class="tagline fade-in">Open Platforms. Public Purpose.</div>
+        <div class="accent-line fade-in" style="margin-top: 28px;"></div>
+        <div class="meeting-context fade-in">Platform Partnership Discussion</div>
+        <div class="date-line fade-in">February 2026 | Prepared for Katherine Maher, CEO</div>
+    </div>
+
+    <!-- ========== SLIDE 2: UNDERSTANDING NPR ========== -->
+    <div class="slide" id="slide-2">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">We Know NPR</div>
+        <h1 class="fade-in" style="margin-top: 8px;">America's Civic<br>Infrastructure</h1>
+        <div class="stats-grid">
+            <div class="stat-card fade-in">
+                <div class="stat-number">100M+</div>
+                <div class="stat-label">People reached monthly across broadcast, digital, and podcasts</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">246</div>
+                <div class="stat-label">Member stations serving every state, from cities to tribal communities</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">43M</div>
+                <div class="stat-label">Weekly listeners, exceeding the reach of any cable news network</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">68</div>
+                <div class="stat-label">Active podcasts, making NPR a top 5 US podcast publisher</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">53%</div>
+                <div class="stat-label">Of Americans trust public media vs. 35% for media overall (Harris Poll)</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">5x</div>
+                <div class="stat-label">NPR+ subscription revenue growth, FY24 to FY25</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 3: KATHERINE / OPEN SOURCE ========== -->
+    <div class="slide" id="slide-3">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">A Shared Philosophy</div>
+        <h1 class="fade-in" style="margin-top: 8px;">A CEO Forged in<br>Open Source</h1>
+        <div class="two-col">
+            <div class="fade-in">
+                <div class="timeline-item">
+                    <div class="year">2016 - 2021 &middot; Wikimedia Foundation</div>
+                    <div class="role">Led the world's largest open knowledge platform. Doubled annual fundraising to $140M. Oversaw Wikipedia's first desktop redesign in 12 years.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="year">Open-Source Champion</div>
+                    <div class="role">Chair of the Signal Foundation Board. Career spanning UNICEF Innovation, World Bank ICT, and digital rights advocacy at Access Now.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="year">2024 - Present &middot; NPR</div>
+                    <div class="role">Hired to transform NPR's digital future. Appointed a tech-forward COO for AI strategy. Leading NPR through the most significant funding transition in public media history.</div>
+                </div>
+            </div>
+            <div class="fade-in">
+                <div class="pull-quote">
+                    "The leader who scaled Wikipedia, the internet's greatest open-source achievement, now steers America's most trusted news organization. The question isn't whether NPR's technology should be open. It's why it isn't already."
+                </div>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 20px;">WordPress, like Wikipedia, is built on the principle that open platforms serve the public better than proprietary ones. GPL-licensed. Community-driven. Powering 43% of the web.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 4: BRIGHTSPOT RISK ========== -->
+    <div class="slide" id="slide-4">
+        <div class="caption fade-in" style="text-transform: uppercase; letter-spacing: 0.1em; color: var(--vip-red);">Risk Assessment</div>
+        <h1 class="fade-in" style="margin-top: 8px;">Brightspot:<br>The Uncomfortable Truth</h1>
+        <div class="risk-grid">
+            <div class="risk-card fade-in">
+                <h3>Vendor Instability</h3>
+                <p>PE-owned by Tailwind Capital. Approximately 218 employees and $24M in revenue. Back-to-back layoffs: 10% followed by 15% in consecutive rounds.</p>
+                <div class="data-point">Glassdoor: 2.7/5 stars. Only 32% of employees recommend the company.</div>
+            </div>
+            <div class="risk-card fade-in">
+                <h3>Talent Scarcity</h3>
+                <p>Built on Java and the proprietary Dari framework. Finding developers with this niche skill set is orders of magnitude harder than PHP/WordPress talent.</p>
+                <div class="data-point">WordPress: 1.3M+ developers globally. Brightspot/Dari: estimated hundreds.</div>
+            </div>
+            <div class="risk-card fade-in">
+                <h3>Proprietary Lock-in</h3>
+                <p>All customizations, content models, and workflows are locked to Brightspot's proprietary platform. If you leave, your code doesn't come with you.</p>
+                <div class="data-point">Gartner review: "An unfinished idea you spend a lot of money trying to make work."</div>
+            </div>
+            <div class="risk-card fade-in">
+                <h3>Hidden Costs</h3>
+                <p>Customers report paying for Brightspot's own bug fixes. Same code across departments incurs multiple licensing charges. Training is an additional cost.</p>
+                <div class="data-point">41% of Brightspot customers spend over $100K/year. ITQlick pricing score: 4.4/10.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 5: OPEN SOURCE ADVANTAGE ========== -->
+    <div class="slide" id="slide-5">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">The Alternative</div>
+        <h1 class="fade-in" style="margin-top: 8px;">Open Source at<br>Enterprise Scale</h1>
+        <div class="eco-grid">
+            <div class="eco-card fade-in">
+                <div class="stat-number">43%</div>
+                <div class="stat-label">Of all websites run on WordPress.<br>Brightspot powers 0.005%.</div>
+            </div>
+            <div class="eco-card fade-in">
+                <div class="stat-number">1.3M+</div>
+                <div class="stat-label">WordPress developers worldwide.<br>No talent scarcity. No vendor dependency.</div>
+            </div>
+            <div class="eco-card fade-in">
+                <div class="stat-number">70K+</div>
+                <div class="stat-label">Plugins and extensions available.<br>Brightspot: proprietary extensions only.</div>
+            </div>
+            <div class="eco-card fade-in">
+                <div class="stat-number">$650B</div>
+                <div class="stat-label">WordPress ecosystem value.<br>The largest CMS ecosystem on earth.</div>
+            </div>
+            <div class="eco-card fade-in">
+                <div class="stat-number">GPL</div>
+                <div class="stat-label">Licensed. You own your code. Always.<br>No lock-in. No exit penalties.</div>
+            </div>
+            <div class="eco-card fade-in">
+                <div class="stat-number" style="font-size: 40px;">2,000+</div>
+                <div class="stat-label">Automattic employees. Profitable.<br>Valued at $7.5B+. Built for the long term.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 6: PLATFORM CAPABILITIES ========== -->
+    <div class="slide" id="slide-6">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">The Platform</div>
+        <h1 class="fade-in" style="margin-top: 8px;">Enterprise Without Compromise</h1>
+        <p class="fade-in" style="color: rgba(255,255,255,0.55); margin-top: 8px; max-width: 640px;">WordPress VIP delivers the full power of WordPress with enterprise-grade infrastructure, security, and support.</p>
+        <div class="cap-grid">
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9711;</div>
+                <div><h3>99.99% Uptime SLA</h3><p>Managed cloud infrastructure with auto-scaling. Your content stays online when it matters most.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9670;</div>
+                <div><h3>Enterprise Security</h3><p>SOC 2 Type II and ISO 27001 certified. Automated code review. WAF and DDoS protection included.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9676;</div>
+                <div><h3>Global Edge Network</h3><p>CDN with edge caching across 30+ locations. Sub-second page loads for audiences worldwide.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9707;</div>
+                <div><h3>Parse.ly Analytics Included</h3><p>Real-time content intelligence at no additional cost. Understand what resonates, when, and why.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9998;</div>
+                <div><h3>Modern Block Editor</h3><p>Gutenberg's intuitive block editor. Minimal training needed. Editors publish in minutes, not hours.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9881;</div>
+                <div><h3>Headless and Decoupled Ready</h3><p>REST API and GraphQL support. Build any front-end experience on a trusted content backend.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#10070;</div>
+                <div><h3>Multisite Architecture</h3><p>Manage 246 station sites from one platform. Shared content, independent branding, unified analytics.</p></div>
+            </div>
+            <div class="cap-item fade-in">
+                <div class="cap-icon">&#9733;</div>
+                <div><h3>24/7 Expert Support</h3><p>Not a help desk. WordPress engineers who understand enterprise publishing at scale.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 7: INTERACTIVE COMPARISON MATRIX ========== -->
+    <div class="slide" id="slide-7" style="padding: 50px 60px;">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">Head to Head</div>
+        <h2 class="fade-in" style="margin-top: 6px;">Brightspot vs. WordPress VIP</h2>
+        <div class="matrix-tabs" id="matrixTabs">
+            <div class="matrix-tab active" data-cat="platform">Platform</div>
+            <div class="matrix-tab" data-cat="editing">Editing</div>
+            <div class="matrix-tab" data-cat="performance">Performance</div>
+            <div class="matrix-tab" data-cat="ecosystem">Ecosystem</div>
+            <div class="matrix-tab" data-cat="cost">Cost &amp; Risk</div>
+        </div>
+        <table class="matrix-table" style="table-layout: fixed;">
+            <tr class="matrix-header"><th style="width:44%;">Capability</th><th style="width:28%;">Brightspot</th><th style="width:28%;">WordPress VIP</th></tr>
+            <!-- Platform -->
+            <tr data-cat="platform" class="visible"><td>Open Source</td><td class="cross">&#10007; Proprietary</td><td class="check">&#10003; GPL Licensed</td></tr>
+            <tr data-cat="platform" class="visible"><td>Code Ownership</td><td class="cross">&#10007; Vendor-owned</td><td class="check">&#10003; You own it</td></tr>
+            <tr data-cat="platform" class="visible"><td>Managed Hosting Included</td><td class="cross">&#10007; Separate</td><td class="check">&#10003; All-inclusive</td></tr>
+            <tr data-cat="platform" class="visible"><td>Uptime SLA</td><td class="partial">&#9679; Varies</td><td class="check">&#10003; 99.99%</td></tr>
+            <tr data-cat="platform" class="visible"><td>Multisite Architecture</td><td class="check">&#10003;</td><td class="check">&#10003; Native</td></tr>
+            <!-- Editing -->
+            <tr data-cat="editing"><td>Modern Block Editor</td><td class="partial">&#9679; "Dated/clunky" (users)</td><td class="check">&#10003; Gutenberg</td></tr>
+            <tr data-cat="editing"><td>Learning Curve</td><td class="cross">&#10007; Steep</td><td class="check">&#10003; Minimal</td></tr>
+            <tr data-cat="editing"><td>Self-Service for Editors</td><td class="cross">&#10007; Needs dev help</td><td class="check">&#10003; Full control</td></tr>
+            <tr data-cat="editing"><td>Real-time Collaboration</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+            <tr data-cat="editing"><td>Content Modeling</td><td class="check">&#10003;</td><td class="check">&#10003; Flexible</td></tr>
+            <!-- Performance -->
+            <tr data-cat="performance"><td>Global CDN Included</td><td class="cross">&#10007; Add-on</td><td class="check">&#10003; 30+ PoPs</td></tr>
+            <tr data-cat="performance"><td>Edge Caching</td><td class="partial">&#9679; Limited</td><td class="check">&#10003; Automatic</td></tr>
+            <tr data-cat="performance"><td>Core Web Vitals</td><td class="partial">&#9679; Inconsistent</td><td class="check">&#10003; Optimized</td></tr>
+            <tr data-cat="performance"><td>Auto-scaling</td><td class="partial">&#9679; Manual config</td><td class="check">&#10003; Automatic</td></tr>
+            <!-- Ecosystem -->
+            <tr data-cat="ecosystem"><td>Developers Worldwide</td><td class="cross">&#10007; Hundreds (Java/Dari)</td><td class="check">&#10003; 1.3M+ (PHP)</td></tr>
+            <tr data-cat="ecosystem"><td>Plugin / Extension Marketplace</td><td class="cross">&#10007; Proprietary only</td><td class="check">&#10003; 70,000+</td></tr>
+            <tr data-cat="ecosystem"><td>Community Support</td><td class="cross">&#10007; Small, enterprise-only</td><td class="check">&#10003; Largest CMS community</td></tr>
+            <tr data-cat="ecosystem"><td>Hiring Ease</td><td class="cross">&#10007; Niche skill set</td><td class="check">&#10003; Vast talent pool</td></tr>
+            <!-- Cost & Risk -->
+            <tr data-cat="cost"><td>Transparent Pricing</td><td class="cross">&#10007; Opaque</td><td class="check">&#10003; Clear tiers</td></tr>
+            <tr data-cat="cost"><td>All-inclusive Platform</td><td class="cross">&#10007; Add-on model</td><td class="check">&#10003; Hosting + security + support</td></tr>
+            <tr data-cat="cost"><td>Vendor Financial Stability</td><td class="cross">&#10007; PE-owned, layoffs</td><td class="check">&#10003; Automattic, profitable</td></tr>
+            <tr data-cat="cost"><td>Exit Strategy</td><td class="cross">&#10007; Proprietary lock-in</td><td class="check">&#10003; Open source, portable</td></tr>
+        </table>
+    </div>
+
+    <!-- ========== SLIDE 8: TCO ========== -->
+    <div class="slide" id="slide-8">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">Total Cost of Ownership</div>
+        <h1 class="fade-in" style="margin-top: 8px;">The Financial Case</h1>
+        <p class="fade-in" style="color: rgba(255,255,255,0.5); margin-top: 6px; font-size: 15px;">With CPB dissolved and every dollar under scrutiny, platform cost isn't abstract. It's existential.</p>
+        <div class="tco-cols">
+            <div class="tco-col competitor fade-in">
+                <h3 style="color: var(--vip-red);">Brightspot</h3>
+                <div class="tco-row"><span class="label">Licensing (100 users)</span><span class="value" style="color: var(--vip-red);">$100K+/yr</span></div>
+                <div class="tco-row"><span class="label">Implementation</span><span class="value" style="color: var(--vip-red);">Months, $$$</span></div>
+                <div class="tco-row"><span class="label">Training</span><span class="value" style="color: var(--vip-red);">$1K-5K/person extra</span></div>
+                <div class="tco-row"><span class="label">Bug Fixes</span><span class="value" style="color: var(--vip-red);">You pay for theirs</span></div>
+                <div class="tco-row"><span class="label">Developer Talent</span><span class="value" style="color: var(--vip-red);">Scarce, premium rates</span></div>
+                <div class="tco-row"><span class="label">Hosting / CDN</span><span class="value" style="color: var(--vip-red);">Separate cost</span></div>
+                <div class="tco-row" style="border: none;"><span class="label">Exit Cost</span><span class="value" style="color: var(--vip-red);">Proprietary, costly</span></div>
+            </div>
+            <div class="tco-col vip fade-in">
+                <h3 style="color: var(--vip-turquoise);">WordPress VIP</h3>
+                <div class="tco-row"><span class="label">Platform Fee</span><span class="value" style="color: var(--vip-turquoise);">All-inclusive</span></div>
+                <div class="tco-row"><span class="label">Implementation</span><span class="value" style="color: var(--vip-turquoise);">Weeks, guided</span></div>
+                <div class="tco-row"><span class="label">Training</span><span class="value" style="color: var(--vip-turquoise);">Minimal (familiar UI)</span></div>
+                <div class="tco-row"><span class="label">Bug Fixes</span><span class="value" style="color: var(--vip-turquoise);">Community-driven</span></div>
+                <div class="tco-row"><span class="label">Developer Talent</span><span class="value" style="color: var(--vip-turquoise);">1.3M+ devs, competitive rates</span></div>
+                <div class="tco-row"><span class="label">Hosting / CDN</span><span class="value" style="color: var(--vip-turquoise);">Included</span></div>
+                <div class="tco-row" style="border: none;"><span class="label">Exit Cost</span><span class="value" style="color: var(--vip-turquoise);">$0. Open source.</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 9: ROI CALCULATOR ========== -->
+    <div class="slide" id="slide-9">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">Your Numbers</div>
+        <h2 class="fade-in" style="margin-top: 6px;">ROI Impact Calculator</h2>
+        <p class="fade-in" style="color: rgba(255,255,255,0.45); font-size: 14px; margin-top: 4px;">Adjust the sliders to model WordPress VIP's impact on NPR's content operations.</p>
+        <div class="roi-layout">
+            <div class="roi-sliders fade-in">
+                <div class="slider-group">
+                    <label>Articles Published per Month <span class="slider-value" id="sv-articles">500</span></label>
+                    <input type="range" id="sl-articles" min="100" max="2000" value="500" step="50">
+                </div>
+                <div class="slider-group">
+                    <label>Editorial Team Size <span class="slider-value" id="sv-team">80</span></label>
+                    <input type="range" id="sl-team" min="10" max="300" value="80" step="5">
+                </div>
+                <div class="slider-group">
+                    <label>Avg. Production Time (min/article) <span class="slider-value" id="sv-time">90</span></label>
+                    <input type="range" id="sl-time" min="15" max="240" value="90" step="5">
+                </div>
+                <div class="slider-group">
+                    <label>Monthly Infrastructure Cost ($) <span class="slider-value" id="sv-infra">$75,000</span></label>
+                    <input type="range" id="sl-infra" min="10000" max="300000" value="75000" step="5000">
+                </div>
+            </div>
+            <div class="roi-results fade-in">
+                <div class="roi-card">
+                    <div class="roi-number" id="roi-hours">750</div>
+                    <div class="roi-label">Hours Saved / Month</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-number" id="roi-velocity">+30%</div>
+                    <div class="roi-label">Content Velocity</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-number" id="roi-infra">$22,500</div>
+                    <div class="roi-label">Monthly Infra Savings</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-number" id="roi-speed">2.1s</div>
+                    <div class="roi-label">Avg. Page Load Time</div>
+                </div>
+                <div class="roi-card featured">
+                    <div class="roi-number" id="roi-annual">$945,000</div>
+                    <div class="roi-label">Estimated Annual Savings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 10: PARSE.LY DASHBOARD ========== -->
+    <div class="slide" id="slide-10" style="padding: 44px 60px;">
+        <div class="caption fade-in" style="text-transform: uppercase; letter-spacing: 0.1em; color: var(--parsely-green);">Included at No Extra Cost</div>
+        <h2 class="fade-in" style="margin-top: 6px;">Content Intelligence with Parse.ly</h2>
+        <div class="parsely-layout fade-in">
+            <div>
+                <div class="parsely-header">
+                    <div class="parsely-brand">Parse.ly</div>
+                    <div class="parsely-tabs" id="parselyTabs">
+                        <button class="parsely-tab active" data-range="1h">1H</button>
+                        <button class="parsely-tab" data-range="24h">24H</button>
+                        <button class="parsely-tab" data-range="7d">7D</button>
+                        <button class="parsely-tab" data-range="30d">30D</button>
+                    </div>
+                </div>
+                <div class="kpi-grid" id="kpiGrid">
+                    <div class="kpi-card"><div class="kpi-value" id="kpi-visitors">24.8K</div><div class="kpi-label">Visitors</div><div class="kpi-change up" id="kpi-visitors-chg">+12.3%</div></div>
+                    <div class="kpi-card"><div class="kpi-value" id="kpi-views">89.2K</div><div class="kpi-label">Page Views</div><div class="kpi-change up" id="kpi-views-chg">+8.7%</div></div>
+                    <div class="kpi-card"><div class="kpi-value" id="kpi-engaged">2m 34s</div><div class="kpi-label">Avg. Engaged Time</div><div class="kpi-change up" id="kpi-engaged-chg">+5.1%</div></div>
+                    <div class="kpi-card"><div class="kpi-value" id="kpi-recirc">18.4%</div><div class="kpi-label">Recirculation</div><div class="kpi-change down" id="kpi-recirc-chg">-1.2%</div></div>
+                </div>
+                <svg width="100%" height="120" viewBox="0 0 520 120" preserveAspectRatio="none" style="display:block;">
+                    <defs><linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#70AC1C" stop-opacity="0.3"/><stop offset="100%" stop-color="#70AC1C" stop-opacity="0.02"/></linearGradient></defs>
+                    <path id="chartArea" d="M0,100 Q65,80 130,60 T260,45 T390,55 T520,30 L520,120 L0,120 Z" fill="url(#chartGrad)"/>
+                    <path id="chartLine" d="M0,100 Q65,80 130,60 T260,45 T390,55 T520,30" fill="none" stroke="#70AC1C" stroke-width="2"/>
+                </svg>
+            </div>
+            <div>
+                <h3 style="font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em;">Trending Now</h3>
+                <ul class="trending-list" id="trendingList">
+                    <li class="trending-item"><span class="trending-rank">1</span><span class="trending-title">Inside the Funding Fight: What It Means for Local Stations</span><span class="trending-views">14.2K</span></li>
+                    <li class="trending-item"><span class="trending-rank">2</span><span class="trending-title">Wild Card's Video Push Hits 1.3M YouTube Views</span><span class="trending-views">11.8K</span></li>
+                    <li class="trending-item"><span class="trending-rank">3</span><span class="trending-title">Morning Edition Reaches Record Q4 Listenership</span><span class="trending-views">9.4K</span></li>
+                    <li class="trending-item"><span class="trending-rank">4</span><span class="trending-title">NPR+ Subscriptions Surge as Donors Rally</span><span class="trending-views">7.1K</span></li>
+                    <li class="trending-item"><span class="trending-rank">5</span><span class="trending-title">A.I. Nation Debuts to Record Downloads</span><span class="trending-views">5.6K</span></li>
+                </ul>
+                <div class="source-bars" style="margin-top: 20px;">
+                    <h3 style="font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">Traffic Sources</h3>
+                    <div class="source-bar-row"><span class="source-bar-label">Direct</span><div class="source-bar-track"><div class="source-bar-fill" id="src-direct" style="width:42%; background: var(--vip-turquoise);"></div></div><span class="source-bar-pct" id="src-direct-pct">42%</span></div>
+                    <div class="source-bar-row"><span class="source-bar-label">Search</span><div class="source-bar-track"><div class="source-bar-fill" id="src-search" style="width:28%; background: var(--parsely-green);"></div></div><span class="source-bar-pct" id="src-search-pct">28%</span></div>
+                    <div class="source-bar-row"><span class="source-bar-label">Social</span><div class="source-bar-track"><div class="source-bar-fill" id="src-social" style="width:19%; background: var(--vip-blueberry);"></div></div><span class="source-bar-pct" id="src-social-pct">19%</span></div>
+                    <div class="source-bar-row"><span class="source-bar-label">Referral</span><div class="source-bar-track"><div class="source-bar-fill" id="src-referral" style="width:11%; background: var(--vip-orange);"></div></div><span class="source-bar-pct" id="src-referral-pct">11%</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 11: CUSTOMER CAROUSEL ========== -->
+    <div class="slide" id="slide-11">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">Social Proof</div>
+        <h1 class="fade-in" style="margin-top: 8px;">Trusted by Leading<br>Newsrooms</h1>
+        <div class="carousel-container fade-in">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- PLACEHOLDER: Replace quotes with verified customer testimonials -->
+                <div class="carousel-card">
+                    <div class="cc-type">Digital Media</div>
+                    <div class="cc-name">TechCrunch</div>
+                    <div class="cc-quote">"WordPress VIP gives us the speed and reliability we need to break news first, every time."</div>
+                    <div class="cc-metrics">
+                        <div class="cc-metric"><div class="cc-metric-val">50M+</div><div class="cc-metric-label">Monthly visitors</div></div>
+                        <div class="cc-metric"><div class="cc-metric-val">99.99%</div><div class="cc-metric-label">Uptime achieved</div></div>
+                    </div>
+                </div>
+                <div class="carousel-card">
+                    <div class="cc-type">Legacy Media</div>
+                    <div class="cc-name">TIME</div>
+                    <div class="cc-quote">"Migrating to WordPress VIP transformed how our editorial team works. Faster publishing, better analytics, lower costs."</div>
+                    <div class="cc-metrics">
+                        <div class="cc-metric"><div class="cc-metric-val">100+</div><div class="cc-metric-label">Years of journalism</div></div>
+                        <div class="cc-metric"><div class="cc-metric-val">40%</div><div class="cc-metric-label">Faster page loads</div></div>
+                    </div>
+                </div>
+                <div class="carousel-card">
+                    <div class="cc-type">Global News</div>
+                    <div class="cc-name">Al Jazeera</div>
+                    <div class="cc-quote">"Enterprise-grade infrastructure that scales across languages, regions, and breaking events without blinking."</div>
+                    <div class="cc-metrics">
+                        <div class="cc-metric"><div class="cc-metric-val">80+</div><div class="cc-metric-label">Bureaus worldwide</div></div>
+                        <div class="cc-metric"><div class="cc-metric-val">Multi</div><div class="cc-metric-label">Language support</div></div>
+                    </div>
+                </div>
+                <div class="carousel-card">
+                    <div class="cc-type">News Network</div>
+                    <div class="cc-name">News Corp</div>
+                    <div class="cc-quote">"WordPress VIP powers our digital properties at scale, with the performance and security our audiences expect."</div>
+                    <div class="cc-metrics">
+                        <div class="cc-metric"><div class="cc-metric-val">100M+</div><div class="cc-metric-label">Monthly audience</div></div>
+                        <div class="cc-metric"><div class="cc-metric-val">Global</div><div class="cc-metric-label">Multi-property platform</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-dots" id="carouselDots">
+                <div class="carousel-dot active" data-idx="0"></div>
+                <div class="carousel-dot" data-idx="1"></div>
+                <div class="carousel-dot" data-idx="2"></div>
+                <div class="carousel-dot" data-idx="3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 12: VISION ========== -->
+    <div class="slide" id="slide-12">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">The Vision</div>
+        <h1 class="fade-in" style="margin-top: 8px;">NPR's Open-Source Future</h1>
+        <p class="fade-in" style="color: rgba(255,255,255,0.5); margin-top: 8px; max-width: 640px; font-size: 15px;">A platform that aligns with NPR's mission, serves its stations, and stands on the same open principles that power Wikipedia.</p>
+        <div class="vision-grid">
+            <div class="vision-item fade-in">
+                <h3>246 Stations, One Open Platform</h3>
+                <p>Every member station on infrastructure they own, with shared content, independent branding, and zero vendor lock-in.</p>
+            </div>
+            <div class="vision-item fade-in">
+                <h3>Unified Content Intelligence</h3>
+                <p>Parse.ly analytics across the entire NPR network. Understand what resonates, from Morning Edition to the smallest rural station.</p>
+            </div>
+            <div class="vision-item fade-in">
+                <h3>Speed When It Matters</h3>
+                <p>Break news faster with an editor that doesn't require developer intervention. Auto-scaling infrastructure that handles the surge.</p>
+            </div>
+            <div class="vision-item fade-in">
+                <h3>A Talent Pool, Not a Bottleneck</h3>
+                <p>1.3 million WordPress developers worldwide. Hire from anywhere. No dependency on a niche Java/Dari talent market.</p>
+            </div>
+            <div class="vision-item fade-in">
+                <h3>Every Dollar Accountable</h3>
+                <p>Transparent, all-inclusive pricing. No surprise licensing fees, no paying for vendor bug fixes. The financial clarity NPR needs right now.</p>
+            </div>
+            <div class="vision-item fade-in">
+                <h3>Mission Alignment</h3>
+                <p>NPR exists to serve the public. WordPress is built by the public. Open source isn't just a technology choice. It's a values statement.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 13: NEXT STEPS ========== -->
+    <div class="slide" id="slide-13">
+        <div class="caption gold fade-in" style="text-transform: uppercase; letter-spacing: 0.1em;">What's Next</div>
+        <h1 class="fade-in" style="margin-top: 8px;">Proposed Path Forward</h1>
+        <div class="steps-list">
+            <div class="step-item fade-in">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h3>Technical Deep Dive</h3>
+                    <p>WordPress VIP engineers meet NPR's technology team to map current architecture, integrations, and requirements.</p>
+                    <div class="step-timeline">Weeks 1-2</div>
+                </div>
+            </div>
+            <div class="step-item fade-in">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h3>Parse.ly Analytics Demo</h3>
+                    <p>Live walkthrough of Parse.ly with NPR's editorial leadership. See how content intelligence drives audience growth.</p>
+                    <div class="step-timeline">Weeks 2-3</div>
+                </div>
+            </div>
+            <div class="step-item fade-in">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h3>Migration Assessment</h3>
+                    <p>Detailed analysis of the Brightspot-to-WordPress VIP migration path, including content modeling, station architecture, and timeline.</p>
+                    <div class="step-timeline">Weeks 3-4</div>
+                </div>
+            </div>
+            <div class="step-item fade-in">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <h3>Pilot Proposal</h3>
+                    <p>Begin with a select group of NPR properties. Prove the value before scaling to the full network.</p>
+                    <div class="step-timeline">Weeks 4-6</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SLIDE 14: CTA ========== -->
+    <div class="slide" id="slide-14">
+        <svg class="bg-waves" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="640" cy="360" r="150" fill="none" stroke="white" stroke-width="0.4"/>
+            <circle cx="640" cy="360" r="250" fill="none" stroke="white" stroke-width="0.3"/>
+            <circle cx="640" cy="360" r="350" fill="none" stroke="white" stroke-width="0.2"/>
+        </svg>
+        <div class="cta-layout">
+            <div class="cta-left fade-in">
+                <div class="vip-logo" style="margin-bottom: 28px;">
+                    <span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span>
+                </div>
+                <h2>Let's Build NPR's<br>Open-Source Future.<br><span class="gold">Together.</span></h2>
+                <div class="accent-line" style="margin-top: 24px;"></div>
+                <div class="cta-contact">
+                    <!-- PLACEHOLDER: Replace with actual sales contact details -->
+                    <div class="contact-line" style="color: rgba(255,255,255,0.8); font-weight: 600;">Your WordPress VIP Team</div>
+                    <div class="contact-line">enterprise@wpvip.com</div>
+                    <div class="contact-line">wpvip.com</div>
+                </div>
+            </div>
+            <div class="cta-right fade-in">
+                <div>
+                    <p style="font-size: 22px; color: rgba(255,255,255,0.7); line-height: 1.4;">Open platforms.<br>Public purpose.<br><span style="color: var(--vip-gold); font-weight: 600;">The future of NPR.</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Grid -->
+    <div class="overview-grid" id="overviewGrid"></div>
+
+    <!-- Navigation -->
+    <div class="nav-controls">
+        <div class="slide-counter" id="slideCounter" title="Press Escape for overview">1 / 14</div>
+        <button class="nav-btn" id="prevBtn" aria-label="Previous slide">&#8592;</button>
+        <button class="nav-btn" id="nextBtn" aria-label="Next slide">&#8594;</button>
+    </div>
+</div>
+</div>
+
+<script>
+(function() {
+    var TOTAL = 14;
+    var current = 0;
+    var overviewOpen = false;
+
+    var slides = document.querySelectorAll('.slide');
+    var progress = document.getElementById('progressBar');
+    var counter = document.getElementById('slideCounter');
+    var overview = document.getElementById('overviewGrid');
+
+    function goTo(n) {
+        if (n < 0 || n >= TOTAL || overviewOpen) return;
+        slides[current].classList.remove('active');
+        current = n;
+        slides[current].classList.add('active');
+        progress.style.width = ((current + 1) / TOTAL * 100) + '%';
+        counter.textContent = (current + 1) + ' / ' + TOTAL;
+    }
+
+    // Keyboard
+    document.addEventListener('keydown', function(e) {
+        if (overviewOpen && e.key === 'Escape') { toggleOverview(); return; }
+        if (e.key === 'Escape') { toggleOverview(); return; }
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+        if (e.key === 'ArrowLeft') { goTo(current - 1); }
+    });
+
+    // Nav buttons
+    document.getElementById('prevBtn').addEventListener('click', function() { goTo(current - 1); });
+    document.getElementById('nextBtn').addEventListener('click', function() { goTo(current + 1); });
+
+    // Touch
+    var tx = 0;
+    document.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; });
+    document.addEventListener('touchend', function(e) {
+        var dx = e.changedTouches[0].clientX - tx;
+        if (Math.abs(dx) > 50) { dx < 0 ? goTo(current + 1) : goTo(current - 1); }
+    });
+
+    // Scale
+    function scaleDeck() {
+        var vw = window.innerWidth, vh = window.innerHeight;
+        var s = Math.min(vw / 1280, vh / 720);
+        document.querySelector('.deck-scaler').style.transform = 'scale(' + s + ')';
+    }
+    window.addEventListener('resize', scaleDeck);
+    scaleDeck();
+
+    // Overview
+    var thumbTitles = [
+        'Title', 'NPR at a Glance', 'CEO & Open Source', 'Brightspot Risks',
+        'Open Source Advantage', 'VIP Platform', 'Comparison Matrix', 'Total Cost of Ownership',
+        'ROI Calculator', 'Parse.ly Analytics', 'Customer Stories', 'Vision',
+        'Next Steps', 'Contact'
+    ];
+
+    function buildOverview() {
+        overview.innerHTML = '';
+        for (var i = 0; i < TOTAL; i++) {
+            var t = document.createElement('div');
+            t.className = 'overview-thumb' + (i === current ? ' current' : '');
+            t.textContent = (i + 1) + '. ' + thumbTitles[i];
+            (function(idx) {
+                t.addEventListener('click', function() { goTo(idx); toggleOverview(); });
+            })(i);
+            overview.appendChild(t);
+        }
+    }
+
+    function toggleOverview() {
+        overviewOpen = !overviewOpen;
+        if (overviewOpen) { buildOverview(); }
+        overview.classList.toggle('active', overviewOpen);
+    }
+
+    counter.addEventListener('click', toggleOverview);
+
+    // ===== COMPARISON MATRIX =====
+    document.querySelectorAll('.matrix-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.matrix-tab').forEach(function(t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            var cat = tab.getAttribute('data-cat');
+            document.querySelectorAll('.matrix-table tr[data-cat]').forEach(function(row) {
+                row.classList.toggle('visible', row.getAttribute('data-cat') === cat);
+            });
+        });
+    });
+
+    // ===== ROI CALCULATOR =====
+    function updateROI() {
+        var articles = parseInt(document.getElementById('sl-articles').value);
+        var team = parseInt(document.getElementById('sl-team').value);
+        var time = parseInt(document.getElementById('sl-time').value);
+        var infra = parseInt(document.getElementById('sl-infra').value);
+
+        document.getElementById('sv-articles').textContent = articles.toLocaleString();
+        document.getElementById('sv-team').textContent = team;
+        document.getElementById('sv-time').textContent = time;
+        document.getElementById('sv-infra').textContent = '$' + infra.toLocaleString();
+
+        var hoursSaved = Math.round(articles * (time * 0.22) / 60);
+        var velocity = Math.round(20 + (team / 300) * 15 + (articles / 2000) * 10);
+        var infraSavings = Math.round(infra * 0.30);
+        var speedImprovement = Math.max(0.8, 3.5 - (velocity / 30)).toFixed(1);
+        var annual = Math.round((hoursSaved * 65 + infraSavings) * 12);
+
+        document.getElementById('roi-hours').textContent = hoursSaved.toLocaleString();
+        document.getElementById('roi-velocity').textContent = '+' + velocity + '%';
+        document.getElementById('roi-infra').textContent = '$' + infraSavings.toLocaleString();
+        document.getElementById('roi-speed').textContent = speedImprovement + 's';
+        document.getElementById('roi-annual').textContent = '$' + annual.toLocaleString();
+    }
+
+    ['sl-articles', 'sl-team', 'sl-time', 'sl-infra'].forEach(function(id) {
+        document.getElementById(id).addEventListener('input', updateROI);
+    });
+    updateROI();
+
+    // ===== PARSE.LY DASHBOARD =====
+    var parselyData = {
+        '1h':  { visitors: '24.8K', vChg: '+12.3%', vUp: true, views: '89.2K', pvChg: '+8.7%', pvUp: true, engaged: '2m 34s', eChg: '+5.1%', eUp: true, recirc: '18.4%', rChg: '-1.2%', rUp: false, direct: 42, search: 28, social: 19, referral: 11 },
+        '24h': { visitors: '312K', vChg: '+6.4%', vUp: true, views: '1.1M', pvChg: '+4.2%', pvUp: true, engaged: '2m 12s', eChg: '-2.1%', eUp: false, recirc: '21.7%', rChg: '+3.4%', rUp: true, direct: 38, search: 32, social: 18, referral: 12 },
+        '7d':  { visitors: '2.4M', vChg: '+9.8%', vUp: true, views: '8.7M', pvChg: '+11.3%', pvUp: true, engaged: '2m 48s', eChg: '+7.2%', eUp: true, recirc: '19.8%', rChg: '+1.1%', rUp: true, direct: 40, search: 30, social: 17, referral: 13 },
+        '30d': { visitors: '9.1M', vChg: '+15.6%', vUp: true, views: '34.2M', pvChg: '+18.1%', pvUp: true, engaged: '2m 22s', eChg: '+3.8%', eUp: true, recirc: '20.3%', rChg: '+2.7%', rUp: true, direct: 41, search: 29, social: 20, referral: 10 }
+    };
+
+    function updateParsely(range) {
+        var d = parselyData[range];
+        document.getElementById('kpi-visitors').textContent = d.visitors;
+        document.getElementById('kpi-visitors-chg').textContent = d.vChg;
+        document.getElementById('kpi-visitors-chg').className = 'kpi-change ' + (d.vUp ? 'up' : 'down');
+        document.getElementById('kpi-views').textContent = d.views;
+        document.getElementById('kpi-views-chg').textContent = d.pvChg;
+        document.getElementById('kpi-views-chg').className = 'kpi-change ' + (d.pvUp ? 'up' : 'down');
+        document.getElementById('kpi-engaged').textContent = d.engaged;
+        document.getElementById('kpi-engaged-chg').textContent = d.eChg;
+        document.getElementById('kpi-engaged-chg').className = 'kpi-change ' + (d.eUp ? 'up' : 'down');
+        document.getElementById('kpi-recirc').textContent = d.recirc;
+        document.getElementById('kpi-recirc-chg').textContent = d.rChg;
+        document.getElementById('kpi-recirc-chg').className = 'kpi-change ' + (d.rUp ? 'up' : 'down');
+
+        ['direct', 'search', 'social', 'referral'].forEach(function(s) {
+            document.getElementById('src-' + s).style.width = d[s] + '%';
+            document.getElementById('src-' + s + '-pct').textContent = d[s] + '%';
+        });
+    }
+
+    document.querySelectorAll('.parsely-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.parsely-tab').forEach(function(t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            updateParsely(tab.getAttribute('data-range'));
+        });
+    });
+
+    // ===== CUSTOMER CAROUSEL =====
+    var carouselIdx = 0;
+    var carouselCards = document.querySelectorAll('.carousel-card');
+    var carouselTrack = document.getElementById('carouselTrack');
+    var carouselDots = document.querySelectorAll('.carousel-dot');
+
+    function scrollCarousel(idx) {
+        carouselIdx = idx;
+        var cardWidth = 350 + 24;
+        carouselTrack.style.transform = 'translateX(-' + (idx * cardWidth) + 'px)';
+        carouselDots.forEach(function(dot, i) {
+            dot.classList.toggle('active', i === idx);
+        });
+    }
+
+    carouselDots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            scrollCarousel(parseInt(dot.getAttribute('data-idx')));
+        });
+    });
+
+    // Auto-advance carousel when slide 11 is active
+    setInterval(function() {
+        if (slides[10].classList.contains('active') && !overviewOpen) {
+            scrollCarousel((carouselIdx + 1) % carouselCards.length);
+        }
+    }, 4000);
+
+    // Init
+    progress.style.width = (1 / TOTAL * 100) + '%';
+})();
+</script>
+</body>
+</html>

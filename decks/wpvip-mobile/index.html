@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#13191E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>WordPress VIP | The Enterprise Content Platform</title>
+<link rel="manifest" href="manifest.json">
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES
+   ============================================ */
+:root {
+  --vip-black: #13191E;
+  --vip-black-light: #1a2230;
+  --vip-white: #FFFFFF;
+  --vip-gold: #D8A45F;
+  --vip-gold-text: #9A6014;
+  --vip-gold-light: #EAE3DA;
+  --vip-turquoise: #3EA0AD;
+  --vip-turquoise-dark: #194146;
+  --vip-purple: #9C5CE1;
+  --vip-red: #FF595E;
+  --vip-orange: #FB902F;
+  --vip-blueberry: #3858E9;
+  --vip-parsely: #70AC1C;
+  --vip-gray: #A8ABAD;
+  --vip-gray-light: #DBDCDD;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  height: 100%;
+  background: var(--vip-black);
+  color: var(--vip-white);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* ============================================
+   SCROLL CONTAINER
+   ============================================ */
+.scroll-container {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   SECTION BASE
+   ============================================ */
+.section {
+  height: 100vh;
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: calc(24px + var(--safe-top)) calc(20px + var(--safe-right)) calc(24px + var(--safe-bottom)) calc(20px + var(--safe-left));
+}
+.section.dark { background: var(--vip-black); color: var(--vip-white); }
+.section.light { background: var(--vip-white); color: var(--vip-black); }
+.section.gradient { background: linear-gradient(165deg, var(--vip-black) 0%, var(--vip-black-light) 100%); color: var(--vip-white); }
+
+/* Desktop cap */
+@media (min-width: 640px) {
+  .section {
+    align-items: center;
+  }
+  .section-inner {
+    max-width: 600px;
+    width: 100%;
+  }
+}
+.section-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   GEOMETRIC PATTERNS
+   ============================================ */
+.geo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.geo-lines {
+  background-image: repeating-linear-gradient(
+    -45deg, transparent, transparent 60px,
+    rgba(216,164,95,0.12) 60px, rgba(216,164,95,0.12) 61px
+  );
+  opacity: 0.05;
+}
+.geo-grid {
+  background-image:
+    linear-gradient(rgba(216,164,95,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(216,164,95,0.08) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.06;
+}
+.geo-circles {
+  background-image:
+    radial-gradient(circle at 90% 10%, transparent 80px, rgba(216,164,95,0.1) 80px, rgba(216,164,95,0.1) 81px, transparent 81px),
+    radial-gradient(circle at 90% 10%, transparent 160px, rgba(216,164,95,0.1) 160px, rgba(216,164,95,0.1) 161px, transparent 161px),
+    radial-gradient(circle at 90% 10%, transparent 240px, rgba(216,164,95,0.1) 240px, rgba(216,164,95,0.1) 241px, transparent 241px);
+  opacity: 0.06;
+}
+.geo-moire {
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(216,164,95,0.08) 24px, rgba(216,164,95,0.08) 25px),
+    repeating-linear-gradient(60deg, transparent, transparent 24px, rgba(216,164,95,0.08) 24px, rgba(216,164,95,0.08) 25px);
+  opacity: 0.04;
+}
+.geo-dots {
+  background-image: radial-gradient(circle, rgba(216,164,95,0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.05;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+.caption {
+  font-size: clamp(10px, 2.8vw, 12px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vip-gold);
+  margin-bottom: 6px;
+}
+h1 {
+  font-size: clamp(28px, 7vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+h2 {
+  font-size: clamp(22px, 5.5vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+h3 {
+  font-size: clamp(16px, 4vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+p, li {
+  font-size: clamp(13px, 3.5vw, 15px);
+  line-height: 1.5;
+}
+.gold { color: var(--vip-gold); }
+.gold-text { color: var(--vip-gold-text); }
+.turquoise { color: var(--vip-turquoise); }
+
+.gold-line {
+  width: 48px;
+  height: 2px;
+  background: var(--vip-gold);
+  border: none;
+  margin: 12px 0;
+}
+
+/* ============================================
+   VIP LOGO
+   ============================================ */
+.vip-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: clamp(14px, 3.5vw, 16px);
+  letter-spacing: 0.02em;
+}
+.vip-logo .wp { font-weight: 400; }
+.vip-logo .vip { font-weight: 700; color: var(--vip-gold); }
+
+/* ============================================
+   PROGRESS DOTS
+   ============================================ */
+.progress-dots {
+  position: fixed;
+  right: calc(8px + var(--safe-right));
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+  padding: 8px 4px;
+}
+.progress-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0;
+}
+.progress-dot.active {
+  background: var(--vip-gold);
+  height: 18px;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATION BASE
+   ============================================ */
+.fade-in {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.section.visible .fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.section.visible .fade-in:nth-child(2) { transition-delay: 0.08s; }
+.section.visible .fade-in:nth-child(3) { transition-delay: 0.16s; }
+.section.visible .fade-in:nth-child(4) { transition-delay: 0.24s; }
+.section.visible .fade-in:nth-child(5) { transition-delay: 0.32s; }
+.section.visible .fade-in:nth-child(6) { transition-delay: 0.4s; }
+.section.visible .fade-in:nth-child(7) { transition-delay: 0.48s; }
+.section.visible .fade-in:nth-child(8) { transition-delay: 0.56s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in { opacity: 1; transform: none; transition: none; }
+  .section.visible .fade-in { transition: none; }
+}
+
+/* ============================================
+   SECTION 0: HERO
+   ============================================ */
+#hero {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+#hero .section-inner {
+  justify-content: center;
+  align-items: center;
+}
+.hero-subtitle {
+  font-size: clamp(14px, 3.8vw, 18px);
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  margin-top: 12px;
+  letter-spacing: 0.01em;
+}
+.scroll-indicator {
+  position: absolute;
+  bottom: calc(32px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.35);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+.scroll-arrow {
+  width: 20px;
+  height: 20px;
+  border-right: 1.5px solid rgba(255,255,255,0.35);
+  border-bottom: 1.5px solid rgba(255,255,255,0.35);
+  transform: rotate(45deg);
+}
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ============================================
+   SECTION 1: THE PROBLEM
+   ============================================ */
+.challenge-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+  flex: 1;
+  min-height: 0;
+}
+.challenge-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.challenge-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.challenge-card h3 {
+  font-size: clamp(13px, 3.2vw, 15px);
+  font-weight: 600;
+}
+.challenge-card p {
+  font-size: clamp(11px, 2.8vw, 13px);
+  color: rgba(255,255,255,0.55);
+  line-height: 1.4;
+}
+
+/* ============================================
+   SECTION 2: PLATFORM OVERVIEW
+   ============================================ */
+.capability-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.cap-pill {
+  background: rgba(216,164,95,0.08);
+  border: 1px solid rgba(216,164,95,0.2);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: clamp(12px, 3vw, 14px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cap-pill.active {
+  background: rgba(216,164,95,0.15);
+  border-color: var(--vip-gold);
+  color: var(--vip-gold);
+}
+.cap-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+  opacity: 0;
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+  margin-top: 0;
+}
+.cap-detail.open {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.cap-detail p {
+  font-size: clamp(12px, 3vw, 14px);
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+.cap-detail .detail-title {
+  font-weight: 600;
+  color: var(--vip-gold);
+  margin-bottom: 4px;
+  font-size: clamp(13px, 3.2vw, 15px);
+}
+
+/* ============================================
+   SECTION 3: GLOBAL PERFORMANCE (CDN)
+   ============================================ */
+.cdn-stats-bar {
+  display: flex;
+  gap: 4px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.cdn-stat {
+  flex: 1;
+  min-width: 0;
+  background: rgba(62,160,173,0.08);
+  border: 1px solid rgba(62,160,173,0.2);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.cdn-stat .val {
+  font-size: clamp(16px, 4.5vw, 22px);
+  font-weight: 700;
+  color: var(--vip-turquoise);
+  letter-spacing: -0.02em;
+}
+.cdn-stat .lbl {
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.cdn-regions {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  margin-top: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.cdn-region {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.cdn-region-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.cdn-region-header h3 {
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cdn-region-header .region-count {
+  font-size: clamp(11px, 2.6vw, 12px);
+  color: var(--vip-turquoise);
+  font-weight: 500;
+}
+.cdn-chevron {
+  width: 16px;
+  height: 16px;
+  color: rgba(255,255,255,0.4);
+  transition: transform 0.3s ease;
+}
+.cdn-region.open .cdn-chevron {
+  transform: rotate(180deg);
+}
+.cdn-pops {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.cdn-region.open .cdn-pops {
+  max-height: 400px;
+}
+.cdn-pop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 8px 24px;
+  font-size: clamp(12px, 3vw, 13px);
+}
+.cdn-pop .city { color: rgba(255,255,255,0.7); }
+.cdn-pop .latency {
+  color: var(--vip-turquoise);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   SECTION 4: CONTENT ANALYTICS (Parse.ly)
+   ============================================ */
+#parsely-section { background: var(--vip-black); }
+
+.parsely-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.parsely-brand {
+  font-size: clamp(13px, 3.2vw, 15px);
+  font-weight: 600;
+  color: var(--vip-parsely);
+}
+.parsely-tabs {
+  display: flex;
+  gap: 4px;
+}
+.parsely-tab {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.parsely-tab.active {
+  background: var(--vip-parsely);
+  color: #fff;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.kpi-card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.kpi-label {
+  font-size: clamp(10px, 2.5vw, 11px);
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.kpi-value {
+  font-size: clamp(18px, 5vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 2px 0;
+}
+.kpi-change {
+  font-size: clamp(11px, 2.6vw, 12px);
+  font-weight: 600;
+}
+.kpi-change.up { color: var(--vip-parsely); }
+.kpi-change.down { color: var(--vip-red); }
+
+.parsely-chart {
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 12px;
+  height: 80px;
+}
+.parsely-chart svg { width: 100%; height: 100%; }
+
+.parsely-bottom {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.trending-section, .sources-section {
+  margin-bottom: 12px;
+}
+.trending-section h4, .sources-section h4 {
+  font-size: clamp(11px, 2.8vw, 12px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+}
+.trending-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.trending-rank {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--vip-parsely);
+  min-width: 16px;
+}
+.trending-title {
+  flex: 1;
+  font-size: clamp(12px, 3vw, 13px);
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trending-views {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap;
+}
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.source-label {
+  font-size: clamp(11px, 2.8vw, 12px);
+  color: rgba(255,255,255,0.6);
+  min-width: 56px;
+}
+.source-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.source-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.source-pct {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ============================================
+   SECTION 5: COLLABORATIVE EDITING
+   ============================================ */
+.editor-mock {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 12px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;
+}
+.toolbar-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editor-avatars {
+  margin-left: auto;
+  display: flex;
+}
+.editor-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--vip-black);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -6px;
+}
+.editor-avatar:first-child { margin-left: 0; }
+.editor-body {
+  padding: 16px;
+  flex: 1;
+  min-height: 0;
+  font-size: clamp(13px, 3.2vw, 15px);
+  line-height: 1.6;
+  position: relative;
+}
+.editor-body .headline {
+  font-size: clamp(18px, 4.5vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: var(--vip-white);
+}
+.editor-body .body-text {
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 12px;
+}
+.editor-body .editor-note {
+  color: var(--vip-turquoise);
+  font-size: clamp(12px, 3vw, 13px);
+  border-left: 2px solid var(--vip-turquoise);
+  padding-left: 10px;
+}
+.cursor-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #fff;
+  position: relative;
+  top: -2px;
+  margin-left: 2px;
+  animation: cursor-blink 1.2s ease-in-out infinite;
+}
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.editor-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.editor-pill {
+  background: rgba(62,160,173,0.1);
+  border: 1px solid rgba(62,160,173,0.2);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: clamp(11px, 2.6vw, 12px);
+  color: var(--vip-turquoise);
+  font-weight: 500;
+}
+
+/* ============================================
+   SECTION 6: SECURITY & TRUST
+   ============================================ */
+.uptime-stat {
+  text-align: center;
+  margin: 16px 0 12px;
+}
+.uptime-number {
+  font-size: clamp(48px, 14vw, 72px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--vip-gold);
+  line-height: 1;
+}
+.uptime-label {
+  font-size: clamp(13px, 3.2vw, 15px);
+  color: rgba(255,255,255,0.55);
+  margin-top: 4px;
+}
+.cert-badges {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.cert-badge {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  text-align: center;
+}
+.cert-badge .badge-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.cert-badge .badge-label {
+  font-size: clamp(10px, 2.5vw, 11px);
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.02em;
+}
+.security-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+.sec-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+}
+.sec-icon {
+  color: var(--vip-turquoise);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.sec-feature span {
+  font-size: clamp(11px, 2.8vw, 13px);
+  color: rgba(255,255,255,0.65);
+  line-height: 1.35;
+}
+
+/* ============================================
+   SECTION 7: CUSTOMER PROOF (Carousel)
+   ============================================ */
+.carousel-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  margin-top: 12px;
+  position: relative;
+}
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  height: 100%;
+  padding-right: 40px;
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-card {
+  flex: 0 0 calc(100% - 32px);
+  scroll-snap-align: start;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.carousel-card .company {
+  font-size: clamp(20px, 5.5vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.carousel-card .industry {
+  font-size: clamp(10px, 2.5vw, 11px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--vip-gold);
+  margin-top: 4px;
+}
+.carousel-card .quote {
+  font-size: clamp(13px, 3.2vw, 15px);
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  line-height: 1.5;
+  border-left: 2px solid var(--vip-gold);
+  padding-left: 12px;
+  margin: 16px 0;
+  flex: 1;
+}
+.carousel-metrics {
+  display: flex;
+  gap: 16px;
+  margin-top: auto;
+}
+.carousel-metric .metric-value {
+  font-size: clamp(20px, 5vw, 26px);
+  font-weight: 700;
+  color: var(--vip-turquoise);
+  letter-spacing: -0.02em;
+}
+.carousel-metric .metric-label {
+  font-size: clamp(10px, 2.5vw, 11px);
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.carousel-dot.active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--vip-gold);
+}
+
+/* ============================================
+   SECTION 8: ROI CALCULATOR
+   ============================================ */
+.roi-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+.roi-slider-group label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: clamp(12px, 3vw, 14px);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.roi-slider-group label span {
+  color: var(--vip-gold);
+  font-weight: 700;
+}
+.roi-slider-group input[type="range"] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
+}
+.roi-slider-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--vip-gold);
+  cursor: pointer;
+  border: 3px solid var(--vip-black);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.roi-slider-group input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--vip-gold);
+  cursor: pointer;
+  border: 3px solid var(--vip-black);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.roi-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+.roi-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.roi-card .roi-value {
+  font-size: clamp(20px, 5.5vw, 28px);
+  font-weight: 700;
+  color: var(--vip-turquoise);
+  letter-spacing: -0.02em;
+}
+.roi-card .roi-label {
+  font-size: clamp(10px, 2.5vw, 11px);
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.roi-card.featured {
+  grid-column: 1 / -1;
+  background: rgba(216,164,95,0.1);
+  border-color: rgba(216,164,95,0.3);
+}
+.roi-card.featured .roi-value {
+  font-size: clamp(28px, 8vw, 38px);
+  color: var(--vip-gold);
+}
+.roi-card.featured .roi-label {
+  color: rgba(216,164,95,0.7);
+}
+
+/* ============================================
+   SECTION 9: CTA
+   ============================================ */
+#cta {
+  justify-content: center;
+  text-align: center;
+}
+#cta .section-inner {
+  justify-content: center;
+  align-items: center;
+}
+.cta-headline {
+  font-size: clamp(32px, 9vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+.cta-sub {
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: rgba(255,255,255,0.6);
+  margin-top: 12px;
+  max-width: 320px;
+}
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+  width: 100%;
+  max-width: 280px;
+}
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: var(--vip-gold);
+  color: var(--vip-black);
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: transparent;
+  color: var(--vip-white);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-secondary:active { transform: scale(0.97); }
+.install-hint {
+  font-size: clamp(11px, 2.6vw, 12px);
+  color: rgba(255,255,255,0.3);
+  margin-top: 20px;
+}
+.share-toast {
+  position: fixed;
+  bottom: calc(24px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--vip-gold);
+  color: var(--vip-black);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 200;
+  pointer-events: none;
+}
+.share-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-container" id="scrollContainer">
+
+  <!-- ═══════════ SECTION 0: HERO ═══════════ -->
+  <section class="section dark" id="hero">
+    <div class="geo geo-lines"></div>
+    <div class="section-inner">
+      <div class="vip-logo fade-in">
+        <span class="wp">WordPress</span>
+        <span class="vip">VIP</span>
+      </div>
+      <hr class="gold-line fade-in" style="margin: 16px auto;">
+      <h1 class="fade-in" style="margin-top: 8px;">The Enterprise<br>Content Platform</h1>
+      <p class="hero-subtitle fade-in">Powering the world's most ambitious content teams with unmatched performance, security, and editorial agility.</p>
+    </div>
+    <div class="scroll-indicator">
+      <span>Swipe to explore</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 1: THE PROBLEM ═══════════ -->
+  <section class="section dark" id="problem">
+    <div class="geo geo-dots"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">The Challenge</p>
+      <h2 class="fade-in">Enterprise Content Is Broken</h2>
+      <p class="fade-in" style="color: rgba(255,255,255,0.55); margin-top: 6px; font-size: clamp(12px, 3vw, 14px);">Legacy platforms force tradeoffs between speed, security, and editorial freedom. Your teams deserve better.</p>
+      <div class="challenge-cards">
+        <div class="challenge-card fade-in">
+          <div class="challenge-icon">&#x1F6E1;</div>
+          <h3>Security Gaps</h3>
+          <p>Constant patching, vulnerability windows, and compliance headaches drain your team.</p>
+        </div>
+        <div class="challenge-card fade-in">
+          <div class="challenge-icon">&#x26A1;</div>
+          <h3>Slow Performance</h3>
+          <p>Pages that load in 3+ seconds lose 53% of mobile visitors before they see your content.</p>
+        </div>
+        <div class="challenge-card fade-in">
+          <div class="challenge-icon">&#x1F504;</div>
+          <h3>Broken Workflows</h3>
+          <p>Editorial bottlenecks, clunky approval chains, and siloed tools slow your publish velocity.</p>
+        </div>
+        <div class="challenge-card fade-in">
+          <div class="challenge-icon">&#x2699;</div>
+          <h3>Infrastructure Tax</h3>
+          <p>Your engineers spend more time on hosting and DevOps than building features your audience needs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 2: PLATFORM OVERVIEW ═══════════ -->
+  <section class="section gradient" id="platform">
+    <div class="geo geo-grid"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">The Platform</p>
+      <h2 class="fade-in">Everything You Need,<br>Nothing You Don't</h2>
+      <div class="capability-grid fade-in" id="capGrid">
+        <div class="cap-pill" data-cap="cms">Content Management</div>
+        <div class="cap-pill" data-cap="analytics">Built-in Analytics</div>
+        <div class="cap-pill" data-cap="security">Enterprise Security</div>
+        <div class="cap-pill" data-cap="cdn">Global CDN</div>
+        <div class="cap-pill" data-cap="ai">AI-Powered Tools</div>
+        <div class="cap-pill" data-cap="collab">Collaborative Editing</div>
+      </div>
+      <div class="cap-detail" id="capDetail">
+        <div class="detail-title" id="capDetailTitle"></div>
+        <p id="capDetailText"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 3: GLOBAL PERFORMANCE ═══════════ -->
+  <section class="section dark" id="cdn-section">
+    <div class="geo geo-circles"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">Global Infrastructure</p>
+      <h2 class="fade-in">Lightning-Fast, Everywhere</h2>
+      <div class="cdn-stats-bar fade-in">
+        <div class="cdn-stat"><div class="val" data-count="30">0</div><div class="lbl">Edge PoPs</div></div>
+        <div class="cdn-stat"><div class="val">&lt;50ms</div><div class="lbl">Avg TTFB</div></div>
+        <div class="cdn-stat"><div class="val">99.99%</div><div class="lbl">Uptime</div></div>
+      </div>
+      <div class="cdn-regions fade-in" id="cdnRegions">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 4: CONTENT ANALYTICS ═══════════ -->
+  <section class="section dark" id="parsely-section">
+    <div class="geo geo-moire"></div>
+    <div class="section-inner">
+      <div class="parsely-header fade-in">
+        <span class="parsely-brand">&#x25CF; Parse.ly Analytics</span>
+        <div class="parsely-tabs" id="parselyTabs">
+          <button class="parsely-tab" data-range="1H">1H</button>
+          <button class="parsely-tab active" data-range="24H">24H</button>
+          <button class="parsely-tab" data-range="7D">7D</button>
+          <button class="parsely-tab" data-range="30D">30D</button>
+        </div>
+      </div>
+      <div class="kpi-grid fade-in" id="kpiGrid">
+        <div class="kpi-card">
+          <div class="kpi-label">Visitors</div>
+          <div class="kpi-value" data-kpi="visitors">189,432</div>
+          <div class="kpi-change up" data-kpi="visitorsChange">+12.4%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Page Views</div>
+          <div class="kpi-value" data-kpi="pageViews">467,891</div>
+          <div class="kpi-change up" data-kpi="pageViewsChange">+8.7%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg. Engaged Time</div>
+          <div class="kpi-value" data-kpi="engagedTime">2:23</div>
+          <div class="kpi-change up" data-kpi="engagedTimeChange">+5.1%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Recirculation</div>
+          <div class="kpi-value" data-kpi="recirc">31%</div>
+          <div class="kpi-change up" data-kpi="recircChange">+3.2%</div>
+        </div>
+      </div>
+      <div class="parsely-chart fade-in">
+        <svg viewBox="0 0 620 130" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#70AC1C" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#70AC1C" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path id="chartArea" d="M0,110 C40,100 90,70 140,80 C190,90 240,50 300,55 C360,60 410,30 470,40 C530,50 570,25 620,35 L620,130 L0,130 Z" fill="url(#chartGrad)"/>
+          <path id="chartLine" d="M0,110 C40,100 90,70 140,80 C190,90 240,50 300,55 C360,60 410,30 470,40 C530,50 570,25 620,35" fill="none" stroke="#70AC1C" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="parsely-bottom fade-in">
+        <div class="trending-section">
+          <h4>Trending Now</h4>
+          <div id="trendingList"></div>
+        </div>
+        <div class="sources-section">
+          <h4>Traffic Sources</h4>
+          <div id="sourcesList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 5: COLLABORATIVE EDITING ═══════════ -->
+  <section class="section dark" id="editor-section">
+    <div class="geo geo-dots"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">Editorial Experience</p>
+      <h2 class="fade-in">Built for Content Teams</h2>
+      <div class="editor-mock fade-in">
+        <div class="editor-toolbar">
+          <div class="toolbar-btn"><b>B</b></div>
+          <div class="toolbar-btn"><i>I</i></div>
+          <div class="toolbar-btn" style="font-size:11px;">H1</div>
+          <div class="toolbar-btn" style="font-size:11px;">H2</div>
+          <div class="toolbar-btn">&#x1F517;</div>
+          <div class="editor-avatars">
+            <div class="editor-avatar" style="background: #3EA0AD;">JM</div>
+            <div class="editor-avatar" style="background: #9C5CE1;">SK</div>
+            <div class="editor-avatar" style="background: #D8A45F;">AR</div>
+          </div>
+        </div>
+        <div class="editor-body">
+          <div class="headline" id="typewriterHeadline"></div>
+          <div class="body-text" id="typewriterBody"></div>
+          <div class="editor-note" id="typewriterNote"></div>
+        </div>
+      </div>
+      <div class="editor-features fade-in">
+        <div class="editor-pill">Real-time Cursors</div>
+        <div class="editor-pill">Block Locking</div>
+        <div class="editor-pill">Inline Comments</div>
+        <div class="editor-pill">Revision History</div>
+        <div class="editor-pill">Editorial Workflows</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 6: SECURITY & TRUST ═══════════ -->
+  <section class="section dark" id="security-section">
+    <div class="geo geo-grid"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">Security & Compliance</p>
+      <h2 class="fade-in">Enterprise-Grade Trust</h2>
+      <div class="uptime-stat fade-in">
+        <div class="uptime-number" id="uptimeNumber">0</div>
+        <div class="uptime-label">Uptime SLA, backed by contract</div>
+      </div>
+      <div class="cert-badges fade-in">
+        <div class="cert-badge">
+          <div class="badge-icon">&#x1F6E1;</div>
+          <div class="badge-label">SOC 2<br>Type II</div>
+        </div>
+        <div class="cert-badge">
+          <div class="badge-icon">&#x1F512;</div>
+          <div class="badge-label">ISO<br>27001</div>
+        </div>
+        <div class="cert-badge">
+          <div class="badge-icon">&#x2705;</div>
+          <div class="badge-label">GDPR<br>Ready</div>
+        </div>
+        <div class="cert-badge">
+          <div class="badge-icon">&#x1F310;</div>
+          <div class="badge-label">FedRAMP<br>In Process</div>
+        </div>
+      </div>
+      <div class="security-features fade-in">
+        <div class="sec-feature">
+          <span class="sec-icon">&#x2714;</span>
+          <span>Automated security patches</span>
+        </div>
+        <div class="sec-feature">
+          <span class="sec-icon">&#x2714;</span>
+          <span>WAF and DDoS protection</span>
+        </div>
+        <div class="sec-feature">
+          <span class="sec-icon">&#x2714;</span>
+          <span>Code review on deploy</span>
+        </div>
+        <div class="sec-feature">
+          <span class="sec-icon">&#x2714;</span>
+          <span>Role-based access control</span>
+        </div>
+        <div class="sec-feature">
+          <span class="sec-icon">&#x2714;</span>
+          <span>Encrypted at rest and in transit</span>
+        </div>
+        <div class="sec-feature">
+          <span class="sec-icon">&#x2714;</span>
+          <span>24/7 incident response team</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 7: CUSTOMER PROOF ═══════════ -->
+  <section class="section dark" id="customers-section">
+    <div class="geo geo-moire"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">Trusted By Leaders</p>
+      <h2 class="fade-in">Powering the Best in Every Industry</h2>
+      <div class="carousel-container fade-in">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-card">
+            <div class="company">TechCrunch</div>
+            <div class="industry">Technology Media</div>
+            <div class="quote">"WordPress VIP gives us the speed and reliability we need to break news first, every time. Our editorial team can focus on storytelling, not infrastructure."</div>
+            <div class="carousel-metrics">
+              <div class="carousel-metric">
+                <div class="metric-value">2x</div>
+                <div class="metric-label">Faster Deploys</div>
+              </div>
+              <div class="carousel-metric">
+                <div class="metric-value">45%</div>
+                <div class="metric-label">More Content</div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-card">
+            <div class="company">Salesforce</div>
+            <div class="industry">Enterprise SaaS</div>
+            <div class="quote">"We run a global multi-brand content operation on WordPress VIP. The platform scales with us and never breaks a sweat during product launches."</div>
+            <div class="carousel-metrics">
+              <div class="carousel-metric">
+                <div class="metric-value">99.99%</div>
+                <div class="metric-label">Uptime</div>
+              </div>
+              <div class="carousel-metric">
+                <div class="metric-value">60%</div>
+                <div class="metric-label">Less Eng. Overhead</div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-card">
+            <div class="company">Bloomberg</div>
+            <div class="industry">Financial Services</div>
+            <div class="quote">"Security and compliance are non-negotiable for us. WordPress VIP checks every box while giving our editors the modern tools they need."</div>
+            <div class="carousel-metrics">
+              <div class="carousel-metric">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">Audit Pass Rate</div>
+              </div>
+              <div class="carousel-metric">
+                <div class="metric-value">30ms</div>
+                <div class="metric-label">Avg TTFB</div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-card">
+            <div class="company">News Corp</div>
+            <div class="industry">Global Media</div>
+            <div class="quote">"We migrated dozens of properties to WordPress VIP. The global CDN and Parse.ly analytics gave us unified performance insights we never had before."</div>
+            <div class="carousel-metrics">
+              <div class="carousel-metric">
+                <div class="metric-value">3x</div>
+                <div class="metric-label">Traffic Handled</div>
+              </div>
+              <div class="carousel-metric">
+                <div class="metric-value">40%</div>
+                <div class="metric-label">Faster Pages</div>
+              </div>
+            </div>
+          </div>
+          <!-- Placeholder: customer quotes are representative examples -->
+          <div class="carousel-card">
+            <div class="company">Meta</div>
+            <div class="industry">Technology</div>
+            <div class="quote">"WordPress VIP powers our engineering and newsroom blogs with the performance and flexibility a platform of our scale demands."</div>
+            <div class="carousel-metrics">
+              <div class="carousel-metric">
+                <div class="metric-value">500M+</div>
+                <div class="metric-label">Monthly Views</div>
+              </div>
+              <div class="carousel-metric">
+                <div class="metric-value">Sub-40ms</div>
+                <div class="metric-label">TTFB Global</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 8: ROI CALCULATOR ═══════════ -->
+  <section class="section dark" id="roi-section">
+    <div class="geo geo-grid"></div>
+    <div class="section-inner">
+      <p class="caption fade-in">The Business Case</p>
+      <h2 class="fade-in">Your ROI with WordPress VIP</h2>
+      <div class="roi-sliders fade-in">
+        <div class="roi-slider-group">
+          <label>Articles / Month <span id="roiArticlesVal">500</span></label>
+          <input type="range" id="roiArticles" min="50" max="2000" step="50" value="500">
+        </div>
+        <div class="roi-slider-group">
+          <label>Editorial Team Size <span id="roiTeamVal">50</span></label>
+          <input type="range" id="roiTeam" min="5" max="200" step="5" value="50">
+        </div>
+        <div class="roi-slider-group">
+          <label>Eng. FTEs on CMS <span id="roiEngVal">8</span></label>
+          <input type="range" id="roiEng" min="1" max="30" step="1" value="8">
+        </div>
+        <div class="roi-slider-group">
+          <label>Monthly Infra Cost <span id="roiInfraVal">$50,000</span></label>
+          <input type="range" id="roiInfra" min="5000" max="200000" step="5000" value="50000">
+        </div>
+      </div>
+      <div class="roi-results fade-in">
+        <div class="roi-card">
+          <div class="roi-value" id="roiHours">831</div>
+          <div class="roi-label">Eng. Hours Freed / Mo.</div>
+        </div>
+        <div class="roi-card">
+          <div class="roi-value" id="roiVelocity">+36%</div>
+          <div class="roi-label">Content Velocity</div>
+        </div>
+        <div class="roi-card">
+          <div class="roi-value" id="roiInfraSave">$17K</div>
+          <div class="roi-label">Infra Savings / Mo.</div>
+        </div>
+        <div class="roi-card">
+          <div class="roi-value" id="roiSpeed">+40%</div>
+          <div class="roi-label">Faster Page Loads</div>
+        </div>
+        <div class="roi-card featured">
+          <div class="roi-value" id="roiAnnual">$1.7M</div>
+          <div class="roi-label">Estimated Annual Savings</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SECTION 9: CTA ═══════════ -->
+  <section class="section dark" id="cta">
+    <div class="geo geo-lines"></div>
+    <div class="section-inner">
+      <div class="vip-logo fade-in">
+        <span class="wp">WordPress</span>
+        <span class="vip">VIP</span>
+      </div>
+      <hr class="gold-line fade-in" style="margin: 16px auto;">
+      <h1 class="cta-headline fade-in">Let's Talk</h1>
+      <p class="cta-sub fade-in">Ready to power your content with the platform trusted by the world's leading brands?</p>
+      <div class="cta-buttons fade-in">
+        <button class="btn-primary" id="shareBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share This Deck
+        </button>
+        <a class="btn-secondary" href="https://wpvip.com/contact/" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Contact Sales
+        </a>
+      </div>
+      <p class="install-hint fade-in" id="installHint" style="display:none;">Add to your home screen for quick access</p>
+    </div>
+  </section>
+
+</div>
+
+<!-- Progress Dots -->
+<nav class="progress-dots" id="progressDots" aria-label="Section navigation"></nav>
+
+<!-- Share Toast -->
+<div class="share-toast" id="shareToast">Link copied to clipboard</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ============================================
+     CORE: SECTIONS & PROGRESS DOTS
+     ============================================ */
+  var sections = Array.from(document.querySelectorAll('.section'));
+  var dotsContainer = document.getElementById('progressDots');
+  var container = document.getElementById('scrollContainer');
+
+  sections.forEach(function(_, i) {
+    var dot = document.createElement('button');
+    dot.className = 'progress-dot';
+    dot.setAttribute('aria-label', 'Go to section ' + (i + 1));
+    dot.addEventListener('click', function() {
+      sections[i].scrollIntoView({ behavior: 'smooth' });
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  var dots = Array.from(dotsContainer.querySelectorAll('.progress-dot'));
+
+  /* ============================================
+     INTERSECTION OBSERVER: Visibility + Dots
+     ============================================ */
+  var currentSection = 0;
+  var visObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+        var idx = sections.indexOf(entry.target);
+        if (idx === -1) return;
+        currentSection = idx;
+        entry.target.classList.add('visible');
+        dots.forEach(function(d, i) {
+          d.classList.toggle('active', i === idx);
+        });
+        onSectionEnter(idx);
+      }
+    });
+  }, {
+    root: container,
+    threshold: 0.55
+  });
+
+  sections.forEach(function(s) { visObserver.observe(s); });
+
+  /* ============================================
+     SECTION ENTER CALLBACKS
+     ============================================ */
+  var sectionState = {};
+  function onSectionEnter(idx) {
+    var id = sections[idx].id;
+    if (id === 'security-section' && !sectionState.uptimeCounted) {
+      sectionState.uptimeCounted = true;
+      animateUptime();
+    }
+    if (id === 'editor-section' && !sectionState.typewriterDone) {
+      sectionState.typewriterDone = true;
+      setTimeout(startTypewriter, 300);
+    }
+    if (id === 'cdn-section' && !sectionState.cdnCounted) {
+      sectionState.cdnCounted = true;
+      animateCdnCount();
+    }
+  }
+
+  /* ============================================
+     CAPABILITY PILLS (Section 2)
+     ============================================ */
+  var capData = {
+    cms: {
+      title: 'Content Management',
+      text: 'Built on WordPress, the CMS powering 43% of the web. Block editor, custom post types, taxonomies, and a plugin ecosystem of 60,000+ extensions. All managed, secured, and optimized for enterprise scale.'
+    },
+    analytics: {
+      title: 'Built-in Analytics (Parse.ly)',
+      text: 'Every VIP plan includes Parse.ly, the content analytics platform trusted by newsrooms and marketers. Real-time dashboards, audience insights, content recommendations, and API access included at no extra cost.'
+    },
+    security: {
+      title: 'Enterprise Security',
+      text: 'SOC 2 Type II, ISO 27001, GDPR-ready. Automated patching, WAF, DDoS protection, code review on every deploy, and 24/7 incident response. Your compliance team will thank you.'
+    },
+    cdn: {
+      title: 'Global CDN',
+      text: '30+ edge locations worldwide with sub-50ms TTFB. Automatic image optimization, edge caching, and auto-scaling for traffic spikes. No CDN configuration or vendor management needed.'
+    },
+    ai: {
+      title: 'AI-Powered Tools',
+      text: 'Content creation assistants, automated tagging, SEO recommendations, and intelligent content recommendations. Leverage AI across your editorial workflow without building custom integrations.'
+    },
+    collab: {
+      title: 'Collaborative Editing',
+      text: 'Real-time multi-author editing with live cursors, block locking, inline comments, revision history, and editorial workflows. Your team works together in the same document, simultaneously.'
+    }
+  };
+
+  var activeCap = null;
+  document.querySelectorAll('.cap-pill').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      var key = pill.getAttribute('data-cap');
+      var detail = document.getElementById('capDetail');
+      var title = document.getElementById('capDetailTitle');
+      var text = document.getElementById('capDetailText');
+
+      if (activeCap === key) {
+        pill.classList.remove('active');
+        detail.classList.remove('open');
+        activeCap = null;
+        return;
+      }
+
+      document.querySelectorAll('.cap-pill').forEach(function(p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+      title.textContent = capData[key].title;
+      text.textContent = capData[key].text;
+      detail.classList.add('open');
+      activeCap = key;
+    });
+  });
+
+  /* ============================================
+     CDN REGIONS ACCORDION (Section 3)
+     ============================================ */
+  var cdnData = [
+    {
+      name: 'North America',
+      icon: '&#x1F30E;',
+      pops: [
+        { city: 'Ashburn, VA', latency: '12ms' },
+        { city: 'San Francisco, CA', latency: '18ms' },
+        { city: 'Chicago, IL', latency: '15ms' },
+        { city: 'Dallas, TX', latency: '16ms' },
+        { city: 'Los Angeles, CA', latency: '19ms' },
+        { city: 'Toronto, ON', latency: '20ms' },
+        { city: 'Seattle, WA', latency: '17ms' },
+        { city: 'Miami, FL', latency: '22ms' }
+      ]
+    },
+    {
+      name: 'Europe',
+      icon: '&#x1F30D;',
+      pops: [
+        { city: 'London, UK', latency: '22ms' },
+        { city: 'Frankfurt, DE', latency: '25ms' },
+        { city: 'Amsterdam, NL', latency: '24ms' },
+        { city: 'Paris, FR', latency: '26ms' },
+        { city: 'Stockholm, SE', latency: '30ms' },
+        { city: 'Madrid, ES', latency: '28ms' },
+        { city: 'Warsaw, PL', latency: '32ms' }
+      ]
+    },
+    {
+      name: 'Asia Pacific',
+      icon: '&#x1F30F;',
+      pops: [
+        { city: 'Tokyo, JP', latency: '35ms' },
+        { city: 'Singapore', latency: '42ms' },
+        { city: 'Sydney, AU', latency: '48ms' },
+        { city: 'Mumbai, IN', latency: '38ms' },
+        { city: 'Hong Kong', latency: '36ms' },
+        { city: 'Seoul, KR', latency: '34ms' },
+        { city: 'Osaka, JP', latency: '37ms' }
+      ]
+    },
+    {
+      name: 'Latin America & Africa',
+      icon: '&#x1F30D;',
+      pops: [
+        { city: 'S\u00e3o Paulo, BR', latency: '55ms' },
+        { city: 'Buenos Aires, AR', latency: '58ms' },
+        { city: 'Mexico City, MX', latency: '32ms' },
+        { city: 'Bogot\u00e1, CO', latency: '50ms' },
+        { city: 'Johannesburg, ZA', latency: '62ms' },
+        { city: 'Lagos, NG', latency: '68ms' },
+        { city: 'Cape Town, ZA', latency: '65ms' },
+        { city: 'Nairobi, KE', latency: '72ms' }
+      ]
+    }
+  ];
+
+  var regionsEl = document.getElementById('cdnRegions');
+  cdnData.forEach(function(region) {
+    var div = document.createElement('div');
+    div.className = 'cdn-region';
+    var popsHtml = region.pops.map(function(pop) {
+      return '<div class="cdn-pop"><span class="city">' + pop.city + '</span><span class="latency">' + pop.latency + '</span></div>';
+    }).join('');
+    div.innerHTML = '<div class="cdn-region-header">' +
+      '<h3>' + region.icon + ' ' + region.name + ' <span class="region-count">' + region.pops.length + ' PoPs</span></h3>' +
+      '<svg class="cdn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div><div class="cdn-pops">' + popsHtml + '</div>';
+
+    div.querySelector('.cdn-region-header').addEventListener('click', function() {
+      div.classList.toggle('open');
+    });
+    regionsEl.appendChild(div);
+  });
+
+  function animateCdnCount() {
+    var el = document.querySelector('.cdn-stat .val[data-count]');
+    if (!el) return;
+    var target = parseInt(el.getAttribute('data-count'));
+    var duration = 800;
+    var start = performance.now();
+    function tick(now) {
+      var p = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + '+';
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ============================================
+     PARSE.LY DASHBOARD (Section 4)
+     ============================================ */
+  var parselyData = {
+    '1H': {
+      visitors: '12,847', pageViews: '31,204', engagedTime: '2:41', recirc: '34%',
+      visitorsChange: '+4.2%', pageViewsChange: '+6.1%', engagedTimeChange: '+8.3%', recircChange: '+2.1%',
+      changeDir: ['up','up','up','up'],
+      chart: 'M0,100 C30,95 70,80 110,85 C150,90 200,60 250,65 C300,70 350,45 400,55 C450,65 500,35 560,40 L620,45',
+      trending: [
+        { title: 'LIVE: Product Launch Day Coverage', views: '3.2K' },
+        { title: 'Breaking: Industry Acquisition Announced', views: '2.8K' },
+        { title: 'Q4 Earnings Recap and Analysis', views: '2.4K' },
+        { title: 'Executive Interview: Vision for 2026', views: '1.9K' },
+        { title: 'How AI Is Reshaping Content Strategy', views: '1.6K' }
+      ],
+      sources: { Direct: 24, Search: 58, Social: 12, Referral: 6 }
+    },
+    '24H': {
+      visitors: '189,432', pageViews: '467,891', engagedTime: '2:23', recirc: '31%',
+      visitorsChange: '+12.4%', pageViewsChange: '+8.7%', engagedTimeChange: '+5.1%', recircChange: '+3.2%',
+      changeDir: ['up','up','up','up'],
+      chart: 'M0,110 C40,100 90,70 140,80 C190,90 240,50 300,55 C360,60 410,30 470,40 C530,50 570,25 620,35',
+      trending: [
+        { title: 'The Complete Guide to Enterprise CMS', views: '24.3K' },
+        { title: 'Why Performance Matters More Than Ever', views: '19.1K' },
+        { title: 'Content Operations at Scale: A Playbook', views: '17.8K' },
+        { title: 'The Rise of Headless Architecture', views: '15.2K' },
+        { title: 'How Top Brands Win With Content', views: '12.9K' }
+      ],
+      sources: { Direct: 22, Search: 63, Social: 9, Referral: 6 }
+    },
+    '7D': {
+      visitors: '1.2M', pageViews: '3.4M', engagedTime: '2:18', recirc: '29%',
+      visitorsChange: '+7.8%', pageViewsChange: '+5.2%', engagedTimeChange: '-1.3%', recircChange: '+1.8%',
+      changeDir: ['up','up','down','up'],
+      chart: 'M0,90 C50,85 100,65 160,70 C220,75 280,45 340,50 C400,55 460,35 510,40 C560,45 590,30 620,28',
+      trending: [
+        { title: 'State of Enterprise Content 2026 Report', views: '142K' },
+        { title: 'WordPress at Scale: Lessons from the Top', views: '128K' },
+        { title: 'Security Best Practices for Publishers', views: '97K' },
+        { title: 'Analytics-Driven Content Strategy', views: '89K' },
+        { title: 'Editorial Workflow Automation Guide', views: '76K' }
+      ],
+      sources: { Direct: 20, Search: 65, Social: 8, Referral: 7 }
+    },
+    '30D': {
+      visitors: '5.1M', pageViews: '14.7M', engagedTime: '2:12', recirc: '27%',
+      visitorsChange: '+3.1%', pageViewsChange: '+2.4%', engagedTimeChange: '-2.7%', recircChange: '-0.5%',
+      changeDir: ['up','up','down','down'],
+      chart: 'M0,105 C60,95 120,75 180,80 C240,85 300,55 370,50 C440,45 500,30 550,35 C590,38 610,25 620,20',
+      trending: [
+        { title: 'Complete Guide: CMS Migration Planning', views: '523K' },
+        { title: 'Content Platform Comparison 2026', views: '467K' },
+        { title: 'Building a World-Class Content Team', views: '398K' },
+        { title: 'Performance Optimization Handbook', views: '341K' },
+        { title: 'How AI Is Transforming Publishing', views: '289K' }
+      ],
+      sources: { Direct: 21, Search: 64, Social: 9, Referral: 6 }
+    }
+  };
+
+  var sourceColors = {
+    Direct: '#D8A45F',
+    Search: '#3EA0AD',
+    Social: '#9C5CE1',
+    Referral: '#3858E9'
+  };
+
+  function updateParsely(range) {
+    var d = parselyData[range];
+    document.querySelector('[data-kpi="visitors"]').textContent = d.visitors;
+    document.querySelector('[data-kpi="pageViews"]').textContent = d.pageViews;
+    document.querySelector('[data-kpi="engagedTime"]').textContent = d.engagedTime;
+    document.querySelector('[data-kpi="recirc"]').textContent = d.recirc;
+
+    var changeKeys = ['visitorsChange', 'pageViewsChange', 'engagedTimeChange', 'recircChange'];
+    changeKeys.forEach(function(key, i) {
+      var el = document.querySelector('[data-kpi="' + key + '"]');
+      el.textContent = d[key];
+      el.className = 'kpi-change ' + d.changeDir[i];
+    });
+
+    document.getElementById('chartLine').setAttribute('d', d.chart);
+    document.getElementById('chartArea').setAttribute('d', d.chart + ' L620,130 L0,130 Z');
+
+    var tl = document.getElementById('trendingList');
+    tl.innerHTML = '';
+    d.trending.forEach(function(item, i) {
+      tl.innerHTML += '<div class="trending-item"><span class="trending-rank">' + (i + 1) + '</span><span class="trending-title">' + item.title + '</span><span class="trending-views">' + item.views + '</span></div>';
+    });
+
+    var sl = document.getElementById('sourcesList');
+    sl.innerHTML = '';
+    Object.keys(d.sources).forEach(function(key) {
+      sl.innerHTML += '<div class="source-row"><span class="source-label">' + key + '</span><div class="source-bar-bg"><div class="source-bar-fill" style="width:' + d.sources[key] + '%;background:' + sourceColors[key] + ';"></div></div><span class="source-pct" style="color:' + sourceColors[key] + ';">' + d.sources[key] + '%</span></div>';
+    });
+
+    document.querySelectorAll('.parsely-tab').forEach(function(t) {
+      t.classList.toggle('active', t.getAttribute('data-range') === range);
+    });
+  }
+
+  document.querySelectorAll('.parsely-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      updateParsely(tab.getAttribute('data-range'));
+    });
+  });
+  updateParsely('24H');
+
+  /* ============================================
+     TYPEWRITER (Section 5)
+     ============================================ */
+  function startTypewriter() {
+    var headline = document.getElementById('typewriterHeadline');
+    var body = document.getElementById('typewriterBody');
+    var note = document.getElementById('typewriterNote');
+    headline.textContent = '';
+    body.textContent = '';
+    note.textContent = '';
+
+    var headlineText = 'Your Content, Amplified';
+    var bodyText = 'WordPress VIP gives editorial teams the power to publish faster, collaborate in real time, and measure impact with integrated analytics. No more waiting on engineering for simple content changes.';
+    var noteText = 'Editor note: Add customer quote from interview before publishing.';
+
+    var i = 0;
+    function typeChar(el, text, speed, callback) {
+      if (i < text.length) {
+        el.textContent += text.charAt(i);
+        i++;
+        setTimeout(function() { typeChar(el, text, speed, callback); }, speed);
+      } else {
+        i = 0;
+        if (callback) setTimeout(callback, 500);
+      }
+    }
+
+    typeChar(headline, headlineText, 35, function() {
+      headline.innerHTML += ' <span class="cursor-label" style="background:#3EA0AD;">JM</span>';
+      typeChar(body, bodyText, 18, function() {
+        body.innerHTML += ' <span class="cursor-label" style="background:#9C5CE1;">SK</span>';
+        typeChar(note, noteText, 25, function() {
+          note.innerHTML += ' <span class="cursor-label" style="background:#D8A45F;">AR</span>';
+        });
+      });
+    });
+  }
+
+  /* ============================================
+     UPTIME COUNT-UP (Section 6)
+     ============================================ */
+  function animateUptime() {
+    var el = document.getElementById('uptimeNumber');
+    var steps = [
+      { val: '0', delay: 0 },
+      { val: '9', delay: 100 },
+      { val: '99', delay: 200 },
+      { val: '99.9', delay: 350 },
+      { val: '99.99%', delay: 550 }
+    ];
+    steps.forEach(function(s) {
+      setTimeout(function() { el.textContent = s.val; }, s.delay);
+    });
+  }
+
+  /* ============================================
+     CUSTOMER CAROUSEL (Section 7)
+     ============================================ */
+  var track = document.getElementById('carouselTrack');
+  var cards = Array.from(track.querySelectorAll('.carousel-card'));
+  var dotsEl = document.getElementById('carouselDots');
+
+  cards.forEach(function(_, i) {
+    var dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Customer ' + (i + 1));
+    dot.addEventListener('click', function() {
+      cards[i].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    });
+    dotsEl.appendChild(dot);
+  });
+
+  var carouselDotList = Array.from(dotsEl.querySelectorAll('.carousel-dot'));
+  track.addEventListener('scroll', function() {
+    var scrollLeft = track.scrollLeft;
+    var cardWidth = cards[0].offsetWidth + 12;
+    var idx = Math.round(scrollLeft / cardWidth);
+    idx = Math.max(0, Math.min(idx, cards.length - 1));
+    carouselDotList.forEach(function(d, i) {
+      d.classList.toggle('active', i === idx);
+    });
+  }, { passive: true });
+
+  /* ============================================
+     ROI CALCULATOR (Section 8)
+     ============================================ */
+  var roiArticles = document.getElementById('roiArticles');
+  var roiTeam = document.getElementById('roiTeam');
+  var roiEng = document.getElementById('roiEng');
+  var roiInfra = document.getElementById('roiInfra');
+
+  function formatCurrency(num) {
+    if (num >= 1000000) return '$' + (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return '$' + Math.round(num / 1000) + 'K';
+    return '$' + Math.round(num);
+  }
+
+  function updateROI() {
+    var articles = parseInt(roiArticles.value);
+    var team = parseInt(roiTeam.value);
+    var eng = parseInt(roiEng.value);
+    var infra = parseInt(roiInfra.value);
+
+    document.getElementById('roiArticlesVal').textContent = articles.toLocaleString();
+    document.getElementById('roiTeamVal').textContent = team;
+    document.getElementById('roiEngVal').textContent = eng;
+    document.getElementById('roiInfraVal').textContent = '$' + infra.toLocaleString();
+
+    var hoursFree = Math.round(eng * 0.6 * 173);
+    document.getElementById('roiHours').textContent = hoursFree.toLocaleString();
+
+    var velocity = Math.round(15 + Math.sqrt(team) * 3);
+    if (velocity > 65) velocity = 65;
+    document.getElementById('roiVelocity').textContent = '+' + velocity + '%';
+
+    var infraSave = Math.round(infra * 0.35);
+    document.getElementById('roiInfraSave').textContent = formatCurrency(infraSave);
+
+    document.getElementById('roiSpeed').textContent = '+40%';
+
+    var hourlyRate = 150;
+    var annualEng = hoursFree * hourlyRate * 12;
+    var annualInfra = infraSave * 12;
+    var annualTotal = annualEng + annualInfra;
+    document.getElementById('roiAnnual').textContent = formatCurrency(annualTotal);
+  }
+
+  [roiArticles, roiTeam, roiEng, roiInfra].forEach(function(slider) {
+    slider.addEventListener('input', updateROI);
+  });
+  updateROI();
+
+  /* ============================================
+     SHARE BUTTON (Section 9)
+     ============================================ */
+  var shareBtn = document.getElementById('shareBtn');
+  shareBtn.addEventListener('click', function() {
+    var url = window.location.href;
+    var title = 'WordPress VIP | The Enterprise Content Platform';
+    if (navigator.share) {
+      navigator.share({ title: title, url: url }).catch(function() {});
+    } else {
+      navigator.clipboard.writeText(url).then(function() {
+        var toast = document.getElementById('shareToast');
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show'); }, 2000);
+      }).catch(function() {});
+    }
+  });
+
+  /* ============================================
+     PWA: SERVICE WORKER + INSTALL HINT
+     ============================================ */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function() {});
+  }
+
+  var installHint = document.getElementById('installHint');
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (!isStandalone) {
+    var isIOS = /iP(hone|od|ad)/.test(navigator.userAgent);
+    var isAndroid = /Android/.test(navigator.userAgent);
+    if (isIOS || isAndroid) {
+      installHint.style.display = 'block';
+      installHint.textContent = isIOS
+        ? 'Tap Share, then "Add to Home Screen"'
+        : 'Tap menu, then "Add to Home Screen"';
+    }
+  }
+
+  /* ============================================
+     KEYBOARD NAV (desktop)
+     ============================================ */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      var next = Math.min(currentSection + 1, sections.length - 1);
+      sections[next].scrollIntoView({ behavior: 'smooth' });
+    }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      var prev = Math.max(currentSection - 1, 0);
+      sections[prev].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

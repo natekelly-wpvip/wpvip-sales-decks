@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valnet | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1c2530;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-purple: #9C5CE1;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --parsely-green: #70AC1C;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        .deck { position:relative; width:100vw; height:100vh; }
+        .slide { position:absolute; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; padding:5vh 6vw; opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s ease; overflow:hidden; }
+        .slide.active { opacity:1; visibility:visible; }
+        h1 { font-size:3.2vw; font-weight:700; letter-spacing:-0.03em; line-height:1.05; margin-bottom:1.5vh; }
+        h2 { font-size:2.4vw; font-weight:600; letter-spacing:-0.02em; line-height:1.1; margin-bottom:1.5vh; }
+        h3 { font-size:1.6vw; font-weight:600; letter-spacing:-0.01em; line-height:1.2; margin-bottom:1vh; }
+        p, li { font-size:1.3vw; font-weight:400; line-height:1.5; }
+        .caption { font-size:0.9vw; font-weight:500; letter-spacing:0.05em; line-height:1.4; text-transform:uppercase; }
+        .stat-number { font-size:4vw; font-weight:700; letter-spacing:-0.04em; line-height:1.0; }
+        .vip-logo { font-size:1.2vw; letter-spacing:-0.01em; margin-bottom:2vh; }
+        .vip-logo .logo-wp { font-weight:400; }
+        .vip-logo .logo-vip { font-weight:700; color:var(--vip-gold); }
+        .vip-logo-large { font-size:1.8vw; }
+        .gold-line { width:60px; height:2px; background:var(--vip-gold); margin:2vh 0; }
+        .gold-line-wide { width:120px; }
+        .geo-pattern { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.04; }
+        .geo-lines { background:repeating-linear-gradient(45deg,transparent,transparent 30px,var(--vip-gold) 30px,var(--vip-gold) 31px); }
+        .geo-moire { background:repeating-linear-gradient(0deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px),repeating-linear-gradient(60deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px); }
+        .corner-accent { position:absolute; width:40px; height:40px; border-color:var(--vip-gold); border-style:solid; border-width:0; }
+        .corner-tl { top:3vh; left:3vw; border-top-width:2px; border-left-width:2px; }
+        .corner-br { bottom:3vh; right:3vw; border-bottom-width:2px; border-right-width:2px; }
+        .slide-dark { background:var(--vip-black); color:var(--vip-white); }
+        .slide-light { background:var(--vip-white); color:var(--vip-black); }
+        .slide-light h1,.slide-light h2,.slide-light h3 { color:var(--vip-black); }
+        .slide-gradient { background:linear-gradient(135deg,var(--vip-black) 0%,var(--vip-black-light) 100%); color:var(--vip-white); }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(2.5); opacity:0; } }
+        @keyframes countUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .slide.active .anim { animation:fadeInUp 0.6s ease forwards; }
+        .slide.active .d1 { animation-delay:0.1s; opacity:0; }
+        .slide.active .d2 { animation-delay:0.2s; opacity:0; }
+        .slide.active .d3 { animation-delay:0.3s; opacity:0; }
+        .slide.active .d4 { animation-delay:0.4s; opacity:0; }
+        .slide.active .d5 { animation-delay:0.5s; opacity:0; }
+        .slide.active .d6 { animation-delay:0.6s; opacity:0; }
+
+        /* Nav */
+        .nav-controls { position:fixed; bottom:2.5vh; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:1.5vw; z-index:100; }
+        .nav-btn { width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); background:rgba(19,25,30,0.8); color:var(--vip-white); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; backdrop-filter:blur(10px); }
+        .nav-btn:hover { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .nav-controls.on-light .nav-btn { border-color:rgba(0,0,0,0.2); background:rgba(255,255,255,0.8); color:var(--vip-black); }
+        .nav-controls.on-light .nav-btn:hover { border-color:var(--vip-gold-text); color:var(--vip-gold-text); }
+        .nav-controls.on-light .slide-counter { color:rgba(0,0,0,0.5); }
+        .slide-counter { font-size:14px; color:rgba(255,255,255,0.5); font-weight:500; cursor:pointer; padding:6px 12px; border-radius:20px; transition:all 0.2s; user-select:none; }
+        .slide-counter:hover { color:var(--vip-gold); }
+        .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--vip-gold); transition:width 0.4s ease; z-index:100; }
+
+        /* Overview */
+        .overview-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:200; display:none; padding:4vh 4vw; overflow-y:auto; }
+        .overview-overlay.active { display:block; }
+        .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2vw; }
+        .overview-thumb { aspect-ratio:16/9; border-radius:6px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.2s; position:relative; background:var(--vip-black); display:flex; align-items:center; justify-content:center; padding:1vw; }
+        .overview-thumb:hover { border-color:var(--vip-gold); transform:scale(1.03); }
+        .overview-thumb.current { border-color:var(--vip-gold); }
+        .overview-thumb-title { font-size:0.9vw; font-weight:600; color:var(--vip-white); text-align:center; }
+        .overview-thumb-num { position:absolute; bottom:6px; right:8px; font-size:0.7vw; color:var(--vip-gray); }
+
+        /* Slide 1: Title */
+        .title-content { position:relative; z-index:1; }
+        .title-customer { font-size:5vw; font-weight:700; letter-spacing:-0.04em; line-height:1; margin:3vh 0 2vh; }
+        .title-sub { font-size:1.6vw; font-weight:400; color:rgba(255,255,255,0.7); margin-bottom:1.5vh; }
+        .title-meta { font-size:1vw; color:rgba(255,255,255,0.4); margin-top:3vh; }
+
+        /* Slide 2: We Know Valnet */
+        .know-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; margin-top:3vh; }
+        .know-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 1.5vw; }
+        .know-card .stat-number { color:var(--vip-gold); font-size:3vw; margin-bottom:0.5vh; }
+        .know-card p { font-size:1.1vw; color:rgba(255,255,255,0.7); }
+        .know-brands { margin-top:2.5vh; display:flex; flex-wrap:wrap; gap:0.8vw; }
+        .brand-tag { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.5vh 1vw; font-size:0.9vw; color:rgba(255,255,255,0.6); }
+        .know-footer { margin-top:3vh; font-size:1.2vw; color:rgba(255,255,255,0.5); font-style:italic; }
+
+        /* Slide 3: Inflection Point */
+        .inflection-layout { display:grid; grid-template-columns:1fr 1.2fr; gap:4vw; margin-top:2vh; align-items:start; }
+        .timeline { position:relative; padding-left:2vw; }
+        .timeline::before { content:''; position:absolute; left:0.5vw; top:0; bottom:0; width:2px; background:var(--vip-gold); opacity:0.3; }
+        .tl-item { position:relative; margin-bottom:2.5vh; padding-left:1.5vw; }
+        .tl-item::before { content:''; position:absolute; left:-1.55vw; top:0.3vh; width:10px; height:10px; border-radius:50%; background:var(--vip-gold); border:2px solid var(--vip-gold-text); }
+        .tl-year { font-size:1vw; font-weight:700; color:var(--vip-gold-text); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3vh; }
+        .tl-text { font-size:1.1vw; color:var(--vip-black); line-height:1.4; }
+        .inflection-right h3 { color:var(--vip-gold-text); font-size:1.4vw; margin-bottom:1.5vh; }
+        .inflection-right p { font-size:1.2vw; color:#444; line-height:1.6; margin-bottom:1.5vh; }
+        .inflection-callout { background:var(--vip-off-white); border-left:3px solid var(--vip-gold); padding:1.5vh 1.5vw; border-radius:0 8px 8px 0; margin-top:2vh; }
+        .inflection-callout p { font-size:1.1vw; color:#555; font-style:italic; }
+
+        /* Slide 4: ROI Calculator */
+        .roi-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; }
+        .roi-sliders { display:flex; flex-direction:column; gap:2vh; }
+        .roi-slider-group label { display:flex; justify-content:space-between; font-size:1vw; color:rgba(255,255,255,0.7); margin-bottom:0.5vh; }
+        .roi-slider-group label span { color:var(--vip-gold); font-weight:600; }
+        input[type="range"] { -webkit-appearance:none; width:100%; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; outline:none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--vip-gold); cursor:pointer; border:2px solid var(--vip-black); }
+        .roi-results { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw; }
+        .roi-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2vh 1.2vw; text-align:center; }
+        .roi-card .roi-val { font-size:2.2vw; font-weight:700; color:var(--vip-turquoise); margin-bottom:0.5vh; }
+        .roi-card .roi-label { font-size:0.9vw; color:rgba(255,255,255,0.6); }
+        .roi-card.featured { grid-column:1/-1; background:rgba(216,164,95,0.1); border-color:var(--vip-gold); }
+        .roi-card.featured .roi-val { font-size:3vw; color:var(--vip-gold); }
+
+        /* Slide 5: Build vs Plumbing */
+        .two-col { display:grid; grid-template-columns:1fr 2px 1fr; gap:2vw; margin-top:2vh; align-items:start; }
+        .col-divider { background:var(--vip-gold); opacity:0.3; height:100%; min-height:30vh; }
+        .col h3 { font-size:1.3vw; margin-bottom:1.5vh; }
+        .col-left h3 { color:rgba(255,255,255,0.5); }
+        .col-right h3 { color:var(--vip-gold); }
+        .col ul { list-style:none; }
+        .col li { font-size:1.1vw; padding:0.7vh 0; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:0.5vw; }
+        .col li::before { content:''; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+        .col-left li::before { background:rgba(255,255,255,0.2); }
+        .col-right li::before { background:var(--vip-gold); }
+        .col-left li { color:rgba(255,255,255,0.5); }
+        .col-right li { color:rgba(255,255,255,0.9); }
+        .two-col-footer { margin-top:3vh; padding:1.5vh 2vw; background:rgba(216,164,95,0.08); border-radius:8px; border-left:3px solid var(--vip-gold); }
+        .two-col-footer p { font-size:1.15vw; color:rgba(255,255,255,0.8); }
+
+        /* Slide 6: Platform Capabilities */
+        .cap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5vw; margin-top:2vh; }
+        .cap-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:2vh 1.3vw; transition:border-color 0.2s; }
+        .cap-card:hover { border-color:var(--vip-gold); }
+        .cap-icon { font-size:2vw; margin-bottom:1vh; }
+        .cap-card h3 { font-size:1.15vw; margin-bottom:0.5vh; }
+        .cap-card p { font-size:0.95vw; color:rgba(255,255,255,0.6); line-height:1.4; }
+
+        /* Slide 7: CDN Explorer */
+        .cdn-layout { display:grid; grid-template-columns:1.5fr 1fr; gap:2vw; margin-top:1vh; }
+        .cdn-map { position:relative; overflow:hidden; border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); }
+        .cdn-map svg { width:100%; height:auto; }
+        .cdn-tooltip { position:absolute; background:var(--vip-black); border:1px solid var(--vip-gold); border-radius:8px; padding:10px 14px; font-size:0.85vw; pointer-events:none; opacity:0; transition:opacity 0.2s; z-index:10; min-width:140px; }
+        .cdn-tooltip.visible { opacity:1; }
+        .cdn-tooltip .tt-city { font-weight:700; color:var(--vip-gold); margin-bottom:4px; display:block; }
+        .cdn-tooltip .tt-row { color:rgba(255,255,255,0.7); display:block; font-size:0.75vw; }
+        .cdn-stats { display:flex; flex-direction:column; gap:1.2vh; }
+        .cdn-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.2vh 1vw; }
+        .cdn-stat .cdn-stat-val { font-size:1.8vw; font-weight:700; color:var(--vip-turquoise); }
+        .cdn-stat .cdn-stat-label { font-size:0.85vw; color:rgba(255,255,255,0.5); margin-top:2px; }
+        .node-dot { cursor:pointer; }
+        .node-pulse { animation:pulse 2s ease-in-out infinite; }
+
+        /* Slide 8: Parse.ly Dashboard */
+        .parsely-dash { display:grid; grid-template-columns:1fr 22vw; gap:1.5vw; margin-top:1vh; height:68vh; }
+        .parsely-main { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.5vw; display:flex; flex-direction:column; overflow:hidden; }
+        .parsely-sidebar { display:flex; flex-direction:column; gap:1.2vh; overflow:hidden; }
+        .parsely-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2vh; flex-shrink:0; }
+        .parsely-brand { font-size:1.2vw; font-weight:700; }
+        .parsely-brand span { color:var(--parsely-green); }
+        .parsely-tabs { display:flex; gap:0.4vw; }
+        .parsely-tab { padding:0.5vh 1vw; border-radius:4px; font-size:0.85vw; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); border:none; transition:all 0.2s; }
+        .parsely-tab:hover { background:rgba(112,172,28,0.2); color:rgba(255,255,255,0.8); }
+        .parsely-tab.active { background:var(--parsely-green); color:white; }
+        .kpi-row { display:flex; gap:1vw; margin-bottom:1.2vh; flex-shrink:0; }
+        .kpi-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1vh 1vw; flex:1; transition:border-color 0.3s; }
+        .kpi-card:hover { border-color:var(--parsely-green); }
+        .kpi-val { font-size:1.8vw; font-weight:700; color:var(--vip-white); line-height:1.1; }
+        .kpi-change { font-size:0.75vw; font-weight:600; margin-top:2px; }
+        .kpi-change.positive { color:#4ade80; }
+        .kpi-change.negative { color:var(--vip-red); }
+        .kpi-label { font-size:0.65vw; color:rgba(255,255,255,0.4); margin-top:4px; text-transform:uppercase; letter-spacing:0.05em; }
+        .parsely-chart-wrap { flex:1; min-height:0; background:rgba(255,255,255,0.02); border-radius:8px; padding:1vh 0.5vw 0.5vh; overflow:hidden; position:relative; }
+        .parsely-chart-wrap svg { width:100%; height:100%; display:block; }
+        .chart-label { font-size:0.6vw; color:rgba(255,255,255,0.25); }
+        .parsely-side-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.2vh 1vw; overflow:hidden; }
+        .parsely-side-card h4 { font-size:0.85vw; font-weight:600; color:var(--parsely-green); margin-bottom:0.8vh; text-transform:uppercase; letter-spacing:0.04em; }
+        .trending-item { display:flex; align-items:flex-start; gap:0.4vw; margin-bottom:0.6vh; padding-bottom:0.6vh; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .trending-item:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+        .trending-rank { font-size:0.85vw; font-weight:700; color:var(--parsely-green); min-width:1.2vw; }
+        .trending-title { font-size:0.75vw; color:rgba(255,255,255,0.8); line-height:1.3; }
+        .trending-views { font-size:0.65vw; color:rgba(255,255,255,0.4); }
+        .source-row { display:flex; align-items:center; gap:0.5vw; margin-bottom:0.5vh; }
+        .source-label { font-size:0.7vw; color:rgba(255,255,255,0.6); min-width:3vw; }
+        .source-bar-bg { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+        .source-bar { height:100%; border-radius:3px; transition:width 0.5s ease; }
+        .source-pct { font-size:0.65vw; color:rgba(255,255,255,0.5); min-width:2vw; text-align:right; }
+        .parsely-note { font-size:0.65vw; color:rgba(255,255,255,0.3); text-align:center; margin-top:auto; padding-top:0.5vh; }
+
+        /* Slide 9: Comparison Matrix */
+        .matrix-tabs { display:flex; gap:0.5vw; margin:2vh 0 1.5vh; flex-wrap:wrap; }
+        .matrix-tab { padding:0.6vh 1.2vw; border-radius:20px; font-size:0.95vw; font-weight:600; cursor:pointer; border:1px solid rgba(0,0,0,0.1); background:var(--vip-off-white); color:#555; transition:all 0.2s; }
+        .matrix-tab.active { background:var(--vip-gold); color:white; border-color:var(--vip-gold); }
+        .matrix-wrap { border:1px solid #ddd; border-radius:10px; overflow:hidden; }
+        .matrix-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+        .matrix-table th { padding:1vh 1vw; font-size:0.95vw; text-align:left; background:var(--vip-off-white); border-bottom:2px solid #ddd; }
+        .matrix-table th:first-child { width:40%; }
+        .matrix-table td { padding:0.8vh 1vw; font-size:0.95vw; border-bottom:1px solid #eee; }
+        .matrix-table tr:nth-child(odd) td { background:rgba(0,0,0,0.015); }
+        .matrix-table tr.hidden-row { display:none; }
+        .check { color:var(--vip-turquoise); font-weight:700; }
+        .cross { color:var(--vip-red); opacity:0.6; font-weight:700; }
+        .partial { color:var(--vip-orange); font-weight:700; }
+        .matrix-note { margin-top:1.5vh; font-size:0.9vw; color:#888; font-style:italic; }
+
+        /* Slide 10: Customer Carousel */
+        .carousel-container { position:relative; overflow:hidden; margin-top:2vh; }
+        .carousel-track { display:flex; gap:20px; transition:transform 0.5s ease; }
+        .cc-card { width:calc(100vw - 12vw - 20px); max-width:800px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 2vw; flex-shrink:0; }
+        .cc-company { font-size:1.6vw; font-weight:700; margin-bottom:0.3vh; }
+        .cc-industry { font-size:0.8vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1.5vh; }
+        .cc-quote { font-size:1vw; font-style:italic; color:rgba(255,255,255,0.7); line-height:1.5; border-left:2px solid var(--vip-gold); padding-left:1vw; margin-bottom:1.5vh; }
+        .cc-metrics { display:flex; gap:1.5vw; }
+        .cc-metric-val { font-size:1.5vw; font-weight:700; color:var(--vip-turquoise); }
+        .cc-metric-label { font-size:0.75vw; color:rgba(255,255,255,0.5); }
+        .carousel-dots { display:flex; justify-content:center; gap:8px; margin-top:2vh; }
+        .carousel-dot { width:10px; height:10px; border-radius:10px; border:none; background:rgba(255,255,255,0.2); cursor:pointer; transition:all 0.3s; }
+        .carousel-dot.active { width:24px; background:var(--vip-gold); }
+
+        /* Slide 11: CTA */
+        .cta-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; align-items:center; }
+        .cta-steps { margin-top:2vh; }
+        .cta-step { display:flex; gap:1vw; align-items:flex-start; margin-bottom:2vh; }
+        .cta-num { width:2.5vw; height:2.5vw; border-radius:50%; background:rgba(216,164,95,0.15); border:1px solid var(--vip-gold); display:flex; align-items:center; justify-content:center; font-size:1.1vw; font-weight:700; color:var(--vip-gold); flex-shrink:0; }
+        .cta-step h4 { font-size:1.15vw; font-weight:600; margin-bottom:0.3vh; }
+        .cta-step p { font-size:0.95vw; color:rgba(255,255,255,0.6); }
+        .cta-contact { margin-top:2vh; font-size:0.95vw; color:rgba(255,255,255,0.4); }
+        .cta-calendar { background:white; border-radius:12px; overflow:hidden; min-height:38vh; display:flex; flex-direction:column; }
+        .cta-cal-header { padding:1.5vh 1.5vw; border-bottom:1px solid #eee; }
+        .cta-cal-header h3 { color:var(--vip-gold-text); font-size:1.3vw; }
+        .cta-cal-body { flex:1; display:flex; align-items:center; justify-content:center; padding:2vh; text-align:center; color:#999; }
+        .cta-cal-body svg { width:48px; height:48px; margin-bottom:1vh; }
+        .cta-cal-body p { font-size:1vw; }
+
+        @media print { .nav-controls,.progress-bar,.overview-overlay { display:none !important; } .slide { opacity:1 !important; visibility:visible !important; position:relative !important; page-break-after:always; } }
+    </style>
+</head>
+<body>
+<div class="deck">
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- ==================== SLIDE 1: TITLE ==================== -->
+    <div class="slide slide-dark active" id="slide-1" data-title="Title">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="title-content">
+            <div class="vip-logo vip-logo-large anim d1"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+            <div class="gold-line gold-line-wide anim d2"></div>
+            <div class="title-customer anim d3">Valnet</div>
+            <div class="title-sub anim d4">A Platform Partnership for the Next Chapter</div>
+            <div class="title-meta anim d5">Prepared for Julien Vadnais, Chief Technology Officer<br>February 2026</div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 2: WE KNOW VALNET ==================== -->
+    <div class="slide slide-gradient" id="slide-2" data-title="We Know Valnet">
+        <h2 class="anim d1">We Know Valnet</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="know-grid">
+            <div class="know-card anim d2">
+                <div class="stat-number">27+</div>
+                <p>Authoritative brands across entertainment, tech, gaming, auto, and lifestyle</p>
+            </div>
+            <div class="know-card anim d3">
+                <div class="stat-number">1,500+</div>
+                <p>Team members coordinating content production across 6 continents</p>
+            </div>
+            <div class="know-card anim d4">
+                <div class="stat-number">1.2B+</div>
+                <p>Annual gaming readers alone, making Valnet the largest gaming publisher</p>
+            </div>
+        </div>
+        <div class="know-brands anim d5">
+            <span class="brand-tag">Screen Rant</span>
+            <span class="brand-tag">Polygon</span>
+            <span class="brand-tag">How-To Geek</span>
+            <span class="brand-tag">Android Police</span>
+            <span class="brand-tag">MakeUseOf</span>
+            <span class="brand-tag">Game Rant</span>
+            <span class="brand-tag">CBR</span>
+            <span class="brand-tag">Collider</span>
+            <span class="brand-tag">CarBuzz</span>
+            <span class="brand-tag">Pocket-lint</span>
+            <span class="brand-tag">XDA</span>
+            <span class="brand-tag">Fextralife</span>
+        </div>
+        <div class="know-footer anim d6">Your growth has been remarkable. The question is whether your infrastructure is keeping pace.</div>
+    </div>
+
+    <!-- ==================== SLIDE 3: INFLECTION POINT ==================== -->
+    <div class="slide slide-light" id="slide-3" data-title="The Inflection Point">
+        <h2 class="anim d1" style="color:var(--vip-black);">The Build vs. Buy Inflection Point</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="inflection-layout">
+            <div class="timeline anim d3">
+                <div class="tl-item"><div class="tl-year">2020</div><div class="tl-text">Emaki built to unify 10+ brands under one proprietary CMS</div></div>
+                <div class="tl-item"><div class="tl-year">2022</div><div class="tl-text">AMP replaced with in-house caching. Pages under 200KB.</div></div>
+                <div class="tl-item"><div class="tl-year">2024</div><div class="tl-text">Sentinel wins CIO Awards Canada for analytics innovation</div></div>
+                <div class="tl-item"><div class="tl-year">2025-26</div><div class="tl-text">27+ brands, Polygon acquired, 1,500 employees, 6 continents</div></div>
+            </div>
+            <div class="inflection-right anim d4">
+                <h3>What's Changed</h3>
+                <p>Five years ago, building custom was the right call. WordPress could not do what you needed at your scale. Your team proved that with Emaki and Sentinel.</p>
+                <p>But the platform landscape has changed. Enterprise WordPress now handles the infrastructure challenges Emaki was built to solve, at a fraction of the operational cost.</p>
+                <div class="inflection-callout">
+                    <p>The question is not whether Emaki works. It is whether maintaining it across 27+ brands is the best use of your engineering talent.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 4: ROI CALCULATOR ==================== -->
+    <div class="slide slide-dark" id="slide-4" data-title="The Hidden Cost of Custom">
+        <h2 class="anim d1">The Hidden Cost of Custom</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="roi-layout anim d3">
+            <div class="roi-sliders">
+                <div class="roi-slider-group">
+                    <label>Articles per month <span id="roi-articles-val">5,000</span></label>
+                    <input type="range" id="roi-articles" min="500" max="10000" value="5000" step="100">
+                </div>
+                <div class="roi-slider-group">
+                    <label>CMS engineering team size <span id="roi-team-val">20</span></label>
+                    <input type="range" id="roi-team" min="5" max="50" value="20" step="1">
+                </div>
+                <div class="roi-slider-group">
+                    <label>Avg. developer salary <span id="roi-salary-val">$140,000</span></label>
+                    <input type="range" id="roi-salary" min="80000" max="200000" value="140000" step="5000">
+                </div>
+                <div class="roi-slider-group">
+                    <label>Monthly infrastructure cost <span id="roi-infra-val">$40,000</span></label>
+                    <input type="range" id="roi-infra" min="10000" max="100000" value="40000" step="5000">
+                </div>
+            </div>
+            <div class="roi-results">
+                <div class="roi-card">
+                    <div class="roi-val" id="roi-maintenance">$2.8M</div>
+                    <div class="roi-label">Annual CMS Maintenance Cost</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-val" id="roi-infra-savings">$144K</div>
+                    <div class="roi-label">Infrastructure Savings</div>
+                </div>
+                <div class="roi-card">
+                    <div class="roi-val" id="roi-hours">16,640</div>
+                    <div class="roi-label">Developer Hours Reclaimed</div>
+                </div>
+                <div class="roi-card featured">
+                    <div class="roi-val" id="roi-total">$1.3M</div>
+                    <div class="roi-label">Estimated Annual Savings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 5: PRODUCT NOT PLUMBING ==================== -->
+    <div class="slide slide-dark" id="slide-5" data-title="Product, Not Plumbing">
+        <h2 class="anim d1">Your Engineers Should Build Product, Not Plumbing</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="two-col anim d3">
+            <div class="col col-left">
+                <h3>Today: Engineering as Infrastructure</h3>
+                <ul>
+                    <li>CMS core maintenance and bug fixes</li>
+                    <li>Security patching and compliance</li>
+                    <li>CDN and caching layer operations</li>
+                    <li>Database scaling across 27 brands</li>
+                    <li>Onboarding each acquisition to Emaki</li>
+                </ul>
+            </div>
+            <div class="col-divider"></div>
+            <div class="col col-right">
+                <h3>Tomorrow: Engineering as Product</h3>
+                <ul>
+                    <li>More innovations like Sentinel</li>
+                    <li>Audience engagement and retention tools</li>
+                    <li>Revenue optimization features</li>
+                    <li>AI-powered content workflows</li>
+                    <li>Competitive editorial tooling</li>
+                </ul>
+            </div>
+        </div>
+        <div class="two-col-footer anim d4">
+            <p>WordPress VIP handles the platform. Your team builds what readers and editors actually see.</p>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 6: PLATFORM CAPABILITIES ==================== -->
+    <div class="slide slide-dark" id="slide-6" data-title="Platform for Publishers">
+        <h2 class="anim d1">A Platform Built for Publishers at Scale</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="cap-grid">
+            <div class="cap-card anim d2"><div class="cap-icon">&#9881;</div><h3>Enterprise WordPress</h3><p>The world's most flexible CMS, hardened for enterprise. 43% of the web runs on WordPress.</p></div>
+            <div class="cap-card anim d3"><div class="cap-icon">&#9729;</div><h3>Managed Infrastructure</h3><p>Auto-scaling, zero-downtime deploys, and managed updates. No ops team required.</p></div>
+            <div class="cap-card anim d3"><div class="cap-icon">&#9733;</div><h3>Parse.ly Analytics</h3><p>Content intelligence included. Real-time engagement data at the article and paragraph level.</p></div>
+            <div class="cap-card anim d4"><div class="cap-icon">&#127760;</div><h3>Global Edge Network</h3><p>30+ edge locations. Sub-200ms TTFB worldwide. Your readers never wait.</p></div>
+            <div class="cap-card anim d4"><div class="cap-icon">&#128274;</div><h3>Enterprise Security</h3><p>SOC 2 Type II, ISO 27001. WAF, DDoS protection, automated patching included.</p></div>
+            <div class="cap-card anim d5"><div class="cap-icon">&#128300;</div><h3>Multisite at Scale</h3><p>One platform, 27+ brands. Shared components with independent brand identities.</p></div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 7: CDN EXPLORER ==================== -->
+    <div class="slide slide-dark" id="slide-7" data-title="Global Performance">
+        <h2 class="anim d1">Global Performance, Zero Ops</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="cdn-layout anim d3">
+            <div class="cdn-map" id="cdn-map">
+                <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Simplified world map outlines -->
+                    <path d="M140,120 L180,100 L220,105 L240,120 L235,140 L260,155 L250,180 L220,200 L200,210 L180,240 L160,260 L140,280 L130,250 L120,200 L125,160 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <path d="M270,130 L280,110 L300,105 L330,95 L360,90 L390,85 L420,80 L450,85 L470,95 L480,110 L490,130 L470,135 L450,140 L430,135 L410,130 L390,135 L370,140 L350,145 L330,140 L310,135 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <path d="M370,150 L390,155 L410,160 L430,170 L440,190 L430,210 L420,230 L400,250 L390,280 L380,300 L370,280 L365,250 L360,220 L355,190 L360,170 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <path d="M490,100 L520,90 L560,85 L600,90 L640,100 L670,115 L690,140 L700,170 L690,190 L670,200 L640,195 L610,185 L580,175 L550,160 L520,145 L500,125 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <path d="M580,200 L610,210 L640,220 L660,240 L650,260 L630,270 L600,265 L580,250 L570,230 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <path d="M680,280 L710,270 L740,280 L750,300 L740,320 L720,330 L700,325 L685,310 Z" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                    <!-- Connection lines -->
+                    <line x1="195" y1="145" x2="355" y2="130" stroke="rgba(62,160,173,0.1)" stroke-width="1"/>
+                    <line x1="355" y1="130" x2="425" y2="125" stroke="rgba(62,160,173,0.1)" stroke-width="1"/>
+                    <line x1="425" y1="125" x2="640" y2="145" stroke="rgba(62,160,173,0.1)" stroke-width="1"/>
+                    <line x1="640" y1="145" x2="720" y2="165" stroke="rgba(62,160,173,0.1)" stroke-width="1"/>
+                    <line x1="580" y1="215" x2="640" y2="145" stroke="rgba(62,160,173,0.1)" stroke-width="1"/>
+                    <line x1="195" y1="145" x2="205" y2="305" stroke="rgba(62,160,173,0.1)" stroke-width="1"/>
+                    <!-- CDN Nodes -->
+                    <g class="cdn-node" data-city="New York" data-latency="8ms" data-type="Primary PoP" data-capacity="150K RPM">
+                        <circle cx="195" cy="145" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="195" cy="145" r="5" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="195" y="135" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">New York</text>
+                    </g>
+                    <g class="cdn-node" data-city="Toronto" data-latency="10ms" data-type="Secondary PoP" data-capacity="80K RPM">
+                        <circle cx="185" cy="125" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="185" cy="125" r="4" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="185" y="118" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Toronto</text>
+                    </g>
+                    <g class="cdn-node" data-city="London" data-latency="12ms" data-type="Primary PoP" data-capacity="120K RPM">
+                        <circle cx="355" cy="130" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="355" cy="130" r="5" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="355" y="120" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">London</text>
+                    </g>
+                    <g class="cdn-node" data-city="Frankfurt" data-latency="14ms" data-type="Primary PoP" data-capacity="130K RPM">
+                        <circle cx="385" cy="125" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="385" cy="125" r="4" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="385" y="115" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Frankfurt</text>
+                    </g>
+                    <g class="cdn-node" data-city="Mumbai" data-latency="22ms" data-type="Edge PoP" data-capacity="60K RPM">
+                        <circle cx="580" cy="215" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="580" cy="215" r="4" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="580" y="208" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Mumbai</text>
+                    </g>
+                    <g class="cdn-node" data-city="Singapore" data-latency="18ms" data-type="Primary PoP" data-capacity="90K RPM">
+                        <circle cx="640" cy="245" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="640" cy="245" r="5" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="640" y="238" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Singapore</text>
+                    </g>
+                    <g class="cdn-node" data-city="Tokyo" data-latency="15ms" data-type="Primary PoP" data-capacity="110K RPM">
+                        <circle cx="700" cy="155" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="700" cy="155" r="5" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="700" y="148" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Tokyo</text>
+                    </g>
+                    <g class="cdn-node" data-city="Sydney" data-latency="28ms" data-type="Edge PoP" data-capacity="50K RPM">
+                        <circle cx="720" cy="310" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="720" cy="310" r="4" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="720" y="328" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Sydney</text>
+                    </g>
+                    <g class="cdn-node" data-city="S&#227;o Paulo" data-latency="32ms" data-type="Edge PoP" data-capacity="45K RPM">
+                        <circle cx="205" cy="305" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="205" cy="305" r="4" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="205" y="322" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">S&#227;o Paulo</text>
+                    </g>
+                    <g class="cdn-node" data-city="Johannesburg" data-latency="35ms" data-type="Edge PoP" data-capacity="30K RPM">
+                        <circle cx="410" cy="310" r="10" fill="none" stroke="var(--vip-turquoise)" stroke-width="1" class="node-pulse" opacity="0.4"/>
+                        <circle cx="410" cy="310" r="4" fill="var(--vip-turquoise)" class="node-dot"/>
+                        <text x="410" y="328" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">Johannesburg</text>
+                    </g>
+                </svg>
+                <div class="cdn-tooltip" id="cdn-tooltip">
+                    <span class="tt-city"></span>
+                    <span class="tt-row">Latency: <span class="tt-latency"></span></span>
+                    <span class="tt-row">Type: <span class="tt-type"></span></span>
+                    <span class="tt-row">Capacity: <span class="tt-capacity"></span></span>
+                </div>
+            </div>
+            <div class="cdn-stats">
+                <div class="cdn-stat"><div class="cdn-stat-val">30+</div><div class="cdn-stat-label">Edge Locations</div></div>
+                <div class="cdn-stat"><div class="cdn-stat-val">&lt;50ms</div><div class="cdn-stat-label">Global TTFB</div></div>
+                <div class="cdn-stat"><div class="cdn-stat-val">99.99%</div><div class="cdn-stat-label">Uptime SLA</div></div>
+                <div class="cdn-stat"><div class="cdn-stat-val">500K+</div><div class="cdn-stat-label">RPM Auto-Scaling</div></div>
+                <div class="cdn-stat"><div class="cdn-stat-val">100B+</div><div class="cdn-stat-label">Pages Served Annually</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 8: PARSE.LY DASHBOARD ==================== -->
+    <div class="slide slide-dark" id="slide-8" data-title="Content Intelligence">
+        <h2 class="anim d1">Content Intelligence, Included</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="parsely-dash anim d3">
+            <!-- Main panel: KPIs + chart -->
+            <div class="parsely-main">
+                <div class="parsely-header">
+                    <div class="parsely-brand"><span>Parse.ly</span> Dashboard</div>
+                    <div class="parsely-tabs">
+                        <button class="parsely-tab active" data-range="1h">1H</button>
+                        <button class="parsely-tab" data-range="24h">24H</button>
+                        <button class="parsely-tab" data-range="7d">7D</button>
+                        <button class="parsely-tab" data-range="30d">30D</button>
+                    </div>
+                </div>
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-visitors">48.2K</div>
+                        <div class="kpi-change positive" id="kpi-visitors-change">+12.4%</div>
+                        <div class="kpi-label">Visitors</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-pageviews">182K</div>
+                        <div class="kpi-change positive" id="kpi-pageviews-change">+8.7%</div>
+                        <div class="kpi-label">Page Views</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-engaged">2:34</div>
+                        <div class="kpi-change positive" id="kpi-engaged-change">+5.1%</div>
+                        <div class="kpi-label">Avg Engaged Time</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-recirc">24.8%</div>
+                        <div class="kpi-change negative" id="kpi-recirc-change">-1.2%</div>
+                        <div class="kpi-label">Recirculation</div>
+                    </div>
+                </div>
+                <div class="parsely-chart-wrap">
+                    <svg id="parsely-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="var(--parsely-green)" stop-opacity="0.4"/>
+                                <stop offset="100%" stop-color="var(--parsely-green)" stop-opacity="0.02"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid lines -->
+                        <line x1="30" y1="60" x2="780" y2="60" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <line x1="30" y1="120" x2="780" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <line x1="30" y1="180" x2="780" y2="180" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <line x1="30" y1="240" x2="780" y2="240" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <path id="chart-area" fill="url(#chartGrad)"/>
+                        <path id="chart-line" fill="none" stroke="var(--parsely-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- Hover dots rendered by JS -->
+                        <g id="chart-dots"></g>
+                    </svg>
+                </div>
+                <div class="parsely-note">Simulated data for demonstration purposes. Powered by Parse.ly real-time analytics.</div>
+            </div>
+            <!-- Sidebar: Trending + Sources -->
+            <div class="parsely-sidebar">
+                <div class="parsely-side-card" style="flex:1;">
+                    <h4>Trending Now</h4>
+                    <div id="trending-list"></div>
+                </div>
+                <div class="parsely-side-card" style="flex-shrink:0;">
+                    <h4>Traffic Sources</h4>
+                    <div class="source-row">
+                        <span class="source-label">Direct</span>
+                        <div class="source-bar-bg"><div class="source-bar" id="src-direct" style="width:35%;background:var(--vip-turquoise);"></div></div>
+                        <span class="source-pct" id="src-direct-pct">35%</span>
+                    </div>
+                    <div class="source-row">
+                        <span class="source-label">Search</span>
+                        <div class="source-bar-bg"><div class="source-bar" id="src-search" style="width:42%;background:var(--parsely-green);"></div></div>
+                        <span class="source-pct" id="src-search-pct">42%</span>
+                    </div>
+                    <div class="source-row">
+                        <span class="source-label">Social</span>
+                        <div class="source-bar-bg"><div class="source-bar" id="src-social" style="width:15%;background:var(--vip-blueberry);"></div></div>
+                        <span class="source-pct" id="src-social-pct">15%</span>
+                    </div>
+                    <div class="source-row">
+                        <span class="source-label">Referral</span>
+                        <div class="source-bar-bg"><div class="source-bar" id="src-referral" style="width:8%;background:var(--vip-orange);"></div></div>
+                        <span class="source-pct" id="src-referral-pct">8%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 9: COMPARISON MATRIX ==================== -->
+    <div class="slide slide-light" id="slide-9" data-title="Emaki vs. WordPress VIP">
+        <h2 class="anim d1">Emaki vs. WordPress VIP</h2>
+        <p class="anim d2" style="font-size:1.1vw;color:#666;margin-bottom:0;">Both platforms serve publishers. Here is how they compare at scale.</p>
+        <div class="matrix-tabs anim d3">
+            <button class="matrix-tab active" data-category="platform">Platform</button>
+            <button class="matrix-tab" data-category="content">Content Creation</button>
+            <button class="matrix-tab" data-category="performance">Performance</button>
+            <button class="matrix-tab" data-category="ecosystem">Ecosystem</button>
+            <button class="matrix-tab" data-category="security">Security</button>
+        </div>
+        <div class="matrix-wrap anim d4">
+            <table class="matrix-table">
+                <thead><tr><th>Capability</th><th>Emaki</th><th>WordPress VIP</th></tr></thead>
+                <tbody id="matrix-tbody">
+                    <tr data-cat="platform"><td>Open source foundation</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="platform"><td>Plugin ecosystem (60,000+)</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="platform"><td>Managed hosting included</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="platform"><td>Multi-brand architecture</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="platform"><td>Headless / decoupled support</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="content" class="hidden-row"><td>Block editor (Gutenberg)</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="content" class="hidden-row"><td>Real-time collaboration</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="content" class="hidden-row"><td>Editorial workflows</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="content" class="hidden-row"><td>Custom content types</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="content" class="hidden-row"><td>Media management at scale</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="performance" class="hidden-row"><td>Global CDN included</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="performance" class="hidden-row"><td>Auto-scaling</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="performance" class="hidden-row"><td>Edge caching</td><td class="check">&#10003;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="performance" class="hidden-row"><td>Core Web Vitals optimization</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="performance" class="hidden-row"><td>Zero-downtime deploys</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="ecosystem" class="hidden-row"><td>43% web market share (hiring pool)</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="ecosystem" class="hidden-row"><td>Third-party integrations</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="ecosystem" class="hidden-row"><td>Community contributions</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="ecosystem" class="hidden-row"><td>Agency partner network</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="ecosystem" class="hidden-row"><td>Documentation and training</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="security" class="hidden-row"><td>SOC 2 Type II certified</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="security" class="hidden-row"><td>ISO 27001</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="security" class="hidden-row"><td>Automated security patching</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="security" class="hidden-row"><td>WAF and DDoS protection</td><td class="partial">&#9679;</td><td class="check">&#10003;</td></tr>
+                    <tr data-cat="security" class="hidden-row"><td>Vulnerability management program</td><td class="cross">&#10007;</td><td class="check">&#10003;</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 10: CUSTOMER CAROUSEL ==================== -->
+    <!-- PLACEHOLDER: Replace with actual WPVIP customer case studies -->
+    <div class="slide slide-dark" id="slide-10" data-title="Publishers Who Shifted">
+        <h2 class="anim d1">Publishers Who Made the Shift</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="carousel-container anim d3">
+            <div class="carousel-track" id="carousel-track">
+                <div class="cc-card">
+                    <div class="cc-company">News Corp</div>
+                    <div class="cc-industry">Media / News</div>
+                    <div class="cc-quote">"Moving to WordPress VIP let us consolidate 12 properties onto one platform while cutting infrastructure costs by 40%."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">40%</div><div class="cc-metric-label">Cost Reduction</div></div><div><div class="cc-metric-val">3x</div><div class="cc-metric-label">Faster Publishing</div></div></div>
+                </div>
+                <div class="cc-card">
+                    <div class="cc-company">TechCrunch</div>
+                    <div class="cc-industry">Technology Media</div>
+                    <div class="cc-quote">"Parse.ly transformed how our editors understand audience engagement. We publish smarter, not just faster."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">60%</div><div class="cc-metric-label">Engagement Increase</div></div><div><div class="cc-metric-val">200ms</div><div class="cc-metric-label">Avg Load Time</div></div></div>
+                </div>
+                <div class="cc-card">
+                    <div class="cc-company">Al Jazeera</div>
+                    <div class="cc-industry">Global News</div>
+                    <div class="cc-quote">"Enterprise-grade security and global CDN performance were non-negotiable. WordPress VIP delivered both."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">99.99%</div><div class="cc-metric-label">Uptime</div></div><div><div class="cc-metric-val">30+</div><div class="cc-metric-label">Global Edge Nodes</div></div></div>
+                </div>
+                <div class="cc-card">
+                    <div class="cc-company">Rolling Stone</div>
+                    <div class="cc-industry">Entertainment</div>
+                    <div class="cc-quote">"Our editorial team went from fighting the CMS to focusing on storytelling."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">50%</div><div class="cc-metric-label">Faster Content</div></div><div><div class="cc-metric-val">2M+</div><div class="cc-metric-label">Daily Readers</div></div></div>
+                </div>
+            </div>
+            <div class="carousel-dots">
+                <button class="carousel-dot active" data-index="0"></button>
+                <button class="carousel-dot" data-index="1"></button>
+                <button class="carousel-dot" data-index="2"></button>
+                <button class="carousel-dot" data-index="3"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 11: CTA ==================== -->
+    <div class="slide slide-dark" id="slide-11" data-title="Next Steps">
+        <div class="cta-layout">
+            <div>
+                <div class="vip-logo vip-logo-large anim d1"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+                <h2 class="anim d2">Let's explore what WordPress VIP can do for Valnet</h2>
+                <div class="gold-line anim d3"></div>
+                <div class="cta-steps">
+                    <div class="cta-step anim d3"><div class="cta-num">1</div><div><h4>Technical Deep Dive</h4><p>Walk through VIP architecture with your engineering team</p></div></div>
+                    <div class="cta-step anim d4"><div class="cta-num">2</div><div><h4>Migration Assessment</h4><p>Scope the Emaki-to-VIP migration path for a pilot brand</p></div></div>
+                    <div class="cta-step anim d5"><div class="cta-num">3</div><div><h4>Proof of Concept</h4><p>Stand up a single Valnet property on VIP in weeks, not months</p></div></div>
+                </div>
+                <div class="cta-contact anim d6">Contact: Nate Kelly / nate.kelly@wpvip.com</div>
+            </div>
+            <div class="anim d4">
+                <div class="cta-calendar">
+                    <div class="cta-cal-header"><h3>Book a Conversation</h3></div>
+                    <div class="cta-cal-body" style="padding:0;">
+                        <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border:0;width:100%;height:100%;min-height:500px;background:white;" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-controls" id="nav-controls">
+        <button class="nav-btn" id="btn-prev">&#8592;</button>
+        <span class="slide-counter" id="slide-counter">1 / 11</span>
+        <button class="nav-btn" id="btn-next">&#8594;</button>
+    </div>
+
+    <!-- Overview -->
+    <div class="overview-overlay" id="overview-overlay">
+        <div style="cursor:pointer;position:fixed;top:2vh;right:2vw;font-size:1.5vw;color:white;z-index:210;opacity:0.7;" id="overview-close">&times;</div>
+        <div class="overview-grid" id="overview-grid"></div>
+    </div>
+</div>
+
+<script>
+(function(){
+    'use strict';
+    var TOTAL=11, cur=1, isOverview=false, carouselTimer=null;
+    var slides=document.querySelectorAll('.slide');
+    var bar=document.getElementById('progress-bar');
+    var counter=document.getElementById('slide-counter');
+    var nav=document.getElementById('nav-controls');
+
+    function go(n){
+        if(n<1||n>TOTAL)return;
+        slides.forEach(function(s){s.classList.remove('active');});
+        cur=n; slides[cur-1].classList.add('active');
+        bar.style.width=((cur/TOTAL)*100)+'%';
+        counter.textContent=cur+' / '+TOTAL;
+        nav.classList.toggle('on-light',slides[cur-1].classList.contains('slide-light'));
+        clearInterval(carouselTimer);
+        if(cur===10) startCarousel();
+    }
+
+    document.getElementById('btn-prev').onclick=function(){go(cur-1);};
+    document.getElementById('btn-next').onclick=function(){go(cur+1);};
+
+    document.addEventListener('keydown',function(e){
+        if(isOverview){if(e.key==='Escape')toggleOverview();return;}
+        if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1);}
+        else if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1);}
+        else if(e.key==='Escape')toggleOverview();
+    });
+
+    counter.addEventListener('click',toggleOverview);
+
+    var tx=0,ty=0;
+    document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].clientX;ty=e.changedTouches[0].clientY;},{passive:true});
+    document.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){dx<0?go(cur+1):go(cur-1);}},{passive:true});
+
+    function toggleOverview(){
+        isOverview=!isOverview;
+        var ov=document.getElementById('overview-overlay');
+        if(isOverview){buildOverview();ov.classList.add('active');}else{ov.classList.remove('active');}
+    }
+    document.getElementById('overview-close').onclick=toggleOverview;
+
+    function buildOverview(){
+        var grid=document.getElementById('overview-grid');grid.innerHTML='';
+        var titles=['Title','We Know Valnet','The Inflection Point','Hidden Cost of Custom','Product, Not Plumbing','Platform for Publishers','Global Performance','Content Intelligence','Emaki vs. WPVIP','Publishers Who Shifted','Next Steps'];
+        titles.forEach(function(t,i){
+            var d=document.createElement('div');d.className='overview-thumb'+(i+1===cur?' current':'');
+            d.innerHTML='<div class="overview-thumb-title">'+t+'</div><div class="overview-thumb-num">'+(i+1)+'</div>';
+            d.onclick=function(){go(i+1);toggleOverview();};
+            grid.appendChild(d);
+        });
+    }
+
+    /* ROI Calculator */
+    var rA=document.getElementById('roi-articles'),rT=document.getElementById('roi-team'),rS=document.getElementById('roi-salary'),rI=document.getElementById('roi-infra');
+    function fmt(n){if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return'$'+Math.round(n).toLocaleString();return'$'+n;}
+    function fmtN(n){return Math.round(n).toLocaleString();}
+    function calcROI(){
+        var a=+rA.value,t=+rT.value,s=+rS.value,inf=+rI.value;
+        document.getElementById('roi-articles-val').textContent=fmtN(a);
+        document.getElementById('roi-team-val').textContent=t;
+        document.getElementById('roi-salary-val').textContent='$'+fmtN(s);
+        document.getElementById('roi-infra-val').textContent='$'+fmtN(inf);
+        var maint=t*s, infraSave=inf*12*0.3, hours=t*0.4*2080, total=(maint*0.4)+infraSave;
+        document.getElementById('roi-maintenance').textContent=fmt(maint);
+        document.getElementById('roi-infra-savings').textContent=fmt(infraSave);
+        document.getElementById('roi-hours').textContent=fmtN(hours);
+        document.getElementById('roi-total').textContent=fmt(total);
+    }
+    rA.oninput=rT.oninput=rS.oninput=rI.oninput=calcROI;
+    calcROI();
+
+    /* CDN Explorer */
+    var cdnMap=document.getElementById('cdn-map'),cdnTT=document.getElementById('cdn-tooltip');
+    document.querySelectorAll('.cdn-node').forEach(function(node){
+        node.addEventListener('mouseenter',function(){
+            var dot=node.querySelector('.node-dot');
+            var cx=+dot.getAttribute('cx'),cy=+dot.getAttribute('cy');
+            var rx=cx/800,ry=cy/450;
+            var cw=cdnMap.offsetWidth,ch=cdnMap.offsetHeight;
+            cdnTT.querySelector('.tt-city').textContent=node.dataset.city;
+            cdnTT.querySelector('.tt-latency').textContent=node.dataset.latency;
+            cdnTT.querySelector('.tt-type').textContent=node.dataset.type;
+            cdnTT.querySelector('.tt-capacity').textContent=node.dataset.capacity;
+            var lx=rx*cw+10,ly=ry*ch;
+            if(lx+160>cw)lx=rx*cw-170;
+            if(ly+100>ch)ly=ch-110;
+            if(ly<0)ly=10;
+            cdnTT.style.left=lx+'px';cdnTT.style.top=ly+'px';
+            cdnTT.classList.add('visible');
+        });
+        node.addEventListener('mouseleave',function(){cdnTT.classList.remove('visible');});
+    });
+
+    /* Parse.ly Dashboard */
+    var pData={
+        '1h':{v:'48.2K',vc:'+12.4%',vd:'positive',pv:'182K',pc:'+8.7%',pd:'positive',e:'2:34',ec:'+5.1%',ed:'positive',r:'24.8%',rc:'-1.2%',rd:'negative',
+            chart:[40,35,50,65,55,70,80,75,90,85,95,88,100,92,105,98],
+            trend:[{t:'GTA 6 Release Date: Everything We Know',v:'24.8K'},{t:'Best Budget Android Phones 2026',v:'18.3K'},{t:'Marvel Phase 7: Every Confirmed Movie',v:'15.1K'},{t:'How to Fix Windows 12 Battery Drain',v:'12.7K'},{t:'2026 Porsche Cayenne EV First Drive',v:'9.4K'}],
+            src:{d:35,se:42,so:15,r:8}},
+        '24h':{v:'312K',vc:'+6.2%',vd:'positive',pv:'1.1M',pc:'+4.8%',pd:'positive',e:'2:18',ec:'+2.3%',ed:'positive',r:'26.1%',rc:'+0.8%',rd:'positive',
+            chart:[60,55,45,40,35,30,28,32,45,58,72,85,90,88,82,78],
+            trend:[{t:'Nintendo Switch 2: First Impressions',v:'142K'},{t:'Screen Rant: New Star Wars Details',v:'118K'},{t:'Android 16 Beta: Top 10 Features',v:'95K'},{t:'Best Electric SUVs 2026',v:'82K'},{t:'Collider: Christopher Nolan Interview',v:'71K'}],
+            src:{d:30,se:45,so:18,r:7}},
+        '7d':{v:'2.1M',vc:'+9.1%',vd:'positive',pv:'8.4M',pc:'+7.3%',pd:'positive',e:'2:42',ec:'+4.6%',ed:'positive',r:'25.5%',rc:'+1.4%',rd:'positive',
+            chart:[50,55,58,62,68,72,78,82,75,80,85,90,88,92,95,100],
+            trend:[{t:'PlayStation 6 Specs Leaked',v:'890K'},{t:'How-To Geek: Home Lab Setup Guide',v:'720K'},{t:'CBR: Best Anime of 2026 Ranked',v:'650K'},{t:'Game Rant: Elden Ring DLC 2 Rumors',v:'580K'},{t:'MakeUseOf: AI Tools That Save Time',v:'510K'}],
+            src:{d:28,se:48,so:16,r:8}},
+        '30d':{v:'8.8M',vc:'+14.2%',vd:'positive',pv:'34M',pc:'+11.6%',pd:'positive',e:'2:28',ec:'+3.8%',ed:'positive',r:'23.9%',rc:'-0.4%',rd:'negative',
+            chart:[30,35,42,48,52,58,55,60,68,72,80,85,82,90,95,105],
+            trend:[{t:'GTA 6 Complete Coverage Hub',v:'4.2M'},{t:'Polygon: 50 Best Games Right Now',v:'3.8M'},{t:'Screen Rant: MCU Phase 7 Timeline',v:'3.1M'},{t:'Android Police: Galaxy S26 Ultra Review',v:'2.7M'},{t:'CarBuzz: 2026 Sports Car Comparison',v:'2.2M'}],
+            src:{d:32,se:44,so:14,r:10}}
+    };
+
+    function drawChart(pts){
+        var w=800,h=300,padL=30,padR=20,padT=30,padB=20;
+        var mx=Math.max.apply(null,pts),mn=Math.min.apply(null,pts)*0.8;
+        var range=mx-mn||1;
+        var st=(w-padL-padR)/(pts.length-1);
+        var coords=pts.map(function(v,i){
+            var x=padL+i*st;
+            var y=padT+((mx-v)/range)*(h-padT-padB);
+            return{x:x,y:y};
+        });
+        var line='M'+coords.map(function(c){return c.x+','+c.y;}).join(' L');
+        var area=line+' L'+coords[coords.length-1].x+','+(h-padB)+' L'+coords[0].x+','+(h-padB)+' Z';
+        document.getElementById('chart-line').setAttribute('d',line);
+        document.getElementById('chart-area').setAttribute('d',area);
+        /* Hover dots */
+        var dotsG=document.getElementById('chart-dots');
+        dotsG.innerHTML='';
+        coords.forEach(function(c,i){
+            var circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+            circle.setAttribute('cx',c.x);circle.setAttribute('cy',c.y);circle.setAttribute('r','4');
+            circle.setAttribute('fill','var(--parsely-green)');circle.setAttribute('opacity','0');
+            circle.setAttribute('style','transition:opacity 0.2s,r 0.2s;cursor:pointer;');
+            circle.addEventListener('mouseenter',function(){circle.setAttribute('opacity','1');circle.setAttribute('r','6');});
+            circle.addEventListener('mouseleave',function(){circle.setAttribute('opacity','0');circle.setAttribute('r','4');});
+            dotsG.appendChild(circle);
+        });
+    }
+
+    function animateValue(el,newText){
+        el.style.transition='opacity 0.15s';el.style.opacity='0';
+        setTimeout(function(){el.textContent=newText;el.style.opacity='1';},150);
+    }
+    function updateParsely(range){
+        var d=pData[range]; if(!d)return;
+        animateValue(document.getElementById('kpi-visitors'),d.v);
+        var vc=document.getElementById('kpi-visitors-change');vc.textContent=d.vc;vc.className='kpi-change '+d.vd;
+        animateValue(document.getElementById('kpi-pageviews'),d.pv);
+        var pc=document.getElementById('kpi-pageviews-change');pc.textContent=d.pc;pc.className='kpi-change '+d.pd;
+        animateValue(document.getElementById('kpi-engaged'),d.e);
+        var ec=document.getElementById('kpi-engaged-change');ec.textContent=d.ec;ec.className='kpi-change '+d.ed;
+        animateValue(document.getElementById('kpi-recirc'),d.r);
+        var rc=document.getElementById('kpi-recirc-change');rc.textContent=d.rc;rc.className='kpi-change '+d.rd;
+        drawChart(d.chart);
+        var tl=document.getElementById('trending-list');tl.innerHTML='';
+        d.trend.forEach(function(item,i){
+            var html='<div class="trending-item" style="opacity:0;animation:fadeInUp 0.3s ease '+(i*0.06)+'s forwards;">';
+            html+='<span class="trending-rank">'+(i+1)+'</span><div><div class="trending-title">'+item.t+'</div><div class="trending-views">'+item.v+' views</div></div></div>';
+            tl.innerHTML+=html;
+        });
+        document.getElementById('src-direct').style.width=d.src.d+'%';document.getElementById('src-direct-pct').textContent=d.src.d+'%';
+        document.getElementById('src-search').style.width=d.src.se+'%';document.getElementById('src-search-pct').textContent=d.src.se+'%';
+        document.getElementById('src-social').style.width=d.src.so+'%';document.getElementById('src-social-pct').textContent=d.src.so+'%';
+        document.getElementById('src-referral').style.width=d.src.r+'%';document.getElementById('src-referral-pct').textContent=d.src.r+'%';
+    }
+
+    document.querySelectorAll('.parsely-tab').forEach(function(tab){
+        tab.onclick=function(){
+            document.querySelectorAll('.parsely-tab').forEach(function(t){t.classList.remove('active');});
+            tab.classList.add('active');updateParsely(tab.dataset.range);
+        };
+    });
+    drawChart(pData['1h'].chart);
+    updateParsely('1h');
+
+    /* Comparison Matrix */
+    document.querySelectorAll('.matrix-tab').forEach(function(tab){
+        tab.onclick=function(){
+            document.querySelectorAll('.matrix-tab').forEach(function(t){t.classList.remove('active');});
+            tab.classList.add('active');
+            var cat=tab.dataset.category;
+            document.querySelectorAll('#matrix-tbody tr').forEach(function(row){
+                if(row.dataset.cat===cat)row.classList.remove('hidden-row');
+                else row.classList.add('hidden-row');
+            });
+        };
+    });
+
+    /* Customer Carousel */
+    var cTrack=document.getElementById('carousel-track'),cIdx=0,cTotal=4;
+    function goCard(i){
+        cIdx=i;
+        var card=cTrack.children[0];
+        if(card){var cardW=card.offsetWidth+20;cTrack.style.transform='translateX(-'+(i*cardW)+'px)';}
+        document.querySelectorAll('.carousel-dot').forEach(function(d,j){d.classList.toggle('active',j===i);});
+    }
+    document.querySelectorAll('.carousel-dot').forEach(function(dot){
+        dot.onclick=function(){goCard(+dot.dataset.index);};
+    });
+    function startCarousel(){
+        carouselTimer=setInterval(function(){goCard((cIdx+1)%cTotal);},4000);
+    }
+
+    go(1);
+})();
+</script>
+</body>
+</html>

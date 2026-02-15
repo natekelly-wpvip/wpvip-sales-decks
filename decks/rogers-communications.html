@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rogers Communications | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1c2530;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-purple: #9C5CE1;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --parsely-green: #70AC1C;
+            --rogers-red: #DA291C;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        .deck { position:relative; width:100vw; height:100vh; }
+        .slide { position:absolute; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; padding:5vh 6vw; opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s ease; overflow:hidden; }
+        .slide.active { opacity:1; visibility:visible; }
+        h1 { font-size:3.2vw; font-weight:700; letter-spacing:-0.03em; line-height:1.05; margin-bottom:1.5vh; }
+        h2 { font-size:2.4vw; font-weight:600; letter-spacing:-0.02em; line-height:1.1; margin-bottom:1.5vh; }
+        h3 { font-size:1.6vw; font-weight:600; letter-spacing:-0.01em; line-height:1.2; margin-bottom:1vh; }
+        p, li { font-size:1.3vw; font-weight:400; line-height:1.5; }
+        .caption { font-size:0.9vw; font-weight:500; letter-spacing:0.05em; line-height:1.4; text-transform:uppercase; }
+        .stat-number { font-size:4vw; font-weight:700; letter-spacing:-0.04em; line-height:1.0; }
+        .vip-logo { font-size:1.2vw; letter-spacing:-0.01em; margin-bottom:2vh; }
+        .vip-logo .logo-wp { font-weight:400; }
+        .vip-logo .logo-vip { font-weight:700; color:var(--vip-gold); }
+        .vip-logo-large { font-size:1.8vw; }
+        .gold-line { width:60px; height:2px; background:var(--vip-gold); margin:2vh 0; }
+        .gold-line-wide { width:120px; }
+        .geo-pattern { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.04; }
+        .geo-lines { background:repeating-linear-gradient(45deg,transparent,transparent 30px,var(--vip-gold) 30px,var(--vip-gold) 31px); }
+        .geo-moire { background:repeating-linear-gradient(0deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px),repeating-linear-gradient(60deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px); }
+        .geo-concentric { background:repeating-radial-gradient(circle at 80% 50%,transparent,transparent 40px,var(--vip-turquoise) 40px,var(--vip-turquoise) 41px); }
+        .corner-accent { position:absolute; width:40px; height:40px; border-color:var(--vip-gold); border-style:solid; border-width:0; }
+        .corner-tl { top:3vh; left:3vw; border-top-width:2px; border-left-width:2px; }
+        .corner-br { bottom:3vh; right:3vw; border-bottom-width:2px; border-right-width:2px; }
+        .slide-dark { background:var(--vip-black); color:var(--vip-white); }
+        .slide-light { background:var(--vip-white); color:var(--vip-black); }
+        .slide-light h1,.slide-light h2,.slide-light h3 { color:var(--vip-black); }
+        .slide-gradient { background:linear-gradient(135deg,var(--vip-black) 0%,var(--vip-black-light) 100%); color:var(--vip-white); }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(2.5); opacity:0; } }
+        @keyframes countUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .slide.active .anim { animation:fadeInUp 0.6s ease forwards; }
+        .slide.active .d1 { animation-delay:0.1s; opacity:0; }
+        .slide.active .d2 { animation-delay:0.2s; opacity:0; }
+        .slide.active .d3 { animation-delay:0.3s; opacity:0; }
+        .slide.active .d4 { animation-delay:0.4s; opacity:0; }
+        .slide.active .d5 { animation-delay:0.5s; opacity:0; }
+        .slide.active .d6 { animation-delay:0.6s; opacity:0; }
+        .slide.active .d7 { animation-delay:0.7s; opacity:0; }
+
+        /* Nav */
+        .nav-controls { position:fixed; bottom:2.5vh; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:1.5vw; z-index:100; }
+        .nav-btn { width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); background:rgba(19,25,30,0.8); color:var(--vip-white); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; backdrop-filter:blur(10px); }
+        .nav-btn:hover { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .nav-controls.on-light .nav-btn { border-color:rgba(0,0,0,0.2); background:rgba(255,255,255,0.8); color:var(--vip-black); }
+        .nav-controls.on-light .nav-btn:hover { border-color:var(--vip-gold-text); color:var(--vip-gold-text); }
+        .nav-controls.on-light .slide-counter { color:rgba(0,0,0,0.5); }
+        .slide-counter { font-size:14px; color:rgba(255,255,255,0.5); font-weight:500; cursor:pointer; padding:6px 12px; border-radius:20px; transition:all 0.2s; user-select:none; }
+        .slide-counter:hover { color:var(--vip-gold); }
+        .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--vip-gold); transition:width 0.4s ease; z-index:100; }
+
+        /* Overview */
+        .overview-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:200; display:none; padding:4vh 4vw; overflow-y:auto; }
+        .overview-overlay.active { display:block; }
+        .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2vw; }
+        .overview-thumb { aspect-ratio:16/9; border-radius:6px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.2s; position:relative; background:var(--vip-black); display:flex; align-items:center; justify-content:center; padding:1vw; }
+        .overview-thumb:hover { border-color:var(--vip-gold); transform:scale(1.03); }
+        .overview-thumb.current { border-color:var(--vip-gold); }
+        .overview-thumb-title { font-size:0.9vw; font-weight:600; color:var(--vip-white); text-align:center; }
+        .overview-thumb-num { position:absolute; bottom:6px; right:8px; font-size:0.7vw; color:var(--vip-gray); }
+
+        /* Slide 1: Title */
+        .title-content { position:relative; z-index:1; }
+        .title-customer { font-size:5vw; font-weight:700; letter-spacing:-0.04em; line-height:1; margin:3vh 0 2vh; }
+        .title-sub { font-size:1.6vw; font-weight:400; color:rgba(255,255,255,0.7); margin-bottom:1.5vh; }
+        .title-meta { font-size:1vw; color:rgba(255,255,255,0.4); margin-top:3vh; }
+
+        /* Slide 2: Agenda */
+        .agenda-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw 3vw; margin-top:3vh; }
+        .agenda-item { display:flex; align-items:flex-start; gap:1vw; padding:1.5vh 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .agenda-num { font-size:1.4vw; font-weight:700; color:var(--vip-gold); min-width:2vw; }
+        .agenda-text { font-size:1.15vw; color:rgba(255,255,255,0.8); line-height:1.4; }
+
+        /* Slide 3: Your Content Empire */
+        .empire-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5vw; margin-top:3vh; }
+        .empire-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 1.5vw; text-align:center; }
+        .empire-card .stat-number { color:var(--vip-gold); font-size:3vw; margin-bottom:0.5vh; }
+        .empire-card p { font-size:1vw; color:rgba(255,255,255,0.7); }
+        .empire-brands { margin-top:2.5vh; display:flex; flex-wrap:wrap; gap:0.8vw; justify-content:center; }
+        .brand-tag { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:0.5vh 1vw; font-size:0.85vw; color:rgba(255,255,255,0.6); }
+        .empire-sub { margin-top:2vh; font-size:1.1vw; color:rgba(255,255,255,0.4); text-align:center; }
+
+        /* Slide 4: The Challenge */
+        .challenge-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; }
+        .challenge-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:2.5vh 2vw; }
+        .challenge-card h3 { font-size:1.3vw; color:var(--vip-turquoise); margin-bottom:1vh; }
+        .challenge-card p { font-size:1.05vw; color:rgba(255,255,255,0.7); line-height:1.5; }
+        .challenge-icon { font-size:2vw; margin-bottom:1vh; }
+        .challenge-footer { margin-top:2.5vh; padding:1.5vh 2vw; background:rgba(216,164,95,0.08); border-radius:8px; border-left:3px solid var(--vip-gold); }
+        .challenge-footer p { font-size:1.15vw; color:rgba(255,255,255,0.8); }
+
+        /* Slide 5: Platform */
+        .platform-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .platform-left p { font-size:1.15vw; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1.5vh; }
+        .platform-features { display:flex; flex-direction:column; gap:1.2vh; }
+        .pf-item { display:flex; align-items:center; gap:0.8vw; padding:1vh 1.2vw; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; transition:border-color 0.2s; }
+        .pf-item:hover { border-color:var(--vip-gold); }
+        .pf-icon { font-size:1.4vw; min-width:2vw; text-align:center; }
+        .pf-text h4 { font-size:1.05vw; font-weight:600; margin-bottom:0.2vh; }
+        .pf-text p { font-size:0.85vw; color:rgba(255,255,255,0.5); line-height:1.3; margin:0; }
+
+        /* Slide 6: Sports Content */
+        .sports-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:3vw; margin-top:2vh; }
+        .sports-scenario { margin-bottom:2vh; }
+        .sports-scenario h3 { font-size:1.2vw; color:var(--vip-turquoise); margin-bottom:0.8vh; }
+        .sports-scenario p { font-size:1.05vw; color:rgba(255,255,255,0.7); line-height:1.5; }
+        .sports-stats { display:grid; grid-template-columns:1fr 1fr; gap:1.2vw; }
+        .sports-stat { background:rgba(62,160,173,0.08); border:1px solid rgba(62,160,173,0.2); border-radius:10px; padding:2vh 1.2vw; text-align:center; }
+        .sports-stat .stat-number { font-size:2.5vw; color:var(--vip-turquoise); margin-bottom:0.3vh; }
+        .sports-stat p { font-size:0.85vw; color:rgba(255,255,255,0.5); }
+        .sports-logos { display:flex; flex-wrap:wrap; gap:0.8vw; margin-top:1.5vh; }
+        .sports-logo-tag { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:0.6vh 1vw; font-size:0.85vw; color:rgba(255,255,255,0.7); font-weight:600; }
+
+        /* Slide 7: Parse.ly Dashboard */
+        .parsely-dash { display:grid; grid-template-columns:1fr 22vw; gap:1.5vw; margin-top:1vh; height:68vh; }
+        .parsely-main { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.5vw; display:flex; flex-direction:column; overflow:hidden; }
+        .parsely-sidebar { display:flex; flex-direction:column; gap:1.2vh; overflow:hidden; }
+        .parsely-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2vh; flex-shrink:0; }
+        .parsely-brand { font-size:1.2vw; font-weight:700; }
+        .parsely-brand span { color:var(--parsely-green); }
+        .parsely-tabs { display:flex; gap:0.4vw; }
+        .parsely-tab { padding:0.5vh 1vw; border-radius:4px; font-size:0.85vw; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); border:none; transition:all 0.2s; }
+        .parsely-tab:hover { background:rgba(112,172,28,0.2); color:rgba(255,255,255,0.8); }
+        .parsely-tab.active { background:var(--parsely-green); color:white; }
+        .kpi-row { display:flex; gap:1vw; margin-bottom:1.2vh; flex-shrink:0; }
+        .kpi-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1vh 1vw; flex:1; transition:border-color 0.3s; }
+        .kpi-card:hover { border-color:var(--parsely-green); }
+        .kpi-val { font-size:1.8vw; font-weight:700; color:var(--vip-white); line-height:1.1; }
+        .kpi-change { font-size:0.75vw; font-weight:600; margin-top:2px; }
+        .kpi-change.positive { color:#4ade80; }
+        .kpi-change.negative { color:var(--vip-red); }
+        .kpi-label { font-size:0.65vw; color:rgba(255,255,255,0.4); margin-top:4px; text-transform:uppercase; letter-spacing:0.05em; }
+        .parsely-chart-wrap { flex:1; min-height:0; background:rgba(255,255,255,0.02); border-radius:8px; padding:1vh 0.5vw 0.5vh; overflow:hidden; position:relative; }
+        .parsely-chart-wrap svg { width:100%; height:100%; display:block; }
+        .chart-label { font-size:0.6vw; color:rgba(255,255,255,0.25); }
+        .parsely-side-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.2vh 1vw; overflow:hidden; }
+        .parsely-side-card h4 { font-size:0.85vw; font-weight:600; color:var(--parsely-green); margin-bottom:0.8vh; text-transform:uppercase; letter-spacing:0.04em; }
+        .trending-item { display:flex; align-items:flex-start; gap:0.4vw; margin-bottom:0.6vh; padding-bottom:0.6vh; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .trending-item:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+        .trending-rank { font-size:0.85vw; font-weight:700; color:var(--parsely-green); min-width:1.2vw; }
+        .trending-title { font-size:0.75vw; color:rgba(255,255,255,0.8); line-height:1.3; }
+        .trending-views { font-size:0.65vw; color:rgba(255,255,255,0.4); }
+        .source-row { display:flex; align-items:center; gap:0.5vw; margin-bottom:0.5vh; }
+        .source-label { font-size:0.7vw; color:rgba(255,255,255,0.6); min-width:3vw; }
+        .source-bar-bg { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+        .source-bar { height:100%; border-radius:3px; transition:width 0.5s ease; }
+        .source-pct { font-size:0.65vw; color:rgba(255,255,255,0.5); min-width:2vw; text-align:right; }
+        .parsely-note { font-size:0.65vw; color:rgba(255,255,255,0.3); text-align:center; margin-top:auto; padding-top:0.5vh; }
+
+        /* Slide 8: Global Performance */
+        .perf-layout { display:grid; grid-template-columns:1.4fr 1fr; gap:2vw; margin-top:1vh; align-items:start; }
+        .perf-panel { border-radius:10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); padding:2.5vh 1.8vw; }
+        .perf-section-title { font-size:0.75vw; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1.8vh; font-weight:600; }
+        .perf-row { display:flex; align-items:center; gap:0.6vw; margin-bottom:0.7vh; }
+        .perf-city { font-size:0.85vw; color:rgba(255,255,255,0.55); min-width:5.5vw; text-align:right; }
+        .perf-city.primary { color:var(--vip-gold); font-weight:600; }
+        .perf-bar-track { flex:1; height:1.2vh; background:rgba(255,255,255,0.04); border-radius:3px; overflow:hidden; }
+        .perf-bar { height:100%; border-radius:3px; background:var(--vip-turquoise); transition:width 0.8s ease-out; }
+        .perf-bar.gold { background:var(--vip-gold); }
+        .perf-ms { font-size:0.75vw; color:rgba(255,255,255,0.35); min-width:2.5vw; font-variant-numeric:tabular-nums; }
+        .perf-ms.primary { color:var(--vip-gold); font-weight:600; }
+        .uptime-section { margin-top:2.5vh; padding-top:2vh; border-top:1px solid rgba(255,255,255,0.06); }
+        .uptime-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1vh; }
+        .uptime-pct { font-size:1.6vw; font-weight:700; color:var(--vip-turquoise); }
+        .uptime-track { height:0.5vh; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+        .uptime-fill { height:100%; width:99.99%; background:linear-gradient(90deg, var(--vip-turquoise), var(--vip-gold)); border-radius:3px; }
+        .perf-stats { display:flex; flex-direction:column; gap:1.2vh; }
+        .perf-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.2vh 1vw; }
+        .perf-stat .perf-stat-val { font-size:1.8vw; font-weight:700; color:var(--vip-turquoise); }
+        .perf-stat .perf-stat-label { font-size:0.85vw; color:rgba(255,255,255,0.5); margin-top:2px; }
+        .perf-reliability { margin-top:1.5vh; padding:1.5vh 1.5vw; background:rgba(216,164,95,0.08); border:1px solid rgba(216,164,95,0.15); border-radius:8px; }
+        .perf-reliability p { font-size:0.95vw; color:rgba(255,255,255,0.7); line-height:1.5; }
+        .perf-reliability strong { color:var(--vip-gold); }
+
+        /* Slide 9: Case Study */
+        .case-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .case-company { font-size:2vw; font-weight:700; color:var(--vip-turquoise); margin-bottom:0.5vh; }
+        .case-industry { font-size:0.9vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2vh; }
+        .case-section { margin-bottom:2vh; }
+        .case-section h4 { font-size:1vw; font-weight:600; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.5vh; }
+        .case-section p { font-size:1.1vw; color:rgba(255,255,255,0.8); line-height:1.5; }
+        .case-metrics { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw; }
+        .case-metric { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2vh 1.5vw; text-align:center; }
+        .case-metric .stat-number { font-size:2.5vw; color:var(--vip-turquoise); margin-bottom:0.3vh; }
+        .case-metric p { font-size:0.85vw; color:rgba(255,255,255,0.5); }
+        .case-quote { font-size:1.1vw; font-style:italic; color:rgba(255,255,255,0.7); line-height:1.5; border-left:2px solid var(--vip-gold); padding-left:1.5vw; margin-top:2vh; }
+        .case-quote-attr { font-size:0.85vw; color:rgba(255,255,255,0.4); margin-top:1vh; padding-left:1.5vw; }
+
+        /* Slide 10: Differentiators */
+        .diff-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5vw; margin-top:2vh; }
+        .diff-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:2.5vh 1.5vw; transition:border-color 0.2s; }
+        .diff-card:hover { border-color:var(--vip-gold); }
+        .diff-icon { font-size:2vw; margin-bottom:1vh; }
+        .diff-card h3 { font-size:1.15vw; margin-bottom:0.5vh; }
+        .diff-card p { font-size:0.95vw; color:rgba(255,255,255,0.6); line-height:1.4; }
+
+        /* Slide 11: Next Steps */
+        .steps-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .cta-steps { display:flex; flex-direction:column; gap:2vh; }
+        .cta-step { display:flex; gap:1vw; align-items:flex-start; }
+        .cta-num { width:2.5vw; height:2.5vw; border-radius:50%; background:rgba(216,164,95,0.15); border:1px solid var(--vip-gold); display:flex; align-items:center; justify-content:center; font-size:1.1vw; font-weight:700; color:var(--vip-gold); flex-shrink:0; }
+        .cta-step-content h4 { font-size:1.15vw; font-weight:600; margin-bottom:0.3vh; }
+        .cta-step-content p { font-size:0.95vw; color:rgba(255,255,255,0.6); }
+        .cta-timeline { font-size:0.8vw; color:var(--vip-turquoise); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-top:0.3vh; }
+        .cta-right { display:flex; flex-direction:column; gap:1.5vh; }
+        .cta-value-card { background:rgba(62,160,173,0.06); border:1px solid rgba(62,160,173,0.15); border-radius:10px; padding:2vh 1.5vw; }
+        .cta-value-card h4 { font-size:1.1vw; color:var(--vip-turquoise); font-weight:600; margin-bottom:0.5vh; }
+        .cta-value-card p { font-size:0.95vw; color:rgba(255,255,255,0.6); line-height:1.4; }
+
+        /* Slide 12: CTA / Book a Conversation */
+        .cta-layout { display:grid; grid-template-columns:1fr 1.2fr; gap:3vw; align-items:start; }
+        .cta-left .vip-logo { font-size:2.2vw; margin-bottom:2vh; }
+        .cta-headline { font-size:2vw; font-weight:600; letter-spacing:-0.02em; line-height:1.15; margin-bottom:1.5vh; }
+        .cta-desc { font-size:1.1vw; color:rgba(255,255,255,0.6); line-height:1.5; margin-bottom:2.5vh; }
+        .cta-contact-row { display:flex; align-items:center; gap:0.8vw; margin-bottom:0.8vh; font-size:1.05vw; color:rgba(255,255,255,0.7); }
+        .cta-contact-label { color:var(--vip-gold); font-weight:600; min-width:3.5vw; }
+        .cta-calendar { background:white; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+        .cta-cal-header { padding:1.2vh 1.5vw; border-bottom:1px solid #eee; }
+        .cta-cal-header h3 { color:var(--vip-gold-text); font-size:1.2vw; margin:0; }
+        .cta-cal-body { flex:1; }
+        .cta-cal-body iframe { width:100%; min-height:500px; border:0; background:white; }
+
+        @media print { .nav-controls,.progress-bar,.overview-overlay { display:none !important; } .slide { opacity:1 !important; visibility:visible !important; position:relative !important; page-break-after:always; } }
+    </style>
+</head>
+<body>
+<div class="deck">
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- ==================== SLIDE 1: TITLE ==================== -->
+    <div class="slide slide-dark active" id="slide-1" data-title="Title">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="title-content">
+            <div class="vip-logo vip-logo-large anim d1"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+            <div class="gold-line gold-line-wide anim d2"></div>
+            <div class="title-customer anim d3">Rogers Communications</div>
+            <div class="title-sub anim d4">Enterprise Content Platform Partnership</div>
+            <div class="title-meta anim d5">Prepared for the Rogers Communications Team<br>February 2026</div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 2: AGENDA ==================== -->
+    <div class="slide slide-gradient" id="slide-2" data-title="Agenda">
+        <h2 class="anim d1">What We Will Cover</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="agenda-grid">
+            <div class="agenda-item anim d2">
+                <div class="agenda-num">01</div>
+                <div class="agenda-text">Rogers' content empire and the scale of the opportunity</div>
+            </div>
+            <div class="agenda-item anim d3">
+                <div class="agenda-num">02</div>
+                <div class="agenda-text">Content challenges facing Canada's largest media company</div>
+            </div>
+            <div class="agenda-item anim d3">
+                <div class="agenda-num">03</div>
+                <div class="agenda-text">How WordPress VIP maps to your specific needs</div>
+            </div>
+            <div class="agenda-item anim d4">
+                <div class="agenda-num">04</div>
+                <div class="agenda-text">Sports content velocity and real-time publishing at scale</div>
+            </div>
+            <div class="agenda-item anim d4">
+                <div class="agenda-num">05</div>
+                <div class="agenda-text">Content intelligence with Parse.ly analytics</div>
+            </div>
+            <div class="agenda-item anim d5">
+                <div class="agenda-num">06</div>
+                <div class="agenda-text">Enterprise reliability and global performance</div>
+            </div>
+            <div class="agenda-item anim d5">
+                <div class="agenda-num">07</div>
+                <div class="agenda-text">Media industry proof points and case studies</div>
+            </div>
+            <div class="agenda-item anim d6">
+                <div class="agenda-num">08</div>
+                <div class="agenda-text">Proposed next steps and partnership path</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 3: YOUR CONTENT EMPIRE ==================== -->
+    <div class="slide slide-dark" id="slide-3" data-title="Your Content Empire">
+        <div class="geo-pattern geo-concentric"></div>
+        <h2 class="anim d1">Canada's Content Powerhouse</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="empire-grid">
+            <div class="empire-card anim d2">
+                <div class="stat-number">31</div>
+                <p>Television channels across news, sports, entertainment, and multicultural</p>
+            </div>
+            <div class="empire-card anim d3">
+                <div class="stat-number">55+</div>
+                <p>Radio stations and podcast networks reaching millions of Canadians daily</p>
+            </div>
+            <div class="empire-card anim d4">
+                <div class="stat-number">5</div>
+                <p>Professional sports teams across MLB, NHL, NBA, MLS, and CFL</p>
+            </div>
+            <div class="empire-card anim d5">
+                <div class="stat-number">2</div>
+                <p>Streaming platforms: Sportsnet+ and Citytv+ with 2.3B+ minutes streamed</p>
+            </div>
+        </div>
+        <div class="empire-brands anim d6">
+            <span class="brand-tag">Sportsnet</span>
+            <span class="brand-tag">Citytv</span>
+            <span class="brand-tag">CityNews</span>
+            <span class="brand-tag">OMNI</span>
+            <span class="brand-tag">Sportsnet+</span>
+            <span class="brand-tag">Citytv+</span>
+            <span class="brand-tag">FX</span>
+            <span class="brand-tag">HGTV</span>
+            <span class="brand-tag">Food Network</span>
+            <span class="brand-tag">Bravo</span>
+            <span class="brand-tag">Discovery</span>
+            <span class="brand-tag">OLN</span>
+        </div>
+        <div class="empire-sub anim d7">CA$21.7 billion in revenue. The largest sports and media operation in Canada.</div>
+    </div>
+
+    <!-- ==================== SLIDE 4: THE CHALLENGE ==================== -->
+    <div class="slide slide-gradient" id="slide-4" data-title="The Challenge">
+        <h2 class="anim d1">The Content Challenge at Scale</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="challenge-layout">
+            <div class="challenge-card anim d3">
+                <div class="challenge-icon">&#128200;</div>
+                <h3>Content Velocity for Sports</h3>
+                <p>NHL, MLB, NBA, MLS, UFC. Real-time scores, highlights, and articles across every platform. When the Blue Jays reach the World Series, your content infrastructure cannot be the bottleneck.</p>
+            </div>
+            <div class="challenge-card anim d3">
+                <div class="challenge-icon">&#127760;</div>
+                <h3>Multi-Property Fragmentation</h3>
+                <p>Dozens of websites across Sportsnet, Citytv, CityNews, OMNI, and specialty channels. Each potentially running different content platforms, creating silos and duplicated effort.</p>
+            </div>
+            <div class="challenge-card anim d4">
+                <div class="challenge-icon">&#128260;</div>
+                <h3>Post-Shaw Consolidation</h3>
+                <p>The CA$26B Shaw acquisition brought new digital properties and technology stacks. Consolidating onto a unified content platform is a natural next step in the integration journey.</p>
+            </div>
+            <div class="challenge-card anim d4">
+                <div class="challenge-icon">&#9889;</div>
+                <h3>Reliability Imperative</h3>
+                <p>After the 2022 outage, Rogers committed CA$10B to resilience and reliability. Your content platform should reflect that same commitment to always-on performance.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 5: THE PLATFORM ==================== -->
+    <div class="slide slide-dark" id="slide-5" data-title="WordPress VIP Platform">
+        <h2 class="anim d1">A Platform Built for Media at Scale</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="platform-layout">
+            <div class="platform-left anim d3">
+                <p>WordPress VIP is the enterprise content platform trusted by the world's largest media companies, from newsrooms to sports networks to global broadcasters.</p>
+                <p>43% of the web runs on WordPress. We provide the enterprise-grade infrastructure, security, and support that organizations like Rogers require.</p>
+                <p>One platform to power every digital property. Shared infrastructure, independent brand experiences, unified analytics, and a single team managing it all.</p>
+            </div>
+            <div class="platform-features">
+                <div class="pf-item anim d3">
+                    <div class="pf-icon">&#9881;</div>
+                    <div class="pf-text"><h4>Enterprise Multisite</h4><p>One platform for Sportsnet, Citytv, CityNews, OMNI, and every property in your portfolio</p></div>
+                </div>
+                <div class="pf-item anim d4">
+                    <div class="pf-icon">&#128274;</div>
+                    <div class="pf-text"><h4>Enterprise Security</h4><p>SOC 2 Type II, ISO 27001. WAF, DDoS protection, automated patching included</p></div>
+                </div>
+                <div class="pf-item anim d4">
+                    <div class="pf-icon">&#127760;</div>
+                    <div class="pf-text"><h4>Global Edge Network</h4><p>30+ PoPs, sub-200ms TTFB. Your Canadian audience, served from the edge</p></div>
+                </div>
+                <div class="pf-item anim d5">
+                    <div class="pf-icon">&#128300;</div>
+                    <div class="pf-text"><h4>Parse.ly Analytics</h4><p>Real-time content intelligence included at no extra cost</p></div>
+                </div>
+                <div class="pf-item anim d5">
+                    <div class="pf-icon">&#9889;</div>
+                    <div class="pf-text"><h4>Auto-Scaling</h4><p>Handle playoff traffic spikes without manual intervention or over-provisioning</p></div>
+                </div>
+                <div class="pf-item anim d6">
+                    <div class="pf-icon">&#129302;</div>
+                    <div class="pf-text"><h4>AI-Ready</h4><p>Built-in AI content tools for workflows, tagging, and optimization</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 6: SPORTS CONTENT AT SCALE ==================== -->
+    <div class="slide slide-dark" id="slide-6" data-title="Sports Content at Scale">
+        <div class="geo-pattern geo-lines"></div>
+        <h2 class="anim d1">Sports Content at the Speed of Live</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="sports-layout">
+            <div class="anim d3">
+                <div class="sports-scenario">
+                    <h3>Game Night on Sportsnet</h3>
+                    <p>The Maple Leafs are in the playoffs. Millions of fans across Canada are refreshing sportsnet.ca for live updates, highlights, and analysis. Traffic spikes 10x in minutes. Your CMS needs to keep pace without breaking a sweat.</p>
+                </div>
+                <div class="sports-scenario">
+                    <h3>What WordPress VIP Delivers</h3>
+                    <p>Auto-scaling infrastructure that absorbs traffic surges. Real-time publishing workflows that get content live in seconds. Multi-platform distribution to web, app, and social simultaneously. The same platform powering sports content for NBC, TechCrunch, and Bloomberg.</p>
+                </div>
+                <div class="sports-logos">
+                    <span class="sports-logo-tag">Blue Jays</span>
+                    <span class="sports-logo-tag">Maple Leafs</span>
+                    <span class="sports-logo-tag">Raptors</span>
+                    <span class="sports-logo-tag">Toronto FC</span>
+                    <span class="sports-logo-tag">Argonauts</span>
+                    <span class="sports-logo-tag">NHL</span>
+                    <span class="sports-logo-tag">UFC</span>
+                </div>
+            </div>
+            <div class="sports-stats anim d4">
+                <div class="sports-stat">
+                    <div class="stat-number">99.99%</div>
+                    <p>Uptime SLA, even during peak events</p>
+                </div>
+                <div class="sports-stat">
+                    <div class="stat-number">&lt;200ms</div>
+                    <p>Time to first byte, globally</p>
+                </div>
+                <div class="sports-stat">
+                    <div class="stat-number">10x</div>
+                    <p>Traffic spike absorption, automatic</p>
+                </div>
+                <div class="sports-stat">
+                    <div class="stat-number">24/7</div>
+                    <p>Expert support from engineers who know media</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 7: PARSE.LY DASHBOARD ==================== -->
+    <div class="slide slide-dark" id="slide-7" data-title="Parse.ly Analytics">
+        <h2 class="anim d1" style="font-size:2vw;">Content Intelligence with Parse.ly <span style="font-size:1.2vw;color:var(--parsely-green);font-weight:400;">Included with WordPress VIP</span></h2>
+        <div class="parsely-dash anim d2">
+            <div class="parsely-main">
+                <div class="parsely-header">
+                    <div class="parsely-brand">Parse.ly <span>Analytics</span> &mdash; Sportsnet</div>
+                    <div class="parsely-tabs">
+                        <button class="parsely-tab active" data-range="1H">1H</button>
+                        <button class="parsely-tab" data-range="24H">24H</button>
+                        <button class="parsely-tab" data-range="7D">7D</button>
+                        <button class="parsely-tab" data-range="30D">30D</button>
+                    </div>
+                </div>
+                <div class="kpi-row">
+                    <div class="kpi-card"><div class="kpi-val" id="kpi-visitors">842K</div><div class="kpi-change positive" id="kpi-visitors-change">+18.2%</div><div class="kpi-label">Visitors</div></div>
+                    <div class="kpi-card"><div class="kpi-val" id="kpi-pageviews">3.1M</div><div class="kpi-change positive" id="kpi-pv-change">+24.5%</div><div class="kpi-label">Page Views</div></div>
+                    <div class="kpi-card"><div class="kpi-val" id="kpi-engaged">2m 48s</div><div class="kpi-change positive" id="kpi-engaged-change">+8.1%</div><div class="kpi-label">Avg Engaged Time</div></div>
+                    <div class="kpi-card"><div class="kpi-val" id="kpi-recirc">34.2%</div><div class="kpi-change positive" id="kpi-recirc-change">+5.7%</div><div class="kpi-label">Recirculation</div></div>
+                </div>
+                <div class="parsely-chart-wrap">
+                    <svg id="parsely-chart" viewBox="0 0 600 200" preserveAspectRatio="none">
+                        <defs><linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#70AC1C" stop-opacity="0.3"/><stop offset="100%" stop-color="#70AC1C" stop-opacity="0.02"/></linearGradient></defs>
+                        <path id="chart-area" fill="url(#chartGrad)"/>
+                        <path id="chart-line" fill="none" stroke="#70AC1C" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="parsely-sidebar">
+                <div class="parsely-side-card" style="flex:1.2;">
+                    <h4>Trending Now</h4>
+                    <!-- PLACEHOLDER: Replace with Rogers-specific content headlines -->
+                    <div class="trending-item"><span class="trending-rank">1</span><div><div class="trending-title">Maple Leafs clinch playoff berth with overtime win</div><div class="trending-views">284K views</div></div></div>
+                    <div class="trending-item"><span class="trending-rank">2</span><div><div class="trending-title">Blue Jays spring training: Five storylines to watch</div><div class="trending-views">198K views</div></div></div>
+                    <div class="trending-item"><span class="trending-rank">3</span><div><div class="trending-title">Raptors trade deadline: What to expect</div><div class="trending-views">156K views</div></div></div>
+                    <div class="trending-item"><span class="trending-rank">4</span><div><div class="trending-title">NHL Power Rankings: Where every Canadian team stands</div><div class="trending-views">142K views</div></div></div>
+                    <div class="trending-item"><span class="trending-rank">5</span><div><div class="trending-title">UFC Fight Night preview and predictions</div><div class="trending-views">89K views</div></div></div>
+                </div>
+                <div class="parsely-side-card" style="flex:0.8;">
+                    <h4>Traffic Sources</h4>
+                    <div class="source-row"><span class="source-label">Direct</span><div class="source-bar-bg"><div class="source-bar" id="src-direct" style="width:42%;background:var(--parsely-green);"></div></div><span class="source-pct" id="src-direct-pct">42%</span></div>
+                    <div class="source-row"><span class="source-label">Search</span><div class="source-bar-bg"><div class="source-bar" id="src-search" style="width:28%;background:var(--vip-turquoise);"></div></div><span class="source-pct" id="src-search-pct">28%</span></div>
+                    <div class="source-row"><span class="source-label">Social</span><div class="source-bar-bg"><div class="source-bar" id="src-social" style="width:18%;background:var(--vip-blueberry);"></div></div><span class="source-pct" id="src-social-pct">18%</span></div>
+                    <div class="source-row"><span class="source-label">Referral</span><div class="source-bar-bg"><div class="source-bar" id="src-ref" style="width:12%;background:var(--vip-orange);"></div></div><span class="source-pct" id="src-ref-pct">12%</span></div>
+                </div>
+                <div class="parsely-note">Simulated data for illustration purposes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 8: GLOBAL PERFORMANCE ==================== -->
+    <div class="slide slide-dark" id="slide-8" data-title="Global Performance">
+        <div class="geo-pattern geo-concentric"></div>
+        <h2 class="anim d1">Enterprise Reliability, Global Performance</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="perf-layout anim d3">
+            <div class="perf-panel">
+                <div class="perf-section-title">Global Edge Response Time <span style="font-weight:400;opacity:0.6">/ TTFB from Toronto</span></div>
+                <div class="perf-row">
+                    <span class="perf-city primary">Toronto</span>
+                    <div class="perf-bar-track"><div class="perf-bar gold" style="width:14.3%"></div></div>
+                    <span class="perf-ms primary">5ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Montreal</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:20%"></div></div>
+                    <span class="perf-ms">7ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">New York</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:22.9%"></div></div>
+                    <span class="perf-ms">8ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Chicago</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:25.7%"></div></div>
+                    <span class="perf-ms">9ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Calgary</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:28.6%"></div></div>
+                    <span class="perf-ms">10ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Vancouver</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:34.3%"></div></div>
+                    <span class="perf-ms">12ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">London</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:40%"></div></div>
+                    <span class="perf-ms">14ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Frankfurt</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:45.7%"></div></div>
+                    <span class="perf-ms">16ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Tokyo</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:51.4%"></div></div>
+                    <span class="perf-ms">18ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Singapore</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:62.9%"></div></div>
+                    <span class="perf-ms">22ms</span>
+                </div>
+                <div class="perf-row">
+                    <span class="perf-city">Sydney</span>
+                    <div class="perf-bar-track"><div class="perf-bar" style="width:85.7%"></div></div>
+                    <span class="perf-ms">30ms</span>
+                </div>
+                <div class="uptime-section">
+                    <div class="uptime-header">
+                        <span class="perf-section-title" style="margin-bottom:0">Rolling 90-Day Platform Uptime</span>
+                        <span class="uptime-pct">99.99%</span>
+                    </div>
+                    <div class="uptime-track">
+                        <div class="uptime-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="perf-stats">
+                    <div class="perf-stat"><div class="perf-stat-val">30+</div><div class="perf-stat-label">Global Edge Locations</div></div>
+                    <div class="perf-stat"><div class="perf-stat-val">&lt;50ms</div><div class="perf-stat-label">Global TTFB</div></div>
+                    <div class="perf-stat"><div class="perf-stat-val">99.99%</div><div class="perf-stat-label">Uptime SLA</div></div>
+                    <div class="perf-stat"><div class="perf-stat-val">SOC 2 + ISO</div><div class="perf-stat-label">Enterprise Security Certifications</div></div>
+                </div>
+                <div class="perf-reliability">
+                    <p><strong>Reliability you can count on.</strong> Rogers committed CA$10B to infrastructure resilience. WordPress VIP delivers 99.99% uptime backed by a contractual SLA, with auto-scaling, DDoS protection, and 24/7 expert support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 9: CASE STUDY ==================== -->
+    <div class="slide slide-dark" id="slide-9" data-title="Case Study: TIME">
+        <div class="geo-pattern geo-lines"></div>
+        <h2 class="anim d1">Case Study: TIME</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="case-layout">
+            <div class="anim d3">
+                <div class="case-company">TIME</div>
+                <div class="case-industry">Digital Media &amp; Publishing</div>
+                <div class="case-section">
+                    <h4>Challenge</h4>
+                    <p>TIME needed a modern content platform that could handle massive traffic spikes during flagship editorial moments, improve editorial velocity, and support a revenue model tied directly to content volume and audience reach.</p>
+                </div>
+                <div class="case-section">
+                    <h4>Solution</h4>
+                    <p>A comprehensive re-platforming of TIME.com using WordPress VIP and the Gutenberg Block Editor, with Google Cloud and Next.js on the front end. Reusable Patterns and Blocks revolutionized how the editorial team manages content, enabling rapid layout changes for breaking news.</p>
+                </div>
+                <div class="case-section">
+                    <h4>Result</h4>
+                    <p>TIME tripled content creation, achieved 100% site uptime, and saw an 82% surge in traffic. When Taylor Swift was named Person of the Year, TIME.com handled over 100,000 requests per second without breaking a sweat.</p>
+                </div>
+            </div>
+            <div class="anim d4">
+                <div class="case-metrics">
+                    <div class="case-metric">
+                        <div class="stat-number">3x</div>
+                        <p>Content creation tripled</p>
+                    </div>
+                    <div class="case-metric">
+                        <div class="stat-number">82%</div>
+                        <p>Surge in site traffic</p>
+                    </div>
+                    <div class="case-metric">
+                        <div class="stat-number">100%</div>
+                        <p>Site uptime achieved</p>
+                    </div>
+                    <div class="case-metric">
+                        <div class="stat-number">100K</div>
+                        <p>Requests per second at peak</p>
+                    </div>
+                </div>
+                <div class="case-quote">
+                    "More stories on TIME.com means more traffic, which means more ads served, which means more revenue for TIME. It really was flawless execution."
+                </div>
+                <div class="case-quote-attr">Burhan Hamid, CTO, TIME</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 10: DIFFERENTIATORS ==================== -->
+    <div class="slide slide-gradient" id="slide-10" data-title="Why WordPress VIP">
+        <h2 class="anim d1">Why WordPress VIP</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="diff-grid">
+            <div class="diff-card anim d3">
+                <div class="diff-icon">&#127942;</div>
+                <h3>Media Industry Expertise</h3>
+                <p>We power content for CNN, Bloomberg, NBC, News Corp, TechCrunch, and hundreds of media brands. We understand the unique demands of newsrooms and live content.</p>
+            </div>
+            <div class="diff-card anim d3">
+                <div class="diff-icon">&#128268;</div>
+                <h3>Open Source Ecosystem</h3>
+                <p>WordPress powers 43% of the web. Tap into the largest developer ecosystem, 60,000+ plugins, and zero vendor lock-in. Your team already knows WordPress.</p>
+            </div>
+            <div class="diff-card anim d4">
+                <div class="diff-icon">&#128202;</div>
+                <h3>Parse.ly Included</h3>
+                <p>Content analytics built in, not bolted on. Real-time audience insights, content recommendations, and performance tracking across every property.</p>
+            </div>
+            <div class="diff-card anim d4">
+                <div class="diff-icon">&#127759;</div>
+                <h3>Canadian Data Residency</h3>
+                <p>Data sovereignty matters for Canadian enterprises. WordPress VIP supports Canadian data residency requirements for regulated industries.</p>
+            </div>
+            <div class="diff-card anim d5">
+                <div class="diff-icon">&#128736;</div>
+                <h3>Managed, Not DIY</h3>
+                <p>Unlike self-hosted WordPress, VIP is fully managed. Auto-scaling, security patching, performance optimization, and 24/7 expert support are all included.</p>
+            </div>
+            <div class="diff-card anim d5">
+                <div class="diff-icon">&#129302;</div>
+                <h3>AI-Ready Content Platform</h3>
+                <p>Built-in AI tools for content optimization, automated tagging, and intelligent workflows. Aligned with Rogers' CA$10B investment in AI and innovation.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 11: NEXT STEPS ==================== -->
+    <div class="slide slide-dark" id="slide-11" data-title="Next Steps">
+        <h2 class="anim d1">Proposed Next Steps</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="steps-layout">
+            <div class="cta-steps">
+                <div class="cta-step anim d3">
+                    <div class="cta-num">1</div>
+                    <div class="cta-step-content">
+                        <h4>Discovery Workshop</h4>
+                        <p>Deep dive into Rogers' content architecture, editorial workflows, and technical requirements across your media properties.</p>
+                        <div class="cta-timeline">Week 1-2</div>
+                    </div>
+                </div>
+                <div class="cta-step anim d4">
+                    <div class="cta-num">2</div>
+                    <div class="cta-step-content">
+                        <h4>Technical Assessment</h4>
+                        <p>Evaluate current CMS landscape, identify consolidation opportunities, and map integration points with existing systems.</p>
+                        <div class="cta-timeline">Week 3-4</div>
+                    </div>
+                </div>
+                <div class="cta-step anim d5">
+                    <div class="cta-num">3</div>
+                    <div class="cta-step-content">
+                        <h4>Proof of Concept</h4>
+                        <p>Build a working prototype on one Rogers property to demonstrate platform capabilities, performance, and editorial experience.</p>
+                        <div class="cta-timeline">Week 5-8</div>
+                    </div>
+                </div>
+                <div class="cta-step anim d6">
+                    <div class="cta-num">4</div>
+                    <div class="cta-step-content">
+                        <h4>Rollout Roadmap</h4>
+                        <p>Develop a phased migration plan across Rogers Sports &amp; Media properties, starting with the highest-impact sites.</p>
+                        <div class="cta-timeline">Week 9-10</div>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-right">
+                <div class="cta-value-card anim d4">
+                    <h4>Why Start Now</h4>
+                    <p>With the Shaw integration maturing and MLSE fully under the Rogers umbrella, this is the ideal moment to consolidate your content platform. A unified CMS strategy amplifies every investment in content, sports, and streaming.</p>
+                </div>
+                <div class="cta-value-card anim d5">
+                    <h4>What Success Looks Like</h4>
+                    <p>One platform powering Sportsnet, Citytv, CityNews, OMNI, and every digital property. Faster publishing, unified analytics, reduced operational overhead, and a content platform that scales with Rogers' ambitions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 12: BOOK A CONVERSATION ==================== -->
+    <div class="slide slide-dark" id="slide-12" data-title="Book a Conversation">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="cta-layout">
+            <div class="cta-left anim d1">
+                <div class="vip-logo"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+                <div class="cta-headline">Let's explore what WordPress VIP can do for Rogers.</div>
+                <div class="gold-line gold-line-wide"></div>
+                <div class="cta-desc">Book a time to discuss your content platform strategy. We will walk through how WordPress VIP supports media operations at your scale, answer technical questions, and outline a path forward.</div>
+                <div class="cta-contact-row"><span class="cta-contact-label">Name</span> Nate Kelly</div>
+                <div class="cta-contact-row"><span class="cta-contact-label">Email</span> nate.kelly@wpvip.com</div>
+                <div class="cta-contact-row"><span class="cta-contact-label">Web</span> wpvip.com</div>
+            </div>
+            <div class="anim d3">
+                <div class="cta-calendar">
+                    <div class="cta-cal-header"><h3>Book a Conversation</h3></div>
+                    <div class="cta-cal-body">
+                        <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border:0" width="100%" height="600" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Navigation Controls -->
+<div class="nav-controls" id="nav-controls">
+    <button class="nav-btn" id="prev-btn">&#8592;</button>
+    <span class="slide-counter" id="slide-counter">1 / 12</span>
+    <button class="nav-btn" id="next-btn">&#8594;</button>
+</div>
+
+<!-- Overview Overlay -->
+<div class="overview-overlay" id="overview-overlay">
+    <div class="overview-grid" id="overview-grid"></div>
+</div>
+
+<script>
+(function(){
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+    let overviewOpen = false;
+
+    const progressBar = document.getElementById('progress-bar');
+    const counter = document.getElementById('slide-counter');
+    const navControls = document.getElementById('nav-controls');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const overlay = document.getElementById('overview-overlay');
+    const overviewGrid = document.getElementById('overview-grid');
+
+    function goTo(n) {
+        if(n<0||n>=total) return;
+        slides[current].classList.remove('active');
+        current = n;
+        slides[current].classList.add('active');
+        updateUI();
+    }
+
+    function updateUI() {
+        counter.textContent = (current+1)+' / '+total;
+        progressBar.style.width = ((current+1)/total*100)+'%';
+        const isLight = slides[current].classList.contains('slide-light');
+        navControls.classList.toggle('on-light', isLight);
+    }
+
+    prevBtn.addEventListener('click', ()=>goTo(current-1));
+    nextBtn.addEventListener('click', ()=>goTo(current+1));
+    counter.addEventListener('click', toggleOverview);
+
+    document.addEventListener('keydown', e=>{
+        if(overviewOpen){ if(e.key==='Escape') toggleOverview(); return; }
+        if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();goTo(current+1);}
+        else if(e.key==='ArrowLeft'){e.preventDefault();goTo(current-1);}
+        else if(e.key==='Escape') toggleOverview();
+    });
+
+    // Touch support
+    let touchStartX=0;
+    document.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
+    document.addEventListener('touchend',e=>{
+        const diff=e.changedTouches[0].screenX-touchStartX;
+        if(Math.abs(diff)>50){diff<0?goTo(current+1):goTo(current-1);}
+    },{passive:true});
+
+    function toggleOverview(){
+        overviewOpen=!overviewOpen;
+        overlay.classList.toggle('active',overviewOpen);
+        if(overviewOpen) buildOverview();
+    }
+
+    function buildOverview(){
+        overviewGrid.innerHTML='';
+        slides.forEach((s,i)=>{
+            const t=document.createElement('div');
+            t.className='overview-thumb'+(i===current?' current':'');
+            t.innerHTML='<div class="overview-thumb-title">'+s.getAttribute('data-title')+'</div><div class="overview-thumb-num">'+(i+1)+'</div>';
+            t.addEventListener('click',()=>{goTo(i);toggleOverview();});
+            overviewGrid.appendChild(t);
+        });
+    }
+
+    updateUI();
+
+    // Parse.ly Dashboard interactivity
+    const parselyData = {
+        '1H':  {visitors:'842K',vChange:'+18.2%',vDir:'positive',pv:'3.1M',pvChange:'+24.5%',pvDir:'positive',engaged:'2m 48s',eChange:'+8.1%',eDir:'positive',recirc:'34.2%',rChange:'+5.7%',rDir:'positive',direct:42,search:28,social:18,ref:12,chart:[40,55,45,70,60,85,80,95,75,90,100,88,92,110,105,120,115,130,125,140]},
+        '24H': {visitors:'2.4M',vChange:'+12.8%',vDir:'positive',pv:'8.7M',pvChange:'+15.3%',pvDir:'positive',engaged:'2m 22s',eChange:'+3.4%',eDir:'positive',recirc:'31.8%',rChange:'+2.1%',rDir:'positive',direct:38,search:32,social:19,ref:11,chart:[80,75,60,50,45,40,42,55,70,85,100,115,120,110,105,95,100,108,112,120]},
+        '7D':  {visitors:'14.2M',vChange:'+8.5%',vDir:'positive',pv:'42.1M',pvChange:'+11.2%',pvDir:'positive',engaged:'2m 05s',eChange:'-1.2%',eDir:'negative',recirc:'29.5%',rChange:'+1.8%',rDir:'positive',direct:35,search:34,social:20,ref:11,chart:[60,65,70,80,85,90,100,95,88,92,105,110,108,115,120,118,125,130,128,135]},
+        '30D': {visitors:'58.6M',vChange:'+22.1%',vDir:'positive',pv:'168M',pvChange:'+19.7%',pvDir:'positive',engaged:'1m 52s',eChange:'-3.5%',eDir:'negative',recirc:'27.1%',rChange:'-0.8%',rDir:'negative',direct:33,search:36,social:18,ref:13,chart:[50,55,60,58,65,70,75,72,80,85,90,88,95,100,98,105,110,115,120,125]}
+    };
+
+    function updateParsely(range){
+        const d=parselyData[range];
+        document.getElementById('kpi-visitors').textContent=d.visitors;
+        document.getElementById('kpi-visitors-change').textContent=d.vChange;
+        document.getElementById('kpi-visitors-change').className='kpi-change '+d.vDir;
+        document.getElementById('kpi-pageviews').textContent=d.pv;
+        document.getElementById('kpi-pv-change').textContent=d.pvChange;
+        document.getElementById('kpi-pv-change').className='kpi-change '+d.pvDir;
+        document.getElementById('kpi-engaged').textContent=d.engaged;
+        document.getElementById('kpi-engaged-change').textContent=d.eChange;
+        document.getElementById('kpi-engaged-change').className='kpi-change '+d.eDir;
+        document.getElementById('kpi-recirc').textContent=d.recirc;
+        document.getElementById('kpi-recirc-change').textContent=d.rChange;
+        document.getElementById('kpi-recirc-change').className='kpi-change '+d.rDir;
+
+        document.getElementById('src-direct').style.width=d.direct+'%';
+        document.getElementById('src-direct-pct').textContent=d.direct+'%';
+        document.getElementById('src-search').style.width=d.search+'%';
+        document.getElementById('src-search-pct').textContent=d.search+'%';
+        document.getElementById('src-social').style.width=d.social+'%';
+        document.getElementById('src-social-pct').textContent=d.social+'%';
+        document.getElementById('src-ref').style.width=d.ref+'%';
+        document.getElementById('src-ref-pct').textContent=d.ref+'%';
+
+        drawChart(d.chart);
+    }
+
+    function drawChart(data){
+        const max=Math.max(...data);
+        const w=600, h=200, pad=10;
+        const stepX=(w-2*pad)/(data.length-1);
+        let pts=data.map((v,i)=>[pad+i*stepX, h-pad-(v/max)*(h-2*pad)]);
+        const line=pts.map((p,i)=>(i===0?'M':'L')+p[0]+','+p[1]).join(' ');
+        const area=line+' L'+pts[pts.length-1][0]+','+(h-pad)+' L'+pts[0][0]+','+(h-pad)+' Z';
+        document.getElementById('chart-line').setAttribute('d',line);
+        document.getElementById('chart-area').setAttribute('d',area);
+    }
+
+    document.querySelectorAll('.parsely-tab').forEach(tab=>{
+        tab.addEventListener('click',()=>{
+            document.querySelectorAll('.parsely-tab').forEach(t=>t.classList.remove('active'));
+            tab.classList.add('active');
+            updateParsely(tab.getAttribute('data-range'));
+        });
+    });
+    updateParsely('1H');
+
+
+})();
+</script>
+</body>
+</html>

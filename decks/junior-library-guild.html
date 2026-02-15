@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junior Library Guild Media Group | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1c2530;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-purple: #9C5CE1;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --parsely-green: #70AC1C;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        .deck { position:relative; width:100vw; height:100vh; }
+        .slide { position:absolute; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; padding:5vh 6vw; opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s ease; overflow:hidden; }
+        .slide.active { opacity:1; visibility:visible; }
+        h1 { font-size:3.2vw; font-weight:700; letter-spacing:-0.03em; line-height:1.05; margin-bottom:1.5vh; }
+        h2 { font-size:2.4vw; font-weight:600; letter-spacing:-0.02em; line-height:1.1; margin-bottom:1.5vh; }
+        h3 { font-size:1.6vw; font-weight:600; letter-spacing:-0.01em; line-height:1.2; margin-bottom:1vh; }
+        p, li { font-size:1.3vw; font-weight:400; line-height:1.5; }
+        .caption { font-size:0.9vw; font-weight:500; letter-spacing:0.05em; line-height:1.4; text-transform:uppercase; }
+        .stat-number { font-size:4vw; font-weight:700; letter-spacing:-0.04em; line-height:1.0; }
+        .vip-logo { font-size:1.2vw; letter-spacing:-0.01em; margin-bottom:2vh; }
+        .vip-logo .logo-wp { font-weight:400; }
+        .vip-logo .logo-vip { font-weight:700; color:var(--vip-gold); }
+        .vip-logo-large { font-size:1.8vw; }
+        .gold-line { width:60px; height:2px; background:var(--vip-gold); margin:2vh 0; }
+        .gold-line-wide { width:120px; }
+        .geo-pattern { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.04; }
+        .geo-lines { background:repeating-linear-gradient(45deg,transparent,transparent 30px,var(--vip-gold) 30px,var(--vip-gold) 31px); }
+        .geo-moire { background:repeating-linear-gradient(0deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px),repeating-linear-gradient(60deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px); }
+        .geo-concentric { background:repeating-radial-gradient(circle at 80% 50%,transparent,transparent 40px,var(--vip-turquoise) 40px,var(--vip-turquoise) 41px); }
+        .corner-accent { position:absolute; width:40px; height:40px; border-color:var(--vip-gold); border-style:solid; border-width:0; }
+        .corner-tl { top:3vh; left:3vw; border-top-width:2px; border-left-width:2px; }
+        .corner-br { bottom:3vh; right:3vw; border-bottom-width:2px; border-right-width:2px; }
+        .slide-dark { background:var(--vip-black); color:var(--vip-white); }
+        .slide-light { background:var(--vip-white); color:var(--vip-black); }
+        .slide-light h1,.slide-light h2,.slide-light h3 { color:var(--vip-black); }
+        .slide-gradient { background:linear-gradient(135deg,var(--vip-black) 0%,var(--vip-black-light) 100%); color:var(--vip-white); }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(2.5); opacity:0; } }
+        .slide.active .anim { animation:fadeInUp 0.6s ease forwards; }
+        .slide.active .d1 { animation-delay:0.1s; opacity:0; }
+        .slide.active .d2 { animation-delay:0.2s; opacity:0; }
+        .slide.active .d3 { animation-delay:0.3s; opacity:0; }
+        .slide.active .d4 { animation-delay:0.4s; opacity:0; }
+        .slide.active .d5 { animation-delay:0.5s; opacity:0; }
+        .slide.active .d6 { animation-delay:0.6s; opacity:0; }
+        .slide.active .d7 { animation-delay:0.7s; opacity:0; }
+
+        /* Nav */
+        .nav-controls { position:fixed; bottom:2.5vh; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:1.5vw; z-index:100; }
+        .nav-btn { width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); background:rgba(19,25,30,0.8); color:var(--vip-white); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; backdrop-filter:blur(10px); }
+        .nav-btn:hover { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .nav-controls.on-light .nav-btn { border-color:rgba(0,0,0,0.2); background:rgba(255,255,255,0.8); color:var(--vip-black); }
+        .nav-controls.on-light .nav-btn:hover { border-color:var(--vip-gold-text); color:var(--vip-gold-text); }
+        .nav-controls.on-light .slide-counter { color:rgba(0,0,0,0.5); }
+        .slide-counter { font-size:14px; color:rgba(255,255,255,0.5); font-weight:500; cursor:pointer; padding:6px 12px; border-radius:20px; transition:all 0.2s; user-select:none; }
+        .slide-counter:hover { color:var(--vip-gold); }
+        .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--vip-gold); transition:width 0.4s ease; z-index:100; }
+
+        /* Overview */
+        .overview-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:200; display:none; padding:4vh 4vw; overflow-y:auto; }
+        .overview-overlay.active { display:block; }
+        .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2vw; }
+        .overview-thumb { aspect-ratio:16/9; border-radius:6px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.2s; position:relative; background:var(--vip-black); display:flex; align-items:center; justify-content:center; padding:1vw; }
+        .overview-thumb:hover { border-color:var(--vip-gold); transform:scale(1.03); }
+        .overview-thumb.current { border-color:var(--vip-gold); }
+        .overview-thumb-title { font-size:0.9vw; font-weight:600; color:var(--vip-white); text-align:center; }
+        .overview-thumb-num { position:absolute; bottom:6px; right:8px; font-size:0.7vw; color:var(--vip-gray); }
+
+        /* Slide 1: Title */
+        .title-content { position:relative; z-index:1; }
+        .title-customer { font-size:4.5vw; font-weight:700; letter-spacing:-0.04em; line-height:1; margin:3vh 0 2vh; }
+        .title-sub { font-size:1.6vw; font-weight:400; color:rgba(255,255,255,0.7); margin-bottom:1.5vh; }
+        .title-meta { font-size:1vw; color:rgba(255,255,255,0.4); margin-top:3vh; }
+
+        /* Slide 2: Agenda */
+        .agenda-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw 3vw; margin-top:3vh; }
+        .agenda-item { display:flex; align-items:flex-start; gap:1vw; padding:1.5vh 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .agenda-num { font-size:1.4vw; font-weight:700; color:var(--vip-gold); min-width:2vw; }
+        .agenda-text { font-size:1.15vw; color:rgba(255,255,255,0.8); line-height:1.4; }
+
+        /* Slide 3: Publications */
+        .pub-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.8vw; margin-top:2.5vh; }
+        .pub-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 1.8vw; position:relative; overflow:hidden; }
+        .pub-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--vip-gold); }
+        .pub-est { font-size:0.8vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-bottom:1vh; }
+        .pub-name { font-size:1.8vw; font-weight:700; margin-bottom:1vh; line-height:1.1; }
+        .pub-desc { font-size:0.95vw; color:rgba(255,255,255,0.65); line-height:1.5; margin-bottom:1.5vh; }
+        .pub-features { list-style:none; }
+        .pub-features li { font-size:0.85vw; color:rgba(255,255,255,0.5); padding:0.3vh 0; padding-left:1vw; position:relative; }
+        .pub-features li::before { content:''; position:absolute; left:0; top:50%; width:4px; height:4px; border-radius:50%; background:var(--vip-turquoise); transform:translateY(-50%); }
+        .pub-anniversary { display:inline-block; background:rgba(216,164,95,0.15); border:1px solid rgba(216,164,95,0.3); border-radius:4px; padding:0.3vh 0.6vw; font-size:0.75vw; color:var(--vip-gold); font-weight:600; margin-bottom:1vh; }
+        .pub-footer { margin-top:2.5vh; text-align:center; font-size:1.1vw; color:rgba(255,255,255,0.4); }
+
+        /* Slide 4: Challenges */
+        .challenge-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.8vw; margin-top:2vh; }
+        .challenge-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:2.5vh 2vw; }
+        .challenge-card h3 { font-size:1.2vw; color:var(--vip-turquoise); margin-bottom:0.8vh; }
+        .challenge-card p { font-size:1vw; color:rgba(255,255,255,0.7); line-height:1.5; }
+        .challenge-icon { font-size:1.8vw; margin-bottom:1vh; }
+        .challenge-footer { margin-top:2vh; padding:1.5vh 2vw; background:rgba(216,164,95,0.08); border-radius:8px; border-left:3px solid var(--vip-gold); }
+        .challenge-footer p { font-size:1.1vw; color:rgba(255,255,255,0.8); }
+
+        /* Slide 5: Unified Platform */
+        .unified-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .unified-left p { font-size:1.1vw; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1.5vh; }
+        .unified-features { display:flex; flex-direction:column; gap:1.2vh; }
+        .uf-item { display:flex; align-items:center; gap:0.8vw; padding:1.2vh 1.2vw; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; transition:border-color 0.2s; }
+        .uf-item:hover { border-color:var(--vip-gold); }
+        .uf-icon { font-size:1.4vw; min-width:2vw; text-align:center; }
+        .uf-text h4 { font-size:1.05vw; font-weight:600; margin-bottom:0.2vh; }
+        .uf-text p { font-size:0.85vw; color:rgba(255,255,255,0.5); line-height:1.3; margin:0; }
+
+        /* Slide 6: Collaborative Editing */
+        .collab-layout { display:grid; grid-template-columns:1.3fr 1fr; gap:2vw; margin-top:1.5vh; }
+        .collab-editor { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; }
+        .collab-toolbar { display:flex; align-items:center; gap:0.5vw; padding:0.8vh 1vw; background:rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.08); }
+        .collab-tb-btn { width:2vw; height:2.5vh; border-radius:4px; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); font-size:0.8vw; cursor:default; display:flex; align-items:center; justify-content:center; font-weight:600; }
+        .collab-avatars { display:flex; gap:-0.3vw; margin-left:auto; }
+        .collab-avatar { width:1.8vw; height:1.8vw; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.6vw; font-weight:700; color:white; border:2px solid var(--vip-black); margin-left:-0.3vw; }
+        .collab-body { padding:2vh 1.5vw; min-height:28vh; position:relative; }
+        .collab-headline { font-size:1.6vw; font-weight:700; color:var(--vip-white); margin-bottom:1vh; min-height:2.2vw; }
+        .collab-text { font-size:0.95vw; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1.2vh; min-height:4vw; }
+        .collab-note { font-size:0.85vw; color:rgba(255,255,255,0.5); font-style:italic; border-left:2px solid var(--vip-turquoise); padding-left:0.8vw; min-height:1.5vw; }
+        .collab-cursor { display:inline-block; width:2px; height:1.2em; animation:blink 1s step-end infinite; vertical-align:text-bottom; }
+        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+        .cursor-hallie { background:#E879F9; }
+        .cursor-hallie::before { content:'Hallie'; position:absolute; top:-1.4em; left:0; font-size:0.55vw; color:#E879F9; font-weight:600; font-style:normal; white-space:nowrap; }
+        .cursor-jen { background:var(--vip-turquoise); }
+        .cursor-jen::before { content:'Jen'; position:absolute; top:-1.4em; left:0; font-size:0.55vw; color:var(--vip-turquoise); font-weight:600; font-style:normal; white-space:nowrap; }
+        .cursor-alia { background:var(--vip-orange); }
+        .cursor-alia::before { content:'Alia'; position:absolute; top:-1.4em; left:0; font-size:0.55vw; color:var(--vip-orange); font-weight:600; font-style:normal; white-space:nowrap; }
+        .collab-cursor { position:relative; }
+        .collab-cards { display:flex; flex-direction:column; gap:1vh; }
+        .collab-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:1.5vh 1.2vw; cursor:pointer; transition:all 0.3s; }
+        .collab-card:hover { border-color:var(--vip-gold); }
+        .collab-card.expanded { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.15); }
+        .collab-card h4 { font-size:0.95vw; font-weight:600; margin-bottom:0.3vh; display:flex; align-items:center; gap:0.4vw; }
+        .collab-card h4 .card-icon { font-size:1vw; }
+        .collab-card-detail { font-size:0.8vw; color:rgba(255,255,255,0.5); line-height:1.4; max-height:0; overflow:hidden; transition:max-height 0.3s ease, padding 0.3s ease; }
+        .collab-card.expanded .collab-card-detail { max-height:10vh; padding-top:0.5vh; }
+
+        /* Slide 7: Parse.ly Dashboard */
+        .parsely-dash { display:grid; grid-template-columns:1fr 22vw; gap:1.5vw; margin-top:1vh; height:68vh; }
+        .parsely-main { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.5vw; display:flex; flex-direction:column; overflow:hidden; }
+        .parsely-sidebar { display:flex; flex-direction:column; gap:1.2vh; overflow:hidden; }
+        .parsely-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2vh; flex-shrink:0; }
+        .parsely-brand { font-size:1.2vw; font-weight:700; }
+        .parsely-brand span { color:var(--parsely-green); }
+        .parsely-tabs { display:flex; gap:0.4vw; }
+        .parsely-tab { padding:0.5vh 1vw; border-radius:4px; font-size:0.85vw; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); border:none; transition:all 0.2s; }
+        .parsely-tab:hover { background:rgba(112,172,28,0.2); color:rgba(255,255,255,0.8); }
+        .parsely-tab.active { background:var(--parsely-green); color:white; }
+        .kpi-row { display:flex; gap:1vw; margin-bottom:1.2vh; flex-shrink:0; }
+        .kpi-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1vh 1vw; flex:1; transition:border-color 0.3s; }
+        .kpi-card:hover { border-color:var(--parsely-green); }
+        .kpi-val { font-size:1.8vw; font-weight:700; color:var(--vip-white); line-height:1.1; }
+        .kpi-change { font-size:0.75vw; font-weight:600; margin-top:2px; }
+        .kpi-change.positive { color:#4ade80; }
+        .kpi-change.negative { color:var(--vip-red); }
+        .kpi-label { font-size:0.65vw; color:rgba(255,255,255,0.4); margin-top:4px; text-transform:uppercase; letter-spacing:0.05em; }
+        .parsely-chart-wrap { flex:1; min-height:0; background:rgba(255,255,255,0.02); border-radius:8px; padding:1vh 0.5vw 0.5vh; overflow:hidden; position:relative; }
+        .parsely-chart-wrap svg { width:100%; height:100%; display:block; }
+        .parsely-side-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.2vh 1vw; overflow:hidden; }
+        .parsely-side-card h4 { font-size:0.85vw; font-weight:600; color:var(--parsely-green); margin-bottom:0.8vh; text-transform:uppercase; letter-spacing:0.04em; }
+        .trending-item { display:flex; align-items:flex-start; gap:0.4vw; margin-bottom:0.6vh; padding-bottom:0.6vh; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .trending-item:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+        .trending-rank { font-size:0.85vw; font-weight:700; color:var(--parsely-green); min-width:1.2vw; }
+        .trending-title { font-size:0.75vw; color:rgba(255,255,255,0.8); line-height:1.3; }
+        .trending-views { font-size:0.65vw; color:rgba(255,255,255,0.4); }
+        .source-row { display:flex; align-items:center; gap:0.5vw; margin-bottom:0.5vh; }
+        .source-label { font-size:0.7vw; color:rgba(255,255,255,0.6); min-width:3vw; }
+        .source-bar-bg { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+        .source-bar { height:100%; border-radius:3px; transition:width 0.5s ease; }
+        .source-pct { font-size:0.65vw; color:rgba(255,255,255,0.5); min-width:2vw; text-align:right; }
+        .parsely-note { font-size:0.65vw; color:rgba(255,255,255,0.3); text-align:center; margin-top:auto; padding-top:0.5vh; }
+
+        /* Slide 8: Subscriptions & Paywalls */
+        .paywall-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .paywall-left p { font-size:1.1vw; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1.5vh; }
+        .paywall-features { display:flex; flex-direction:column; gap:1.5vh; }
+        .paywall-feature { display:flex; align-items:flex-start; gap:1vw; }
+        .paywall-feature-icon { width:2.5vw; height:2.5vw; border-radius:8px; background:rgba(62,160,173,0.12); border:1px solid rgba(62,160,173,0.2); display:flex; align-items:center; justify-content:center; font-size:1.2vw; flex-shrink:0; }
+        .paywall-feature h4 { font-size:1.05vw; font-weight:600; margin-bottom:0.3vh; }
+        .paywall-feature p { font-size:0.9vw; color:rgba(255,255,255,0.55); line-height:1.4; margin:0; }
+
+        /* Slide 9: Integration */
+        .integration-layout { display:grid; grid-template-columns:1fr 1fr; gap:2vw; margin-top:2vh; }
+        .int-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:2.5vh 2vw; }
+        .int-card h3 { font-size:1.2vw; color:var(--vip-turquoise); margin-bottom:0.8vh; }
+        .int-card p { font-size:0.95vw; color:rgba(255,255,255,0.65); line-height:1.5; }
+        .int-icon { font-size:1.8vw; margin-bottom:1vh; }
+        .int-tag { display:inline-block; background:rgba(62,160,173,0.12); border:1px solid rgba(62,160,173,0.2); border-radius:4px; padding:0.2vh 0.5vw; font-size:0.75vw; color:var(--vip-turquoise); font-weight:600; margin-top:0.5vh; margin-right:0.3vw; }
+
+        /* Slide 10: Infrastructure */
+        .infra-layout { display:grid; grid-template-columns:1.4fr 1fr; gap:2vw; margin-top:1.5vh; align-items:start; }
+        .infra-stats { display:grid; grid-template-columns:1fr 1fr; gap:1.2vw; }
+        .infra-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2vh 1.5vw; text-align:center; }
+        .infra-stat .stat-number { font-size:2.5vw; color:var(--vip-turquoise); margin-bottom:0.3vh; }
+        .infra-stat p { font-size:0.85vw; color:rgba(255,255,255,0.5); }
+        .infra-detail { display:flex; flex-direction:column; gap:1.2vh; }
+        .infra-detail-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:1.5vh 1.2vw; }
+        .infra-detail-card h4 { font-size:1vw; font-weight:600; color:var(--vip-gold); margin-bottom:0.3vh; }
+        .infra-detail-card p { font-size:0.9vw; color:rgba(255,255,255,0.6); line-height:1.4; }
+        .infra-callout { grid-column:1/-1; margin-top:1vh; padding:1.5vh 2vw; background:rgba(216,164,95,0.08); border-radius:8px; border-left:3px solid var(--vip-gold); }
+        .infra-callout p { font-size:1vw; color:rgba(255,255,255,0.75); }
+
+        /* Slide 11: A4A / No Developer */
+        .a4a-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .a4a-left p { font-size:1.1vw; color:rgba(255,255,255,0.7); line-height:1.6; margin-bottom:1.5vh; }
+        .a4a-steps { display:flex; flex-direction:column; gap:1.5vh; }
+        .a4a-step { display:flex; gap:1vw; align-items:flex-start; }
+        .a4a-num { width:2.2vw; height:2.2vw; border-radius:50%; background:rgba(216,164,95,0.15); border:1px solid var(--vip-gold); display:flex; align-items:center; justify-content:center; font-size:1vw; font-weight:700; color:var(--vip-gold); flex-shrink:0; }
+        .a4a-step-content h4 { font-size:1.05vw; font-weight:600; margin-bottom:0.2vh; }
+        .a4a-step-content p { font-size:0.9vw; color:rgba(255,255,255,0.55); line-height:1.4; }
+        .a4a-support { display:flex; flex-direction:column; gap:1.2vh; }
+        .a4a-support-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.8vh 1.5vw; }
+        .a4a-support-card h4 { font-size:1.05vw; font-weight:600; color:var(--vip-turquoise); margin-bottom:0.3vh; }
+        .a4a-support-card p { font-size:0.9vw; color:rgba(255,255,255,0.55); line-height:1.4; }
+
+        /* Slide 12: Customer carousel */
+        .carousel-container { margin-top:2vh; position:relative; overflow:hidden; }
+        .carousel-track { display:flex; gap:1.5vw; overflow-x:hidden; scroll-behavior:smooth; padding-bottom:1vh; }
+        .carousel-card { min-width:26vw; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:3vh 2vw; flex-shrink:0; }
+        .carousel-card-name { font-size:1.6vw; font-weight:700; margin-bottom:0.5vh; }
+        .carousel-card-type { font-size:0.8vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:1.5vh; }
+        .carousel-card-quote { font-size:1vw; font-style:italic; color:rgba(255,255,255,0.7); line-height:1.5; border-left:2px solid var(--vip-gold); padding-left:1vw; margin-bottom:1.5vh; }
+        .carousel-metrics { display:flex; gap:1.5vw; }
+        .carousel-metric { text-align:center; }
+        .carousel-metric .stat-number { font-size:1.8vw; color:var(--vip-turquoise); }
+        .carousel-metric p { font-size:0.75vw; color:rgba(255,255,255,0.5); }
+        .carousel-dots { display:flex; justify-content:center; gap:0.5vw; margin-top:1.5vh; }
+        .carousel-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2); cursor:pointer; transition:all 0.3s; }
+        .carousel-dot.active { width:24px; border-radius:4px; background:var(--vip-gold); }
+
+        /* Slide 13: Next Steps / Timeline */
+        .timeline-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .timeline-steps { display:flex; flex-direction:column; gap:2vh; }
+        .timeline-step { display:flex; gap:1vw; align-items:flex-start; }
+        .timeline-num { width:2.5vw; height:2.5vw; border-radius:50%; background:rgba(216,164,95,0.15); border:1px solid var(--vip-gold); display:flex; align-items:center; justify-content:center; font-size:1.1vw; font-weight:700; color:var(--vip-gold); flex-shrink:0; }
+        .timeline-step-content h4 { font-size:1.15vw; font-weight:600; margin-bottom:0.3vh; }
+        .timeline-step-content p { font-size:0.95vw; color:rgba(255,255,255,0.6); }
+        .timeline-date { font-size:0.8vw; color:var(--vip-turquoise); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-top:0.3vh; }
+        .timeline-right { display:flex; flex-direction:column; gap:1.5vh; }
+        .timeline-value-card { background:rgba(62,160,173,0.06); border:1px solid rgba(62,160,173,0.15); border-radius:10px; padding:2vh 1.5vw; }
+        .timeline-value-card h4 { font-size:1.1vw; color:var(--vip-turquoise); font-weight:600; margin-bottom:0.5vh; }
+        .timeline-value-card p { font-size:0.95vw; color:rgba(255,255,255,0.6); line-height:1.4; }
+
+        /* Slide 14: CTA / Book a Conversation */
+        .cta-layout { display:grid; grid-template-columns:1fr 1.2fr; gap:3vw; align-items:start; }
+        .cta-left .vip-logo { font-size:2.2vw; margin-bottom:2vh; }
+        .cta-headline { font-size:2vw; font-weight:600; letter-spacing:-0.02em; line-height:1.15; margin-bottom:1.5vh; }
+        .cta-desc { font-size:1.1vw; color:rgba(255,255,255,0.6); line-height:1.5; margin-bottom:2.5vh; }
+        .cta-contact-row { display:flex; align-items:center; gap:0.8vw; margin-bottom:0.8vh; font-size:1.05vw; color:rgba(255,255,255,0.7); }
+        .cta-contact-label { color:var(--vip-gold); font-weight:600; min-width:3.5vw; }
+        .cta-calendar { background:white; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+        .cta-cal-header { padding:1.2vh 1.5vw; border-bottom:1px solid #eee; }
+        .cta-cal-header h3 { color:var(--vip-gold-text); font-size:1.2vw; margin:0; }
+        .cta-cal-body { flex:1; }
+        .cta-cal-body iframe { width:100%; min-height:500px; border:0; background:white; }
+
+        @media print { .nav-controls,.progress-bar,.overview-overlay { display:none !important; } .slide { opacity:1 !important; visibility:visible !important; position:relative !important; page-break-after:always; } }
+    </style>
+</head>
+<body>
+<div class="deck">
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- ==================== SLIDE 1: TITLE ==================== -->
+    <div class="slide slide-dark active" id="slide-1" data-title="Title">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="title-content">
+            <div class="vip-logo vip-logo-large anim d1"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+            <div class="gold-line gold-line-wide anim d2"></div>
+            <div class="title-customer anim d3">Junior Library Guild</div>
+            <div class="title-sub anim d4">A Unified Content Platform for Library Journal, School Library Journal, and The Horn Book</div>
+            <div class="title-meta anim d5">Prepared for Jon Cahen, Jen Jones, Hallie Rich, and the JLG Media Group Team<br>February 2026</div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 2: AGENDA ==================== -->
+    <div class="slide slide-gradient" id="slide-2" data-title="Agenda">
+        <h2 class="anim d1">What We Will Cover</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="agenda-grid">
+            <div class="agenda-item anim d2">
+                <div class="agenda-num">01</div>
+                <div class="agenda-text">Your publications and the legacy they carry</div>
+            </div>
+            <div class="agenda-item anim d3">
+                <div class="agenda-num">02</div>
+                <div class="agenda-text">The content challenges you shared with us</div>
+            </div>
+            <div class="agenda-item anim d3">
+                <div class="agenda-num">03</div>
+                <div class="agenda-text">One platform, three distinct voices</div>
+            </div>
+            <div class="agenda-item anim d4">
+                <div class="agenda-num">04</div>
+                <div class="agenda-text">Collaborative editing for your editorial team</div>
+            </div>
+            <div class="agenda-item anim d4">
+                <div class="agenda-num">05</div>
+                <div class="agenda-text">Content intelligence with Parse.ly analytics</div>
+            </div>
+            <div class="agenda-item anim d5">
+                <div class="agenda-num">06</div>
+                <div class="agenda-text">Subscriptions, paywalls, and digital replicas</div>
+            </div>
+            <div class="agenda-item anim d5">
+                <div class="agenda-num">07</div>
+                <div class="agenda-text">Integration with your existing tech stack</div>
+            </div>
+            <div class="agenda-item anim d6">
+                <div class="agenda-num">08</div>
+                <div class="agenda-text">Enterprise infrastructure, support, and the path forward</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 3: YOUR PUBLICATIONS ==================== -->
+    <div class="slide slide-dark" id="slide-3" data-title="Your Publications">
+        <div class="geo-pattern geo-concentric"></div>
+        <h2 class="anim d1">Trusted Voices in Library Publishing</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="pub-grid">
+            <div class="pub-card anim d3">
+                <div class="pub-est">Est. 1876</div>
+                <div class="pub-anniversary">150th Anniversary</div>
+                <div class="pub-name">Library Journal</div>
+                <div class="pub-desc">The definitive resource for library professionals. Reviews, news, technology, and career development serving public and academic librarians nationwide.</div>
+                <ul class="pub-features">
+                    <li>Comprehensive book reviews and recommendations</li>
+                    <li>Industry news and leadership coverage</li>
+                    <li>Professional development courses</li>
+                    <li>Libraries Lead Podcast and infoDOCKET</li>
+                </ul>
+            </div>
+            <div class="pub-card anim d4">
+                <div class="pub-est">Est. 1954</div>
+                <div class="pub-name">School Library Journal</div>
+                <div class="pub-desc">The go-to publication for school librarians and educators. Starred reviews, reading lists, and resources for K-12 library professionals.</div>
+                <ul class="pub-features">
+                    <li>Starred reviews and curated booklists</li>
+                    <li>Censorship and intellectual freedom coverage</li>
+                    <li>Blog network (A Fuse #8, Teen Librarian Toolbox)</li>
+                    <li>Virtual events and author festivals</li>
+                </ul>
+            </div>
+            <div class="pub-card anim d5">
+                <div class="pub-est">Est. 1924</div>
+                <div class="pub-name">The Horn Book</div>
+                <div class="pub-desc">Over a century of children's literature criticism and coverage. The standard-bearer for reviews of books for young readers.</div>
+                <ul class="pub-features">
+                    <li>In-depth reviews and criticism</li>
+                    <li>Boston Globe-Horn Book Awards</li>
+                    <li>Horn Book Guide companion database</li>
+                    <li>Searchable review archive to 2010</li>
+                </ul>
+            </div>
+        </div>
+        <div class="pub-footer anim d6">Three publications. Decades of trust. One opportunity to modernize.</div>
+    </div>
+
+    <!-- ==================== SLIDE 4: WHAT WE HEARD ==================== -->
+    <div class="slide slide-gradient" id="slide-4" data-title="What We Heard">
+        <h2 class="anim d1">The Challenges You Shared</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="challenge-layout">
+            <div class="challenge-card anim d3">
+                <div class="challenge-icon">&#128268;</div>
+                <h3>A CMS That Holds You Back</h3>
+                <p>Your current Hippo/Bloomreach CMS is deprecated, with a backend experience that slows your editorial team. Every change requires an outside firm, creating bottlenecks and cost.</p>
+            </div>
+            <div class="challenge-card anim d3">
+                <div class="challenge-icon">&#127760;</div>
+                <h3>Fragmented Publishing Workflows</h3>
+                <p>Each publication operates in its own silo. There is no shared content hub, no unified editorial view, and no easy way to move content between brands.</p>
+            </div>
+            <div class="challenge-card anim d4">
+                <div class="challenge-icon">&#128274;</div>
+                <h3>Off-Site Everything</h3>
+                <p>Registrations, event signups, and purchases all happen off-site because the current CMS cannot support them. That means lost engagement data and a fragmented user experience.</p>
+            </div>
+            <div class="challenge-card anim d4">
+                <div class="challenge-icon">&#128241;</div>
+                <h3>Digital Replicas Need an Upgrade</h3>
+                <p>Your eMags flip-through PDFs are not mobile-friendly and lack proper access gating. Your archive back to 2018 deserves a modern reading experience.</p>
+            </div>
+        </div>
+        <div class="challenge-footer anim d5">
+            <p>You told us you want a backend where editors add content once and push it to the right publication. You want connected carts, modern paywalls, and independence from outside firms. We heard you.</p>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 5: ONE PLATFORM ==================== -->
+    <div class="slide slide-dark" id="slide-5" data-title="Unified Platform">
+        <div class="geo-pattern geo-lines"></div>
+        <h2 class="anim d1">One Platform, Three Voices</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="unified-layout">
+            <div class="unified-left anim d3">
+                <p>WordPress VIP multisite lets your editorial team work from a single dashboard while each publication maintains its own identity, design, and audience experience.</p>
+                <p>Create content in one place. Route it to Library Journal, School Library Journal, or The Horn Book with a click. Share assets, reviews, and features across brands when it makes sense, or keep them independent when it does not.</p>
+                <p>43% of the web runs on WordPress. Your team will feel at home with an editor they can learn in hours, not months. No more waiting on an outside firm to publish a story.</p>
+            </div>
+            <div class="unified-features">
+                <div class="uf-item anim d3">
+                    <div class="uf-icon">&#9881;</div>
+                    <div class="uf-text"><h4>Enterprise Multisite</h4><p>LJ, SLJ, and Horn Book from one dashboard with shared users, roles, and permissions</p></div>
+                </div>
+                <div class="uf-item anim d4">
+                    <div class="uf-icon">&#128260;</div>
+                    <div class="uf-text"><h4>Cross-Brand Content Sharing</h4><p>Push or pull content between publications while maintaining brand-specific layouts</p></div>
+                </div>
+                <div class="uf-item anim d4">
+                    <div class="uf-icon">&#9997;</div>
+                    <div class="uf-text"><h4>Intuitive Block Editor</h4><p>No developer required. Your editorial team can build pages, embed media, and publish independently</p></div>
+                </div>
+                <div class="uf-item anim d5">
+                    <div class="uf-icon">&#128640;</div>
+                    <div class="uf-text"><h4>60,000+ Plugins</h4><p>Extend functionality without custom development. Newsletters, SEO, forms, events, and more</p></div>
+                </div>
+                <div class="uf-item anim d5">
+                    <div class="uf-icon">&#127759;</div>
+                    <div class="uf-text"><h4>Multi-Language Ready</h4><p>When the time comes to publish in Spanish or other languages, the platform supports it natively</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 6: COLLABORATIVE EDITING ==================== -->
+    <div class="slide slide-dark" id="slide-6" data-title="Collaborative Editing">
+        <h2 class="anim d1" style="font-size:2vw;">Collaborative Editing</h2>
+        <div class="caption anim d1" style="color:rgba(255,255,255,0.4);margin-bottom:1.5vh;">Google Docs-style collaboration, directly inside your CMS</div>
+        <div class="collab-layout">
+            <div class="collab-editor anim d2">
+                <div class="collab-toolbar">
+                    <div class="collab-tb-btn">B</div>
+                    <div class="collab-tb-btn"><em>I</em></div>
+                    <div class="collab-tb-btn">H1</div>
+                    <div class="collab-tb-btn">H2</div>
+                    <div class="collab-tb-btn">&#128279;</div>
+                    <div class="collab-tb-btn">&#128247;</div>
+                    <div class="collab-avatars">
+                        <div class="collab-avatar" style="background:#E879F9;">HR</div>
+                        <div class="collab-avatar" style="background:var(--vip-turquoise);">JJ</div>
+                        <div class="collab-avatar" style="background:var(--vip-orange);">AW</div>
+                    </div>
+                </div>
+                <div class="collab-body">
+                    <div class="collab-headline" id="collab-headline"></div>
+                    <div class="collab-text" id="collab-text"></div>
+                    <div class="collab-note" id="collab-note"></div>
+                </div>
+            </div>
+            <div class="collab-cards anim d3">
+                <div class="collab-card" data-card="cursors">
+                    <h4><span class="card-icon">&#128433;</span> Real-Time Cursors</h4>
+                    <div class="collab-card-detail">See who is editing what in real time. Each team member gets a named, color-coded cursor so work never overlaps.</div>
+                </div>
+                <div class="collab-card" data-card="locking">
+                    <h4><span class="card-icon">&#128274;</span> Block Locking</h4>
+                    <div class="collab-card-detail">When Hallie is editing a paragraph, that block is locked. No more "get out of my story" moments. Other editors work freely on adjacent content.</div>
+                </div>
+                <div class="collab-card" data-card="comments">
+                    <h4><span class="card-icon">&#128172;</span> Inline Comments</h4>
+                    <div class="collab-card-detail">Leave feedback directly on content blocks. Resolve threads when addressed. No more email chains about edits.</div>
+                </div>
+                <div class="collab-card" data-card="history">
+                    <h4><span class="card-icon">&#128337;</span> Revision History</h4>
+                    <div class="collab-card-detail">Every change is tracked. Revert to any previous version with one click. Full audit trail of who changed what and when.</div>
+                </div>
+                <div class="collab-card" data-card="workflows">
+                    <h4><span class="card-icon">&#9989;</span> Editorial Workflows</h4>
+                    <div class="collab-card-detail">Assign articles through draft, review, and publish stages. Custom approval chains match how your team already works.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 7: PARSE.LY ANALYTICS ==================== -->
+    <div class="slide slide-dark" id="slide-7" data-title="Parse.ly Analytics">
+        <h2 class="anim d1" style="font-size:2vw;">Parse.ly Content Analytics</h2>
+        <div class="caption anim d1" style="color:rgba(255,255,255,0.4);margin-bottom:0.5vh;">Included with WordPress VIP. Built for editorial teams, not engineers.</div>
+        <div class="parsely-dash anim d2">
+            <div class="parsely-main">
+                <div class="parsely-header">
+                    <div class="parsely-brand"><span>Parse.ly</span> Dashboard</div>
+                    <div class="parsely-tabs">
+                        <button class="parsely-tab active" data-range="1H">1H</button>
+                        <button class="parsely-tab" data-range="24H">24H</button>
+                        <button class="parsely-tab" data-range="7D">7D</button>
+                        <button class="parsely-tab" data-range="30D">30D</button>
+                    </div>
+                </div>
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-visitors">18.4K</div>
+                        <div class="kpi-change positive" id="kpi-visitors-change">+12.3%</div>
+                        <div class="kpi-label">Visitors</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-pageviews">67.2K</div>
+                        <div class="kpi-change positive" id="kpi-pv-change">+18.7%</div>
+                        <div class="kpi-label">Page Views</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-engaged">3m 12s</div>
+                        <div class="kpi-change positive" id="kpi-engaged-change">+6.4%</div>
+                        <div class="kpi-label">Avg. Engaged Time</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-val" id="kpi-recirc">28.5%</div>
+                        <div class="kpi-change positive" id="kpi-recirc-change">+3.2%</div>
+                        <div class="kpi-label">Recirculation Rate</div>
+                    </div>
+                </div>
+                <div class="parsely-chart-wrap">
+                    <svg viewBox="0 0 600 200" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#70AC1C" stop-opacity="0.3"/>
+                                <stop offset="100%" stop-color="#70AC1C" stop-opacity="0.02"/>
+                            </linearGradient>
+                        </defs>
+                        <path id="chart-area" fill="url(#chartGrad)"/>
+                        <path id="chart-line" fill="none" stroke="#70AC1C" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="parsely-note">Interactive demo. Click time ranges above to explore.</div>
+            </div>
+            <div class="parsely-sidebar">
+                <div class="parsely-side-card" style="flex:1.2;">
+                    <h4>Trending Now</h4>
+                    <div class="trending-item">
+                        <div class="trending-rank">1</div>
+                        <div><div class="trending-title">2026 Best Books for Young Adults: The Complete List</div><div class="trending-views">4,821 views</div></div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-rank">2</div>
+                        <div><div class="trending-title">Library Budget Trends: What Changed This Year</div><div class="trending-views">3,412 views</div></div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-rank">3</div>
+                        <div><div class="trending-title">Censorship Attempts Reach New High, ALA Data Shows</div><div class="trending-views">2,987 views</div></div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-rank">4</div>
+                        <div><div class="trending-title">Summer Reading Lists for Middle Schoolers</div><div class="trending-views">2,654 views</div></div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-rank">5</div>
+                        <div><div class="trending-title">AI Literacy for Librarians: A Professional Guide</div><div class="trending-views">2,103 views</div></div>
+                    </div>
+                </div>
+                <div class="parsely-side-card" style="flex:0.8;">
+                    <h4>Traffic Sources</h4>
+                    <div class="source-row"><div class="source-label">Direct</div><div class="source-bar-bg"><div class="source-bar" id="src-direct" style="width:38%;background:var(--vip-turquoise);"></div></div><div class="source-pct" id="src-direct-pct">38%</div></div>
+                    <div class="source-row"><div class="source-label">Search</div><div class="source-bar-bg"><div class="source-bar" id="src-search" style="width:31%;background:var(--parsely-green);"></div></div><div class="source-pct" id="src-search-pct">31%</div></div>
+                    <div class="source-row"><div class="source-label">Social</div><div class="source-bar-bg"><div class="source-bar" id="src-social" style="width:19%;background:var(--vip-purple);"></div></div><div class="source-pct" id="src-social-pct">19%</div></div>
+                    <div class="source-row"><div class="source-label">Referral</div><div class="source-bar-bg"><div class="source-bar" id="src-ref" style="width:12%;background:var(--vip-orange);"></div></div><div class="source-pct" id="src-ref-pct">12%</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 8: SUBSCRIPTIONS & PAYWALLS ==================== -->
+    <div class="slide slide-gradient" id="slide-8" data-title="Subscriptions & Paywalls">
+        <h2 class="anim d1">Subscriptions, Paywalls, and Digital Replicas</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="paywall-layout">
+            <div class="paywall-left anim d3">
+                <p>Your publications depend on subscription revenue. WordPress VIP supports the full spectrum of paywall strategies, from metered access to hard paywalls with institutional licensing.</p>
+                <p>Nearly every publisher we serve runs some form of paywall or subscription program. The architecture is proven at scale across news, trade, and specialty publishers.</p>
+                <p>And for your digital magazine replicas, WordPress plugins can replace eMags with a mobile-friendly, fully gated reading experience that serves your entire archive.</p>
+            </div>
+            <div class="paywall-features anim d4">
+                <div class="paywall-feature">
+                    <div class="paywall-feature-icon">&#128275;</div>
+                    <div>
+                        <h4>Flexible Paywall Models</h4>
+                        <p>Metered, hard, freemium, or hybrid. Configure per-publication or per-content-type. Gate reviews while keeping news open, or vice versa.</p>
+                    </div>
+                </div>
+                <div class="paywall-feature">
+                    <div class="paywall-feature-icon">&#127970;</div>
+                    <div>
+                        <h4>Institutional Access</h4>
+                        <p>Support for IP-based institutional subscriptions, perfect for the libraries and schools that make up your subscriber base.</p>
+                    </div>
+                </div>
+                <div class="paywall-feature">
+                    <div class="paywall-feature-icon">&#128214;</div>
+                    <div>
+                        <h4>Digital Magazine Replicas</h4>
+                        <p>Modern, mobile-responsive reader plugins replace eMags. Your full archive back to 2018, gated by subscription tier, readable on any device.</p>
+                    </div>
+                </div>
+                <div class="paywall-feature">
+                    <div class="paywall-feature-icon">&#128176;</div>
+                    <div>
+                        <h4>Registration and Conversion</h4>
+                        <p>Keep event registration, course signups, and purchases on-site. No more sending users to third-party platforms for every transaction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 9: INTEGRATION ==================== -->
+    <div class="slide slide-dark" id="slide-9" data-title="Integration & Flexibility">
+        <div class="geo-pattern geo-lines"></div>
+        <h2 class="anim d1">Built to Work With Your Stack</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="integration-layout">
+            <div class="int-card anim d3">
+                <div class="int-icon">&#128722;</div>
+                <h3>Magento Integration</h3>
+                <p>Keep your Magento e-commerce for now. WordPress VIP integrates via REST APIs and webhooks, enabling connected carts and shared user sessions across all four websites.</p>
+                <div><span class="int-tag">REST API</span><span class="int-tag">Webhooks</span><span class="int-tag">SSO</span></div>
+            </div>
+            <div class="int-card anim d3">
+                <div class="int-icon">&#128230;</div>
+                <h3>Darwin Fulfillment</h3>
+                <p>Your fulfillment workflow stays intact. WordPress VIP connects to Darwin and other fulfillment providers through standard API integrations, keeping your subscription pipeline flowing.</p>
+                <div><span class="int-tag">API</span><span class="int-tag">Fulfillment</span><span class="int-tag">Subscriptions</span></div>
+            </div>
+            <div class="int-card anim d4">
+                <div class="int-icon">&#127916;</div>
+                <h3>ON24 Virtual Events</h3>
+                <p>Embed ON24 registration and event experiences directly on your sites. No more sending users off-site for conferences and professional development.</p>
+                <div><span class="int-tag">Embed</span><span class="int-tag">iFrame</span><span class="int-tag">Registration</span></div>
+            </div>
+            <div class="int-card anim d4">
+                <div class="int-icon">&#128640;</div>
+                <h3>Future-Ready Architecture</h3>
+                <p>When you are ready to migrate from Magento to WooCommerce or explore video, the platform grows with you. 60,000+ plugins and 10,000+ developers ensure you are never locked in.</p>
+                <div><span class="int-tag">WooCommerce</span><span class="int-tag">Extensible</span><span class="int-tag">Open Source</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 10: INFRASTRUCTURE ==================== -->
+    <div class="slide slide-gradient" id="slide-10" data-title="Enterprise Infrastructure">
+        <h2 class="anim d1">Enterprise Infrastructure</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="infra-layout">
+            <div>
+                <div class="infra-stats">
+                    <div class="infra-stat anim d3">
+                        <div class="stat-number">99.99%</div>
+                        <p>Uptime SLA across all client sites</p>
+                    </div>
+                    <div class="infra-stat anim d3">
+                        <div class="stat-number">15 min</div>
+                        <p>Response time for urgent support requests</p>
+                    </div>
+                    <div class="infra-stat anim d4">
+                        <div class="stat-number">24/7</div>
+                        <p>Expert support, 365 days a year</p>
+                    </div>
+                    <div class="infra-stat anim d4">
+                        <div class="stat-number">0</div>
+                        <p>Hosting vendors to manage separately</p>
+                    </div>
+                </div>
+                <div class="infra-callout anim d6">
+                    <p>When AWS experienced outages last fall, WordPress VIP clients stayed green across the board. Our infrastructure is built to keep your sites live, regardless of what happens upstream.</p>
+                </div>
+            </div>
+            <div class="infra-detail anim d5">
+                <div class="infra-detail-card">
+                    <h4>CMS + Hosting, Unified</h4>
+                    <p>No separate hosting vendor. No Fastly or Cloudflare to manage. WordPress VIP handles global edge caching, CDN, SSL, and DDoS protection as part of the platform.</p>
+                </div>
+                <div class="infra-detail-card">
+                    <h4>Enterprise Security</h4>
+                    <p>SOC 2 Type II and ISO 27001 certified. Web application firewall, automated patching, and proactive vulnerability scanning included.</p>
+                </div>
+                <div class="infra-detail-card">
+                    <h4>Sandbox Environments</h4>
+                    <p>Every site gets its own sandbox for testing. Stage content, preview designs, and validate changes before they go live. Separate sandboxes per publication or a unified staging hub.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 11: NO DEVELOPER REQUIRED ==================== -->
+    <div class="slide slide-dark" id="slide-11" data-title="Your Team, Empowered">
+        <div class="geo-pattern geo-concentric"></div>
+        <h2 class="anim d1">No Developer on Staff? No Problem.</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="a4a-layout">
+            <div>
+                <div class="a4a-left anim d3">
+                    <p>You told us you have no web developer on staff and limited appetite for a long-term agency engagement. We designed for exactly this situation.</p>
+                    <p>WordPress VIP's Automattic for Agencies (A4A) program connects you with vetted agency partners who specialize in migrations and ongoing support. The engagement is scoped to your needs, not an open-ended retainer.</p>
+                </div>
+                <div class="a4a-steps anim d4">
+                    <div class="a4a-step">
+                        <div class="a4a-num">1</div>
+                        <div class="a4a-step-content">
+                            <h4>We Match You With the Right Partner</h4>
+                            <p>From our network of gold-certified agencies, we find the right fit for your scope, budget, and timeline.</p>
+                        </div>
+                    </div>
+                    <div class="a4a-step">
+                        <div class="a4a-num">2</div>
+                        <div class="a4a-step-content">
+                            <h4>They Build, We Support</h4>
+                            <p>The agency handles design and development. WordPress VIP provides infrastructure, code review, and technical guidance throughout.</p>
+                        </div>
+                    </div>
+                    <div class="a4a-step">
+                        <div class="a4a-num">3</div>
+                        <div class="a4a-step-content">
+                            <h4>Your Team Takes the Wheel</h4>
+                            <p>Post-launch, your editorial team manages content independently. WordPress VIP handles hosting, security, and updates. Agency support scales to what you actually need.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="a4a-support anim d5">
+                <div class="a4a-support-card">
+                    <h4>Relationship Manager</h4>
+                    <p>A dedicated contact who understands your business and ensures the migration stays on track from kickoff to launch.</p>
+                </div>
+                <div class="a4a-support-card">
+                    <h4>Technical Account Manager</h4>
+                    <p>Your technical advocate inside WordPress VIP. Proactive performance reviews, architecture guidance, and escalation support.</p>
+                </div>
+                <div class="a4a-support-card">
+                    <h4>10,000+ WordPress Developers</h4>
+                    <p>The world's largest ecosystem of developers who specialize in WordPress. You are never locked into a single vendor.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 12: CUSTOMER SUCCESS ==================== -->
+    <div class="slide slide-gradient" id="slide-12" data-title="Publishers Who Trust VIP">
+        <h2 class="anim d1">Publishers Who Trust WordPress VIP</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="carousel-container anim d3">
+            <div class="carousel-track" id="carousel-track">
+                <div class="carousel-card">
+                    <div class="carousel-card-name">News Corp</div>
+                    <div class="carousel-card-type">Global Media</div>
+                    <div class="carousel-card-quote">Unified dozens of digital properties across multiple continents onto WordPress VIP, streamlining editorial workflows while maintaining distinct brand identities.</div>
+                    <div class="carousel-metrics">
+                        <div class="carousel-metric"><div class="stat-number">100+</div><p>Sites on VIP</p></div>
+                        <div class="carousel-metric"><div class="stat-number">50%</div><p>Faster publishing</p></div>
+                    </div>
+                </div>
+                <div class="carousel-card">
+                    <div class="carousel-card-name">Penske Media Corp</div>
+                    <div class="carousel-card-type">Digital Publishing</div>
+                    <div class="carousel-card-quote">PMC brought Rolling Stone, Variety, Deadline, and more onto a single WordPress VIP multisite. Shared infrastructure, independent editorial, unified analytics.</div>
+                    <div class="carousel-metrics">
+                        <div class="carousel-metric"><div class="stat-number">20+</div><p>Iconic brands</p></div>
+                        <div class="carousel-metric"><div class="stat-number">1B+</div><p>Monthly page views</p></div>
+                    </div>
+                </div>
+                <div class="carousel-card">
+                    <div class="carousel-card-name">Katie Couric Media</div>
+                    <div class="carousel-card-type">Independent Media</div>
+                    <div class="carousel-card-quote">Uses Parse.ly to understand what content resonates with their audience, driving editorial strategy with real data rather than guesswork.</div>
+                    <div class="carousel-metrics">
+                        <div class="carousel-metric"><div class="stat-number">3x</div><p>Content engagement</p></div>
+                        <div class="carousel-metric"><div class="stat-number">40%</div><p>Higher recirculation</p></div>
+                    </div>
+                </div>
+                <!-- PLACEHOLDER: Add JLG-specific case study if available -->
+                <div class="carousel-card">
+                    <div class="carousel-card-name">Nexstar Media</div>
+                    <div class="carousel-card-type">Broadcast & Digital</div>
+                    <div class="carousel-card-quote">America's largest local television and media company trusts WordPress VIP to power their digital content across hundreds of local markets.</div>
+                    <div class="carousel-metrics">
+                        <div class="carousel-metric"><div class="stat-number">200+</div><p>Local sites</p></div>
+                        <div class="carousel-metric"><div class="stat-number">99.99%</div><p>Uptime maintained</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-dots" id="carousel-dots"></div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 13: NEXT STEPS ==================== -->
+    <div class="slide slide-dark" id="slide-13" data-title="The Path Forward">
+        <div class="geo-pattern geo-lines"></div>
+        <h2 class="anim d1">The Path Forward</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="timeline-layout">
+            <div class="timeline-steps">
+                <div class="timeline-step anim d3">
+                    <div class="timeline-num">1</div>
+                    <div class="timeline-step-content">
+                        <h4>Technical Deep Dive</h4>
+                        <p>Our solutions engineer walks through your tech stack, answers integration questions, and demos collaborative editing, paywalls, and Parse.ly.</p>
+                        <div class="timeline-date">February 2026</div>
+                    </div>
+                </div>
+                <div class="timeline-step anim d4">
+                    <div class="timeline-num">2</div>
+                    <div class="timeline-step-content">
+                        <h4>Hands-On Sandbox</h4>
+                        <p>Your editorial team gets a sandbox environment to explore the WordPress backend. Kick the tires on their own schedule.</p>
+                        <div class="timeline-date">March 2026</div>
+                    </div>
+                </div>
+                <div class="timeline-step anim d5">
+                    <div class="timeline-num">3</div>
+                    <div class="timeline-step-content">
+                        <h4>Agency Partner Selection</h4>
+                        <p>We connect you with A4A agency partners. You evaluate fit, scope the build, and align on timelines and investment.</p>
+                        <div class="timeline-date">Q2 2026</div>
+                    </div>
+                </div>
+                <div class="timeline-step anim d6">
+                    <div class="timeline-num">4</div>
+                    <div class="timeline-step-content">
+                        <h4>Migration and Launch</h4>
+                        <p>Build, migrate content, test, and launch. Your relationship manager and technical account manager guide every milestone.</p>
+                        <div class="timeline-date">Target: Before January 1, 2027</div>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-right">
+                <div class="timeline-value-card anim d4">
+                    <h4>Plenty of Runway</h4>
+                    <p>Your January 2027 target gives us more time than we typically need for a migration of this scope. We will work backward from your deadline to build a comfortable timeline with built-in buffers.</p>
+                </div>
+                <div class="timeline-value-card anim d5">
+                    <h4>Celebrate the 150th in Style</h4>
+                    <p>Library Journal's 150th anniversary deserves a modern digital home. Imagine launching the new LJ experience as part of the anniversary celebration.</p>
+                </div>
+                <div class="timeline-value-card anim d6">
+                    <h4>We Will Send You</h4>
+                    <p>Migration process documentation, relevant case studies for media publishers, and technical details on paywall architecture and integration patterns.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 14: CTA / BOOK A CONVERSATION ==================== -->
+    <div class="slide slide-dark" id="slide-14" data-title="Let's Continue">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="cta-layout">
+            <div class="cta-left anim d2">
+                <div class="vip-logo vip-logo-large"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+                <div class="gold-line gold-line-wide"></div>
+                <div class="cta-headline">Let's build the next chapter for Library Journal, School Library Journal, and The Horn Book.</div>
+                <div class="cta-desc">Ready to see the platform in action? Book time with our team and we will walk through everything, from collaborative editing to paywalls to Parse.ly, tailored to your publications.</div>
+                <div class="cta-contact-row"><span class="cta-contact-label">Name</span> Nate Kelly, Account Executive</div>
+                <div class="cta-contact-row"><span class="cta-contact-label">Email</span> nate.kelly@wpvip.com</div>
+                <div class="cta-contact-row"><span class="cta-contact-label">Web</span> wpvip.com</div>
+            </div>
+            <div class="anim d3">
+                <div class="cta-calendar">
+                    <div class="cta-cal-header"><h3>Book a Conversation</h3></div>
+                    <div class="cta-cal-body">
+                        <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border:0" width="100%" height="600" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Navigation Controls -->
+<div class="nav-controls" id="nav-controls">
+    <button class="nav-btn" id="prev-btn">&#8592;</button>
+    <span class="slide-counter" id="slide-counter">1 / 14</span>
+    <button class="nav-btn" id="next-btn">&#8594;</button>
+</div>
+
+<!-- Overview Overlay -->
+<div class="overview-overlay" id="overview-overlay">
+    <div class="overview-grid" id="overview-grid"></div>
+</div>
+
+<script>
+(function(){
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+    let overviewOpen = false;
+
+    const progressBar = document.getElementById('progress-bar');
+    const counter = document.getElementById('slide-counter');
+    const navControls = document.getElementById('nav-controls');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const overlay = document.getElementById('overview-overlay');
+    const overviewGrid = document.getElementById('overview-grid');
+
+    function goTo(n) {
+        if(n<0||n>=total) return;
+        slides[current].classList.remove('active');
+        current = n;
+        slides[current].classList.add('active');
+        updateUI();
+    }
+
+    function updateUI() {
+        counter.textContent = (current+1)+' / '+total;
+        progressBar.style.width = ((current+1)/total*100)+'%';
+        const isLight = slides[current].classList.contains('slide-light');
+        navControls.classList.toggle('on-light', isLight);
+    }
+
+    prevBtn.addEventListener('click', ()=>goTo(current-1));
+    nextBtn.addEventListener('click', ()=>goTo(current+1));
+    counter.addEventListener('click', toggleOverview);
+
+    document.addEventListener('keydown', e=>{
+        if(overviewOpen){ if(e.key==='Escape') toggleOverview(); return; }
+        if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();goTo(current+1);}
+        else if(e.key==='ArrowLeft'){e.preventDefault();goTo(current-1);}
+        else if(e.key==='Escape') toggleOverview();
+    });
+
+    // Touch support
+    let touchStartX=0;
+    document.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
+    document.addEventListener('touchend',e=>{
+        const diff=e.changedTouches[0].screenX-touchStartX;
+        if(Math.abs(diff)>50){diff<0?goTo(current+1):goTo(current-1);}
+    },{passive:true});
+
+    function toggleOverview(){
+        overviewOpen=!overviewOpen;
+        overlay.classList.toggle('active',overviewOpen);
+        if(overviewOpen) buildOverview();
+    }
+
+    function buildOverview(){
+        overviewGrid.innerHTML='';
+        slides.forEach((s,i)=>{
+            const t=document.createElement('div');
+            t.className='overview-thumb'+(i===current?' current':'');
+            t.innerHTML='<div class="overview-thumb-title">'+s.getAttribute('data-title')+'</div><div class="overview-thumb-num">'+(i+1)+'</div>';
+            t.addEventListener('click',()=>{goTo(i);toggleOverview();});
+            overviewGrid.appendChild(t);
+        });
+    }
+
+    updateUI();
+
+    // ==================== COLLABORATIVE EDITING DEMO ====================
+    const collabHeadline = document.getElementById('collab-headline');
+    const collabText = document.getElementById('collab-text');
+    const collabNote = document.getElementById('collab-note');
+
+    const headlineStr = 'Boston Globe-Horn Book Award Winners Announced';
+    const bodyStr = 'The Horn Book Magazine revealed this year\'s winners at a ceremony in Boston, honoring excellence in children\'s and young adult literature across fiction, nonfiction, and picture book categories. Librarians nationwide praised the selections for elevating diverse voices and fresh perspectives.';
+    const noteStr = 'Hallie: Let\'s add the full winners list below this section and cross-post to SLJ.';
+
+    let collabRunning = false;
+    let collabTimeout = null;
+
+    function typeText(el, text, cursorClass, speed, cb) {
+        let i = 0;
+        el.innerHTML = '<span class="collab-cursor '+cursorClass+'"></span>';
+        function step() {
+            if(i < text.length) {
+                el.innerHTML = text.slice(0, i+1) + '<span class="collab-cursor '+cursorClass+'"></span>';
+                i++;
+                collabTimeout = setTimeout(step, speed + Math.random()*speed*0.5);
+            } else {
+                el.innerHTML = text;
+                if(cb) cb();
+            }
+        }
+        step();
+    }
+
+    function runCollabDemo() {
+        if(collabRunning) return;
+        collabRunning = true;
+        collabHeadline.innerHTML = '';
+        collabText.innerHTML = '';
+        collabNote.innerHTML = '';
+
+        typeText(collabHeadline, headlineStr, 'cursor-hallie', 35, function(){
+            collabTimeout = setTimeout(function(){
+                typeText(collabText, bodyStr, 'cursor-jen', 18, function(){
+                    collabTimeout = setTimeout(function(){
+                        typeText(collabNote, noteStr, 'cursor-alia', 25, function(){
+                            collabRunning = false;
+                        });
+                    }, 500);
+                });
+            }, 500);
+        });
+    }
+
+    // Use MutationObserver to trigger collab demo when slide becomes active
+    const collabSlide = document.getElementById('slide-6');
+    const observer = new MutationObserver(function(mutations){
+        mutations.forEach(function(m){
+            if(m.attributeName === 'class' && collabSlide.classList.contains('active')){
+                collabRunning = false;
+                if(collabTimeout) clearTimeout(collabTimeout);
+                runCollabDemo();
+            }
+        });
+    });
+    observer.observe(collabSlide, {attributes:true});
+
+    // Expandable collab cards
+    document.querySelectorAll('.collab-card').forEach(function(card){
+        card.addEventListener('click', function(){
+            const wasExpanded = card.classList.contains('expanded');
+            document.querySelectorAll('.collab-card').forEach(function(c){ c.classList.remove('expanded'); });
+            if(!wasExpanded) card.classList.add('expanded');
+        });
+    });
+
+    // ==================== PARSE.LY DASHBOARD ====================
+    const parselyData = {
+        '1H':  {visitors:'18.4K',vChange:'+12.3%',vDir:'positive',pv:'67.2K',pvChange:'+18.7%',pvDir:'positive',engaged:'3m 12s',eChange:'+6.4%',eDir:'positive',recirc:'28.5%',rChange:'+3.2%',rDir:'positive',direct:38,search:31,social:19,ref:12,chart:[40,55,48,62,58,70,65,78,72,85,80,88,84,95,90,100,96,105,100,110]},
+        '24H': {visitors:'52.8K',vChange:'+9.1%',vDir:'positive',pv:'198K',pvChange:'+14.2%',pvDir:'positive',engaged:'2m 54s',eChange:'+2.8%',eDir:'positive',recirc:'26.1%',rChange:'+1.5%',rDir:'positive',direct:35,search:33,social:20,ref:12,chart:[80,75,60,50,45,42,44,55,68,82,95,108,115,110,105,98,102,108,114,118]},
+        '7D':  {visitors:'312K',vChange:'+15.6%',vDir:'positive',pv:'1.1M',pvChange:'+11.9%',pvDir:'positive',engaged:'2m 38s',eChange:'-0.8%',eDir:'negative',recirc:'24.8%',rChange:'+2.1%',rDir:'positive',direct:33,search:35,social:21,ref:11,chart:[60,65,70,75,82,88,95,90,86,92,100,105,103,110,115,112,120,125,122,130]},
+        '30D': {visitors:'1.2M',vChange:'+21.4%',vDir:'positive',pv:'4.3M',pvChange:'+18.8%',pvDir:'positive',engaged:'2m 22s',eChange:'-2.1%',eDir:'negative',recirc:'23.2%',rChange:'-0.4%',rDir:'negative',direct:31,search:37,social:19,ref:13,chart:[50,55,58,60,65,70,72,75,80,84,88,90,95,98,100,105,108,112,118,122]}
+    };
+
+    function updateParsely(range){
+        const d=parselyData[range];
+        document.getElementById('kpi-visitors').textContent=d.visitors;
+        document.getElementById('kpi-visitors-change').textContent=d.vChange;
+        document.getElementById('kpi-visitors-change').className='kpi-change '+d.vDir;
+        document.getElementById('kpi-pageviews').textContent=d.pv;
+        document.getElementById('kpi-pv-change').textContent=d.pvChange;
+        document.getElementById('kpi-pv-change').className='kpi-change '+d.pvDir;
+        document.getElementById('kpi-engaged').textContent=d.engaged;
+        document.getElementById('kpi-engaged-change').textContent=d.eChange;
+        document.getElementById('kpi-engaged-change').className='kpi-change '+d.eDir;
+        document.getElementById('kpi-recirc').textContent=d.recirc;
+        document.getElementById('kpi-recirc-change').textContent=d.rChange;
+        document.getElementById('kpi-recirc-change').className='kpi-change '+d.rDir;
+
+        document.getElementById('src-direct').style.width=d.direct+'%';
+        document.getElementById('src-direct-pct').textContent=d.direct+'%';
+        document.getElementById('src-search').style.width=d.search+'%';
+        document.getElementById('src-search-pct').textContent=d.search+'%';
+        document.getElementById('src-social').style.width=d.social+'%';
+        document.getElementById('src-social-pct').textContent=d.social+'%';
+        document.getElementById('src-ref').style.width=d.ref+'%';
+        document.getElementById('src-ref-pct').textContent=d.ref+'%';
+
+        drawChart(d.chart);
+    }
+
+    function drawChart(data){
+        const max=Math.max(...data);
+        const w=600, h=200, pad=10;
+        const stepX=(w-2*pad)/(data.length-1);
+        let pts=data.map((v,i)=>[pad+i*stepX, h-pad-(v/max)*(h-2*pad)]);
+        const line=pts.map((p,i)=>(i===0?'M':'L')+p[0]+','+p[1]).join(' ');
+        const area=line+' L'+pts[pts.length-1][0]+','+(h-pad)+' L'+pts[0][0]+','+(h-pad)+' Z';
+        document.getElementById('chart-line').setAttribute('d',line);
+        document.getElementById('chart-area').setAttribute('d',area);
+    }
+
+    document.querySelectorAll('.parsely-tab').forEach(tab=>{
+        tab.addEventListener('click',()=>{
+            document.querySelectorAll('.parsely-tab').forEach(t=>t.classList.remove('active'));
+            tab.classList.add('active');
+            updateParsely(tab.getAttribute('data-range'));
+        });
+    });
+    updateParsely('1H');
+
+    // ==================== CUSTOMER CAROUSEL ====================
+    const track = document.getElementById('carousel-track');
+    const dotsContainer = document.getElementById('carousel-dots');
+    const cards = track.querySelectorAll('.carousel-card');
+    let carouselIdx = 0;
+    let carouselTimer = null;
+
+    // Build dots
+    cards.forEach(function(_, i){
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot' + (i===0?' active':'');
+        dot.addEventListener('click', function(){ scrollCarousel(i); });
+        dotsContainer.appendChild(dot);
+    });
+
+    function scrollCarousel(idx){
+        carouselIdx = idx;
+        const card = cards[0];
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        const cardW = card.offsetWidth + gap;
+        track.scrollTo({left: cardW * idx, behavior:'smooth'});
+        dotsContainer.querySelectorAll('.carousel-dot').forEach(function(d,i){
+            d.classList.toggle('active', i===idx);
+        });
+    }
+
+    function autoAdvance(){
+        carouselTimer = setInterval(function(){
+            if(slides[current] && slides[current].id === 'slide-12'){
+                carouselIdx = (carouselIdx+1) % cards.length;
+                scrollCarousel(carouselIdx);
+            }
+        }, 4000);
+    }
+    autoAdvance();
+
+})();
+</script>
+</body>
+</html>

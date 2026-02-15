@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valnet | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1c2530;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-purple: #9C5CE1;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --parsely-green: #70AC1C;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        .deck { position:relative; width:100vw; height:100vh; }
+        .slide { position:absolute; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; padding:5vh 6vw; opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s ease; overflow:hidden; }
+        .slide.active { opacity:1; visibility:visible; }
+        h1 { font-size:3.2vw; font-weight:700; letter-spacing:-0.03em; line-height:1.05; margin-bottom:1.5vh; }
+        h2 { font-size:2.4vw; font-weight:600; letter-spacing:-0.02em; line-height:1.1; margin-bottom:1.5vh; }
+        h3 { font-size:1.6vw; font-weight:600; letter-spacing:-0.01em; line-height:1.2; margin-bottom:1vh; }
+        p, li { font-size:1.3vw; font-weight:400; line-height:1.5; }
+        .caption { font-size:0.9vw; font-weight:500; letter-spacing:0.05em; line-height:1.4; text-transform:uppercase; }
+        .stat-number { font-size:4vw; font-weight:700; letter-spacing:-0.04em; line-height:1.0; }
+        .vip-logo { font-size:1.2vw; letter-spacing:-0.01em; margin-bottom:2vh; }
+        .vip-logo .logo-wp { font-weight:400; }
+        .vip-logo .logo-vip { font-weight:700; color:var(--vip-gold); }
+        .vip-logo-large { font-size:1.8vw; }
+        .gold-line { width:60px; height:2px; background:var(--vip-gold); margin:2vh 0; }
+        .gold-line-wide { width:120px; }
+        .geo-pattern { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.04; }
+        .geo-moire { background:repeating-linear-gradient(0deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px),repeating-linear-gradient(60deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px); }
+        .geo-grid { background:linear-gradient(var(--vip-gold) 1px,transparent 1px),linear-gradient(90deg,var(--vip-gold) 1px,transparent 1px); background-size:80px 80px; }
+        .corner-accent { position:absolute; width:40px; height:40px; border-color:var(--vip-gold); border-style:solid; border-width:0; }
+        .corner-tl { top:3vh; left:3vw; border-top-width:2px; border-left-width:2px; }
+        .corner-br { bottom:3vh; right:3vw; border-bottom-width:2px; border-right-width:2px; }
+        .slide-dark { background:var(--vip-black); color:var(--vip-white); }
+        .slide-light { background:var(--vip-white); color:var(--vip-black); }
+        .slide-light h1,.slide-light h2,.slide-light h3 { color:var(--vip-black); }
+        .slide-gradient { background:linear-gradient(135deg,var(--vip-black) 0%,var(--vip-black-light) 100%); color:var(--vip-white); }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(2.5); opacity:0; } }
+        .slide.active .anim { animation:fadeInUp 0.6s ease forwards; }
+        .slide.active .d1 { animation-delay:0.1s; opacity:0; }
+        .slide.active .d2 { animation-delay:0.2s; opacity:0; }
+        .slide.active .d3 { animation-delay:0.3s; opacity:0; }
+        .slide.active .d4 { animation-delay:0.4s; opacity:0; }
+        .slide.active .d5 { animation-delay:0.5s; opacity:0; }
+        .slide.active .d6 { animation-delay:0.6s; opacity:0; }
+
+        /* Nav */
+        .nav-controls { position:fixed; bottom:2.5vh; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:1.5vw; z-index:100; }
+        .nav-btn { width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); background:rgba(19,25,30,0.8); color:var(--vip-white); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; backdrop-filter:blur(10px); }
+        .nav-btn:hover { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .nav-controls.on-light .nav-btn { border-color:rgba(0,0,0,0.2); background:rgba(255,255,255,0.8); color:var(--vip-black); }
+        .nav-controls.on-light .nav-btn:hover { border-color:var(--vip-gold-text); color:var(--vip-gold-text); }
+        .nav-controls.on-light .slide-counter { color:rgba(0,0,0,0.5); }
+        .slide-counter { font-size:14px; color:rgba(255,255,255,0.5); font-weight:500; cursor:pointer; padding:6px 12px; border-radius:20px; transition:all 0.2s; user-select:none; }
+        .slide-counter:hover { color:var(--vip-gold); }
+        .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--vip-gold); transition:width 0.4s ease; z-index:100; }
+
+        /* Overview */
+        .overview-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:200; display:none; padding:4vh 4vw; overflow-y:auto; }
+        .overview-overlay.active { display:block; }
+        .overview-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; }
+        .overview-thumb { aspect-ratio:16/9; border-radius:6px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.2s; position:relative; background:var(--vip-black); display:flex; align-items:center; justify-content:center; padding:1vw; }
+        .overview-thumb:hover { border-color:var(--vip-gold); transform:scale(1.03); }
+        .overview-thumb.current { border-color:var(--vip-gold); }
+        .overview-thumb-title { font-size:0.9vw; font-weight:600; color:var(--vip-white); text-align:center; }
+        .overview-thumb-num { position:absolute; bottom:6px; right:8px; font-size:0.7vw; color:var(--vip-gray); }
+
+        /* Slide 1: Title */
+        .title-content { position:relative; z-index:1; }
+        .title-customer { font-size:5vw; font-weight:700; letter-spacing:-0.04em; line-height:1; margin:3vh 0 2vh; }
+        .title-sub { font-size:1.6vw; font-weight:400; color:rgba(255,255,255,0.7); margin-bottom:1.5vh; }
+        .title-meta { font-size:1vw; color:rgba(255,255,255,0.4); margin-top:3vh; }
+
+        /* Slide 2: We Know Valnet */
+        .know-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5vw; margin-top:3vh; }
+        .know-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 1.5vw; text-align:center; }
+        .know-stat .stat-number { color:var(--vip-gold); font-size:3.2vw; margin-bottom:0.5vh; }
+        .know-stat p { font-size:1vw; color:rgba(255,255,255,0.6); }
+        .know-timeline { display:flex; gap:1vw; margin-top:2.5vh; align-items:stretch; }
+        .know-acq { flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1vh 0.8vw; text-align:center; }
+        .know-acq .acq-year { font-size:0.7vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.05em; }
+        .know-acq .acq-name { font-size:0.9vw; font-weight:600; color:rgba(255,255,255,0.8); margin-top:2px; }
+        .know-footer { margin-top:2.5vh; font-size:1.15vw; color:rgba(255,255,255,0.5); font-style:italic; }
+
+        /* Slide 3: Platform Behind Portfolio */
+        .pillars { display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; margin-top:3vh; }
+        .pillar { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:3vh 1.5vw; text-align:center; transition:border-color 0.2s; }
+        .pillar:hover { border-color:var(--vip-gold); }
+        .pillar-icon { font-size:2.5vw; margin-bottom:1.5vh; }
+        .pillar h3 { font-size:1.3vw; margin-bottom:1vh; }
+        .pillar p { font-size:1vw; color:rgba(255,255,255,0.6); line-height:1.5; }
+        .pillar-stat { font-size:1.8vw; font-weight:700; color:var(--vip-turquoise); margin-top:1.5vh; }
+        .pillar-stat-label { font-size:0.7vw; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.04em; }
+
+        /* Slide 4: Acquire Faster */
+        .acq-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; align-items:start; }
+        .brand-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.8vw; }
+        .brand-tile { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.2vh 0.8vw; text-align:center; cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden; }
+        .brand-tile:hover,.brand-tile.active { border-color:var(--vip-gold); background:rgba(216,164,95,0.08); }
+        .brand-tile .bt-name { font-size:0.95vw; font-weight:600; }
+        .brand-tile .bt-type { font-size:0.6vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
+        .acq-detail { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 2vw; }
+        .acq-detail h3 { font-size:1.4vw; color:var(--vip-gold); margin-bottom:1vh; }
+        .acq-compare { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw; margin-top:2vh; }
+        .acq-box { border-radius:8px; padding:1.5vh 1vw; text-align:center; }
+        .acq-box.old { background:rgba(255,89,94,0.08); border:1px solid rgba(255,89,94,0.15); }
+        .acq-box.new { background:rgba(62,160,173,0.08); border:1px solid rgba(62,160,173,0.15); }
+        .acq-box .ab-label { font-size:0.7vw; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.5vh; }
+        .acq-box.old .ab-label { color:var(--vip-red); }
+        .acq-box.new .ab-label { color:var(--vip-turquoise); }
+        .acq-box .ab-val { font-size:2.2vw; font-weight:700; }
+        .acq-box.old .ab-val { color:rgba(255,89,94,0.8); }
+        .acq-box.new .ab-val { color:var(--vip-turquoise); }
+        .acq-box .ab-desc { font-size:0.75vw; color:rgba(255,255,255,0.5); margin-top:0.3vh; }
+        .acq-benefits { margin-top:2vh; }
+        .acq-benefit { display:flex; align-items:center; gap:0.5vw; margin-bottom:0.6vh; font-size:0.95vw; color:rgba(255,255,255,0.7); }
+        .acq-benefit::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--vip-gold); flex-shrink:0; }
+
+        /* Slide 5: Competitive Moat */
+        .moat-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:3vw; margin-top:2vh; }
+        .moat-bars { display:flex; flex-direction:column; gap:1.5vh; }
+        .moat-row { display:flex; align-items:center; gap:1vw; }
+        .moat-label { font-size:0.85vw; color:rgba(255,255,255,0.7); min-width:6vw; }
+        .moat-bar-wrap { flex:1; height:28px; background:rgba(255,255,255,0.04); border-radius:6px; overflow:hidden; position:relative; cursor:pointer; }
+        .moat-bar { height:100%; border-radius:6px; transition:width 0.8s ease; display:flex; align-items:center; padding-left:0.5vw; }
+        .moat-bar span { font-size:0.75vw; font-weight:600; color:white; opacity:0.9; }
+        .moat-cards { display:flex; flex-direction:column; gap:1.2vh; }
+        .moat-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.2vw; transition:border-color 0.2s; }
+        .moat-card:hover { border-color:var(--vip-gold); }
+        .moat-card h4 { font-size:1vw; font-weight:600; margin-bottom:0.3vh; }
+        .moat-card p { font-size:0.85vw; color:rgba(255,255,255,0.5); line-height:1.4; }
+
+        /* Slide 6: Parse.ly CEO View */
+        .parsely-ceo { display:grid; grid-template-columns:1fr 1fr; gap:2vw; margin-top:2vh; }
+        .parsely-ceo-panel { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2vh 1.5vw; }
+        .parsely-ceo-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5vh; }
+        .parsely-ceo-brand { font-size:1.1vw; font-weight:700; }
+        .parsely-ceo-brand span { color:var(--parsely-green); }
+        .p-tab { padding:0.4vh 0.8vw; border-radius:4px; font-size:0.75vw; font-weight:600; cursor:pointer; background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.5); border:none; transition:all 0.2s; }
+        .p-tab:hover { background:rgba(112,172,28,0.2); color:rgba(255,255,255,0.8); }
+        .p-tab.active { background:var(--parsely-green); color:white; }
+        .portfolio-kpis { display:grid; grid-template-columns:1fr 1fr; gap:0.8vw; margin-bottom:1.5vh; }
+        .p-kpi { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:1vh 0.8vw; text-align:center; transition:border-color 0.3s; }
+        .p-kpi:hover { border-color:var(--parsely-green); }
+        .p-kpi-val { font-size:1.6vw; font-weight:700; }
+        .p-kpi-change { font-size:0.65vw; font-weight:600; }
+        .p-kpi-change.up { color:#4ade80; }
+        .p-kpi-change.down { color:var(--vip-red); }
+        .p-kpi-label { font-size:0.6vw; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
+        .p-chart-wrap { background:rgba(255,255,255,0.02); border-radius:8px; padding:1vh 0.5vw; overflow:hidden; height:18vh; }
+        .p-chart-wrap svg { width:100%; height:100%; display:block; }
+        .brand-perf { display:flex; flex-direction:column; gap:0.8vh; }
+        .bp-row { display:flex; align-items:center; gap:0.6vw; padding:0.6vh 0; border-bottom:1px solid rgba(255,255,255,0.04); cursor:pointer; transition:background 0.2s; border-radius:4px; padding-left:0.3vw; }
+        .bp-row:hover { background:rgba(255,255,255,0.03); }
+        .bp-rank { font-size:0.8vw; font-weight:700; color:var(--parsely-green); min-width:1.2vw; }
+        .bp-name { font-size:0.85vw; font-weight:600; flex:1; }
+        .bp-views { font-size:0.8vw; color:rgba(255,255,255,0.5); }
+        .bp-bar-wrap { width:5vw; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+        .bp-bar { height:100%; border-radius:3px; background:var(--parsely-green); transition:width 0.5s ease; }
+        .insight-cards { display:grid; grid-template-columns:1fr 1fr; gap:0.8vw; margin-top:1.5vh; }
+        .insight-card { background:rgba(112,172,28,0.06); border:1px solid rgba(112,172,28,0.15); border-radius:8px; padding:1vh 0.8vw; }
+        .insight-card h4 { font-size:0.8vw; color:var(--parsely-green); margin-bottom:0.3vh; }
+        .insight-card p { font-size:0.75vw; color:rgba(255,255,255,0.6); line-height:1.3; }
+
+        /* Slide 7: Enterprise Foundation */
+        .found-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5vw; margin-top:3vh; }
+        .found-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:2.5vh 1.5vw; display:flex; gap:1vw; align-items:flex-start; transition:border-color 0.2s; }
+        .found-card:hover { border-color:var(--vip-gold); }
+        .found-icon { font-size:2vw; flex-shrink:0; }
+        .found-card h3 { font-size:1.1vw; margin-bottom:0.5vh; }
+        .found-card p { font-size:0.95vw; color:rgba(255,255,255,0.6); line-height:1.4; }
+        .found-badge { display:inline-block; background:rgba(216,164,95,0.12); border:1px solid rgba(216,164,95,0.25); border-radius:4px; padding:0.2vh 0.5vw; font-size:0.7vw; color:var(--vip-gold); font-weight:600; margin-top:0.5vh; }
+
+        /* Slide 8: Customer Carousel */
+        .carousel-container { position:relative; overflow:hidden; margin-top:2vh; }
+        .carousel-track { display:flex; gap:20px; transition:transform 0.5s ease; }
+        .cc-card { width:calc(100vw - 12vw - 20px); max-width:800px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 2vw; flex-shrink:0; }
+        .cc-company { font-size:1.6vw; font-weight:700; margin-bottom:0.3vh; }
+        .cc-industry { font-size:0.8vw; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1.5vh; }
+        .cc-quote { font-size:1vw; font-style:italic; color:rgba(255,255,255,0.7); line-height:1.5; border-left:2px solid var(--vip-gold); padding-left:1vw; margin-bottom:1.5vh; }
+        .cc-metrics { display:flex; gap:2vw; }
+        .cc-metric-val { font-size:1.5vw; font-weight:700; color:var(--vip-turquoise); }
+        .cc-metric-label { font-size:0.75vw; color:rgba(255,255,255,0.5); }
+        .carousel-dots { display:flex; justify-content:center; gap:8px; margin-top:2vh; }
+        .carousel-dot { width:10px; height:10px; border-radius:10px; border:none; background:rgba(255,255,255,0.2); cursor:pointer; transition:all 0.3s; }
+        .carousel-dot.active { width:24px; background:var(--vip-gold); }
+
+        /* Slide 9: CTA */
+        .cta-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; align-items:center; }
+        .cta-steps { margin-top:2vh; }
+        .cta-step { display:flex; gap:1vw; align-items:flex-start; margin-bottom:2vh; }
+        .cta-num { width:2.5vw; height:2.5vw; border-radius:50%; background:rgba(216,164,95,0.15); border:1px solid var(--vip-gold); display:flex; align-items:center; justify-content:center; font-size:1.1vw; font-weight:700; color:var(--vip-gold); flex-shrink:0; }
+        .cta-step h4 { font-size:1.15vw; font-weight:600; margin-bottom:0.3vh; }
+        .cta-step p { font-size:0.95vw; color:rgba(255,255,255,0.6); }
+        .cta-contact { margin-top:2vh; font-size:0.95vw; color:rgba(255,255,255,0.4); }
+        .cta-calendar { background:white; border-radius:12px; overflow:hidden; min-height:38vh; display:flex; flex-direction:column; }
+        .cta-cal-header { padding:1.5vh 1.5vw; border-bottom:1px solid #eee; }
+        .cta-cal-header h3 { color:var(--vip-gold-text); font-size:1.3vw; }
+        .cta-cal-body { flex:1; }
+
+        @media print { .nav-controls,.progress-bar,.overview-overlay { display:none !important; } .slide { opacity:1 !important; visibility:visible !important; position:relative !important; page-break-after:always; } }
+    </style>
+</head>
+<body>
+<div class="deck">
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- ==================== SLIDE 1: TITLE ==================== -->
+    <div class="slide slide-dark active" id="slide-1" data-title="Title">
+        <div class="geo-pattern geo-moire"></div>
+        <div class="corner-accent corner-tl"></div>
+        <div class="corner-accent corner-br"></div>
+        <div class="title-content">
+            <div class="vip-logo vip-logo-large anim d1"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+            <div class="gold-line gold-line-wide anim d2"></div>
+            <div class="title-customer anim d3">Valnet</div>
+            <div class="title-sub anim d4">Growth Infrastructure for the Next 27 Brands</div>
+            <div class="title-meta anim d5">Prepared for Hassan Youssef, CEO &amp; Co-Founder<br>February 2026</div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 2: WE KNOW VALNET ==================== -->
+    <div class="slide slide-gradient" id="slide-2" data-title="We Know Valnet">
+        <h2 class="anim d1">We Know Valnet</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="know-stats anim d3">
+            <div class="know-stat">
+                <div class="stat-number">27+</div>
+                <p>Portfolio brands across entertainment, tech, gaming, and auto</p>
+            </div>
+            <div class="know-stat">
+                <div class="stat-number">1.2B+</div>
+                <p>Annual readers in gaming alone. The largest gaming publisher.</p>
+            </div>
+            <div class="know-stat">
+                <div class="stat-number">1,500+</div>
+                <p>Team members producing content across 6 continents</p>
+            </div>
+            <div class="know-stat">
+                <div class="stat-number">13</div>
+                <p>Years of disciplined growth since founding in 2012</p>
+            </div>
+        </div>
+        <div class="know-timeline anim d4">
+            <div class="know-acq"><div class="acq-year">2016</div><div class="acq-name">Screen Rant</div></div>
+            <div class="know-acq"><div class="acq-year">2019</div><div class="acq-name">CBR</div></div>
+            <div class="know-acq"><div class="acq-year">2021</div><div class="acq-name">How-To Geek</div></div>
+            <div class="know-acq"><div class="acq-year">2022</div><div class="acq-name">Android Police</div></div>
+            <div class="know-acq"><div class="acq-year">2023</div><div class="acq-name">Collider</div></div>
+            <div class="know-acq"><div class="acq-year">2024</div><div class="acq-name">Fextralife</div></div>
+            <div class="know-acq"><div class="acq-year">2024</div><div class="acq-name">OpenCritic</div></div>
+            <div class="know-acq"><div class="acq-year">2025</div><div class="acq-name">Polygon</div></div>
+        </div>
+        <div class="know-footer anim d5">"Part investment platform, part publishing powerhouse." Your M&amp;A engine is unmatched. The question is: can your infrastructure keep pace?</div>
+    </div>
+
+    <!-- ==================== SLIDE 3: PLATFORM BEHIND THE PORTFOLIO ==================== -->
+    <div class="slide slide-dark" id="slide-3" data-title="Platform Behind the Portfolio">
+        <h2 class="anim d1">The Platform Behind the Portfolio</h2>
+        <p class="anim d2" style="font-size:1.2vw;color:rgba(255,255,255,0.6);max-width:50vw;">WordPress VIP is not a CMS. It is growth infrastructure for media companies that acquire, scale, and dominate.</p>
+        <div class="gold-line anim d2"></div>
+        <div class="pillars anim d3">
+            <div class="pillar">
+                <div class="pillar-icon">&#9889;</div>
+                <h3>Accelerate M&amp;A</h3>
+                <p>Onboard acquired brands in weeks, not months. Shared platform, independent identities.</p>
+                <div class="pillar-stat">4x</div>
+                <div class="pillar-stat-label">Faster Integration</div>
+            </div>
+            <div class="pillar">
+                <div class="pillar-icon">&#128200;</div>
+                <h3>Compound Returns</h3>
+                <p>Every platform improvement lifts all 27+ brands simultaneously. One investment, portfolio-wide impact.</p>
+                <div class="pillar-stat">27x</div>
+                <div class="pillar-stat-label">Leverage per Improvement</div>
+            </div>
+            <div class="pillar">
+                <div class="pillar-icon">&#127919;</div>
+                <h3>Focus on Product</h3>
+                <p>Let your engineers build audience tools and revenue features. We handle the infrastructure.</p>
+                <div class="pillar-stat">40%</div>
+                <div class="pillar-stat-label">Engineering Reclaimed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 4: ACQUIRE FASTER ==================== -->
+    <div class="slide slide-dark" id="slide-4" data-title="Acquire Faster">
+        <h2 class="anim d1">Acquire Faster, Integrate Instantly</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="acq-layout anim d3">
+            <div>
+                <p style="font-size:1vw;color:rgba(255,255,255,0.5);margin-bottom:1.5vh;">Click a brand to see integration details</p>
+                <div class="brand-grid" id="brand-grid">
+                    <div class="brand-tile active" data-brand="0"><div class="bt-name">Polygon</div><div class="bt-type">Gaming</div></div>
+                    <div class="brand-tile" data-brand="1"><div class="bt-name">How-To Geek</div><div class="bt-type">Technology</div></div>
+                    <div class="brand-tile" data-brand="2"><div class="bt-name">Fextralife</div><div class="bt-type">Gaming Wikis</div></div>
+                    <div class="brand-tile" data-brand="3"><div class="bt-name">Android Police</div><div class="bt-type">Mobile Tech</div></div>
+                    <div class="brand-tile" data-brand="4"><div class="bt-name">Collider</div><div class="bt-type">Entertainment</div></div>
+                    <div class="brand-tile" data-brand="5"><div class="bt-name">Next Acquisition</div><div class="bt-type">Any Vertical</div></div>
+                </div>
+            </div>
+            <div class="acq-detail" id="acq-detail">
+                <h3 id="acq-title">Polygon</h3>
+                <p id="acq-desc" style="font-size:0.95vw;color:rgba(255,255,255,0.6);">Premium gaming publication acquired from Vox Media in 2025.</p>
+                <div class="acq-compare">
+                    <div class="acq-box old">
+                        <div class="ab-label">Custom CMS Migration</div>
+                        <div class="ab-val" id="acq-old">6-9 mo</div>
+                        <div class="ab-desc">Rebuild templates, migrate content, test integrations</div>
+                    </div>
+                    <div class="acq-box new">
+                        <div class="ab-label">WordPress VIP</div>
+                        <div class="ab-val" id="acq-new">4-6 wk</div>
+                        <div class="ab-desc">Theme config, content import, same-day publishing</div>
+                    </div>
+                </div>
+                <div class="acq-benefits" id="acq-benefits">
+                    <div class="acq-benefit">Shared analytics across entire gaming portfolio</div>
+                    <div class="acq-benefit">Unified ad stack from day one</div>
+                    <div class="acq-benefit">Editorial team productive within first week</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 5: COMPETITIVE MOAT ==================== -->
+    <div class="slide slide-dark" id="slide-5" data-title="Competitive Moat">
+        <h2 class="anim d1">Competitive Moat at Scale</h2>
+        <p class="anim d2" style="font-size:1.1vw;color:rgba(255,255,255,0.5);">Performance is not just a technical metric. It is a competitive weapon for audience acquisition and SEO dominance.</p>
+        <div class="gold-line anim d2"></div>
+        <div class="moat-layout anim d3">
+            <div>
+                <h3 style="font-size:1.1vw;margin-bottom:1.5vh;color:rgba(255,255,255,0.7);">Core Web Vitals Performance</h3>
+                <div class="moat-bars">
+                    <div class="moat-row">
+                        <div class="moat-label">TTFB</div>
+                        <div class="moat-bar-wrap"><div class="moat-bar" style="width:92%;background:linear-gradient(90deg,var(--vip-turquoise),var(--parsely-green));"><span>92 / 100</span></div></div>
+                    </div>
+                    <div class="moat-row">
+                        <div class="moat-label">LCP</div>
+                        <div class="moat-bar-wrap"><div class="moat-bar" style="width:88%;background:linear-gradient(90deg,var(--vip-turquoise),var(--parsely-green));"><span>88 / 100</span></div></div>
+                    </div>
+                    <div class="moat-row">
+                        <div class="moat-label">CLS</div>
+                        <div class="moat-bar-wrap"><div class="moat-bar" style="width:95%;background:linear-gradient(90deg,var(--vip-turquoise),var(--parsely-green));"><span>95 / 100</span></div></div>
+                    </div>
+                    <div class="moat-row">
+                        <div class="moat-label">INP</div>
+                        <div class="moat-bar-wrap"><div class="moat-bar" style="width:90%;background:linear-gradient(90deg,var(--vip-turquoise),var(--parsely-green));"><span>90 / 100</span></div></div>
+                    </div>
+                </div>
+                <p style="font-size:0.8vw;color:rgba(255,255,255,0.35);margin-top:1vh;">Google rewards faster sites with higher rankings. Every 100ms of improvement compounds across 27+ brands.</p>
+            </div>
+            <div class="moat-cards">
+                <div class="moat-card">
+                    <h4 style="color:var(--vip-gold);">&#127760; 30+ Global Edge Locations</h4>
+                    <p>Sub-50ms response times worldwide. Your readers in Tokyo, London, and Sao Paulo all get the same experience.</p>
+                </div>
+                <div class="moat-card">
+                    <h4 style="color:var(--vip-gold);">&#128200; SEO Authority Amplification</h4>
+                    <p>Google's Core Web Vitals directly impact ranking. Better performance means more organic traffic across every brand.</p>
+                </div>
+                <div class="moat-card">
+                    <h4 style="color:var(--vip-gold);">&#9889; 99.99% Uptime SLA</h4>
+                    <p>Brand reputation is non-negotiable. Contractual uptime guarantees protect every property in your portfolio.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 6: PARSE.LY CEO VIEW ==================== -->
+    <div class="slide slide-dark" id="slide-6" data-title="Content Intelligence">
+        <h2 class="anim d1">Content Intelligence as Competitive Advantage</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="parsely-ceo anim d3">
+            <div class="parsely-ceo-panel">
+                <div class="parsely-ceo-header">
+                    <div class="parsely-ceo-brand"><span>Parse.ly</span> Portfolio View</div>
+                    <div style="display:flex;gap:0.3vw;">
+                        <button class="p-tab active" data-range="7d">7D</button>
+                        <button class="p-tab" data-range="30d">30D</button>
+                        <button class="p-tab" data-range="90d">90D</button>
+                    </div>
+                </div>
+                <div class="portfolio-kpis">
+                    <div class="p-kpi"><div class="p-kpi-val" id="p-visitors">18.4M</div><div class="p-kpi-change up" id="p-visitors-c">+11.2%</div><div class="p-kpi-label">Portfolio Visitors</div></div>
+                    <div class="p-kpi"><div class="p-kpi-val" id="p-pageviews">72M</div><div class="p-kpi-change up" id="p-pageviews-c">+8.6%</div><div class="p-kpi-label">Portfolio Page Views</div></div>
+                    <div class="p-kpi"><div class="p-kpi-val" id="p-engaged">2:38</div><div class="p-kpi-change up" id="p-engaged-c">+4.1%</div><div class="p-kpi-label">Avg Engaged Time</div></div>
+                    <div class="p-kpi"><div class="p-kpi-val" id="p-rpm">$14.20</div><div class="p-kpi-change up" id="p-rpm-c">+6.3%</div><div class="p-kpi-label">Portfolio RPM</div></div>
+                </div>
+                <div class="p-chart-wrap">
+                    <svg id="ceo-chart" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
+                        <defs><linearGradient id="ceoGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--parsely-green)" stop-opacity="0.35"/><stop offset="100%" stop-color="var(--parsely-green)" stop-opacity="0.02"/></linearGradient></defs>
+                        <line x1="20" y1="50" x2="580" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <line x1="20" y1="100" x2="580" y2="100" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <line x1="20" y1="150" x2="580" y2="150" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <path id="ceo-area" fill="url(#ceoGrad)"/>
+                        <path id="ceo-line" fill="none" stroke="var(--parsely-green)" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+            <div>
+                <div class="parsely-ceo-panel" style="margin-bottom:1.2vh;">
+                    <div class="parsely-ceo-header"><div class="parsely-ceo-brand">Brand Performance</div></div>
+                    <div class="brand-perf" id="brand-perf"></div>
+                </div>
+                <div class="insight-cards">
+                    <div class="insight-card"><h4>Cross-Portfolio Insight</h4><p>Gaming content drives 3x more engagement when cross-promoted with entertainment brands.</p></div>
+                    <div class="insight-card"><h4>Revenue Opportunity</h4><p>Top-performing articles across brands share content patterns that can be replicated portfolio-wide.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 7: ENTERPRISE FOUNDATION ==================== -->
+    <div class="slide slide-dark" id="slide-7" data-title="Enterprise Foundation">
+        <h2 class="anim d1">Enterprise-Grade Foundation</h2>
+        <p class="anim d2" style="font-size:1.2vw;color:rgba(255,255,255,0.5);">Your brands are your most valuable assets. They deserve infrastructure that protects and accelerates them.</p>
+        <div class="gold-line anim d2"></div>
+        <div class="found-grid">
+            <div class="found-card anim d3">
+                <div class="found-icon">&#128274;</div>
+                <div>
+                    <h3>Security as Brand Protection</h3>
+                    <p>A single breach across any of your 27 brands damages the entire portfolio. Automated patching, WAF, and DDoS protection across every property.</p>
+                    <span class="found-badge">SOC 2 Type II</span> <span class="found-badge">ISO 27001</span>
+                </div>
+            </div>
+            <div class="found-card anim d4">
+                <div class="found-icon">&#127760;</div>
+                <div>
+                    <h3>Global Scale, Zero Ops</h3>
+                    <p>30+ edge locations, auto-scaling to 500K+ requests per minute. Your infrastructure team focuses on product, not keeping the lights on.</p>
+                    <span class="found-badge">99.99% Uptime SLA</span>
+                </div>
+            </div>
+            <div class="found-card anim d4">
+                <div class="found-icon">&#128101;</div>
+                <div>
+                    <h3>The WordPress Talent Pool</h3>
+                    <p>43% of the web runs on WordPress. Hiring developers for a proprietary CMS is expensive and slow. WordPress talent is abundant and proven.</p>
+                    <span class="found-badge">60,000+ Plugins</span>
+                </div>
+            </div>
+            <div class="found-card anim d5">
+                <div class="found-icon">&#128640;</div>
+                <div>
+                    <h3>Future-Proof Platform</h3>
+                    <p>Headless, decoupled, traditional. WordPress VIP supports every architecture as your brands evolve. No lock-in, no limitations.</p>
+                    <span class="found-badge">Open Source</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 8: CUSTOMER CAROUSEL ==================== -->
+    <!-- PLACEHOLDER: Replace with actual WPVIP customer case studies -->
+    <div class="slide slide-dark" id="slide-8" data-title="Publishers Who Trust VIP">
+        <h2 class="anim d1">Publishers Who Trust WordPress VIP</h2>
+        <div class="gold-line anim d2"></div>
+        <div class="carousel-container anim d3">
+            <div class="carousel-track" id="carousel-track">
+                <div class="cc-card">
+                    <div class="cc-company">News Corp</div>
+                    <div class="cc-industry">Media / News</div>
+                    <div class="cc-quote">"Moving to WordPress VIP let us consolidate 12 properties onto one platform while cutting infrastructure costs by 40%."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">12</div><div class="cc-metric-label">Brands Consolidated</div></div><div><div class="cc-metric-val">40%</div><div class="cc-metric-label">Cost Reduction</div></div><div><div class="cc-metric-val">3x</div><div class="cc-metric-label">Faster Publishing</div></div></div>
+                </div>
+                <div class="cc-card">
+                    <div class="cc-company">TechCrunch</div>
+                    <div class="cc-industry">Technology Media</div>
+                    <div class="cc-quote">"Parse.ly transformed how our editors understand audience engagement. We publish smarter, not just faster."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">60%</div><div class="cc-metric-label">Engagement Increase</div></div><div><div class="cc-metric-val">200ms</div><div class="cc-metric-label">Avg Load Time</div></div><div><div class="cc-metric-val">2x</div><div class="cc-metric-label">Content Velocity</div></div></div>
+                </div>
+                <div class="cc-card">
+                    <div class="cc-company">Al Jazeera</div>
+                    <div class="cc-industry">Global News</div>
+                    <div class="cc-quote">"Enterprise-grade security and global CDN performance were non-negotiable. WordPress VIP delivered both."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">99.99%</div><div class="cc-metric-label">Uptime</div></div><div><div class="cc-metric-val">30+</div><div class="cc-metric-label">Global Edge Nodes</div></div><div><div class="cc-metric-val">0</div><div class="cc-metric-label">Security Incidents</div></div></div>
+                </div>
+                <div class="cc-card">
+                    <div class="cc-company">Rolling Stone</div>
+                    <div class="cc-industry">Entertainment</div>
+                    <div class="cc-quote">"Our editorial team went from fighting the CMS to focusing on storytelling."</div>
+                    <div class="cc-metrics"><div><div class="cc-metric-val">50%</div><div class="cc-metric-label">Faster Production</div></div><div><div class="cc-metric-val">2M+</div><div class="cc-metric-label">Daily Readers</div></div><div><div class="cc-metric-val">35%</div><div class="cc-metric-label">Higher Engagement</div></div></div>
+                </div>
+            </div>
+            <div class="carousel-dots">
+                <button class="carousel-dot active" data-index="0"></button>
+                <button class="carousel-dot" data-index="1"></button>
+                <button class="carousel-dot" data-index="2"></button>
+                <button class="carousel-dot" data-index="3"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SLIDE 9: CTA ==================== -->
+    <div class="slide slide-dark" id="slide-9" data-title="Next Steps">
+        <div class="cta-layout">
+            <div>
+                <div class="vip-logo vip-logo-large anim d1"><span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span></div>
+                <h2 class="anim d2">Let's Talk Growth</h2>
+                <div class="gold-line anim d3"></div>
+                <div class="cta-steps">
+                    <div class="cta-step anim d3"><div class="cta-num">1</div><div><h4>Executive Briefing</h4><p>How WordPress VIP accelerates M&amp;A integration for media portfolios</p></div></div>
+                    <div class="cta-step anim d4"><div class="cta-num">2</div><div><h4>Portfolio Assessment</h4><p>Map Valnet's 27+ brands to a phased migration roadmap</p></div></div>
+                    <div class="cta-step anim d5"><div class="cta-num">3</div><div><h4>Pilot Brand Launch</h4><p>Stand up one Valnet property on VIP in weeks, not months</p></div></div>
+                </div>
+                <div class="cta-contact anim d6">Contact: Nate Kelly / nate.kelly@wpvip.com</div>
+            </div>
+            <div class="anim d4">
+                <div class="cta-calendar">
+                    <div class="cta-cal-header"><h3>Book a Conversation</h3></div>
+                    <div class="cta-cal-body" style="padding:0;">
+                        <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border:0;width:100%;height:100%;min-height:500px;background:white;" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-controls" id="nav-controls">
+        <button class="nav-btn" id="btn-prev">&#8592;</button>
+        <span class="slide-counter" id="slide-counter">1 / 9</span>
+        <button class="nav-btn" id="btn-next">&#8594;</button>
+    </div>
+
+    <!-- Overview -->
+    <div class="overview-overlay" id="overview-overlay">
+        <div style="cursor:pointer;position:fixed;top:2vh;right:2vw;font-size:1.5vw;color:white;z-index:210;opacity:0.7;" id="overview-close">&times;</div>
+        <div class="overview-grid" id="overview-grid"></div>
+    </div>
+</div>
+
+<script>
+(function(){
+    'use strict';
+    var TOTAL=9, cur=1, isOverview=false, carouselTimer=null;
+    var slides=document.querySelectorAll('.slide');
+    var bar=document.getElementById('progress-bar');
+    var counter=document.getElementById('slide-counter');
+    var nav=document.getElementById('nav-controls');
+
+    function go(n){
+        if(n<1||n>TOTAL)return;
+        slides.forEach(function(s){s.classList.remove('active');});
+        cur=n; slides[cur-1].classList.add('active');
+        bar.style.width=((cur/TOTAL)*100)+'%';
+        counter.textContent=cur+' / '+TOTAL;
+        nav.classList.toggle('on-light',slides[cur-1].classList.contains('slide-light'));
+        clearInterval(carouselTimer);
+        if(cur===8) startCarousel();
+    }
+
+    document.getElementById('btn-prev').onclick=function(){go(cur-1);};
+    document.getElementById('btn-next').onclick=function(){go(cur+1);};
+
+    document.addEventListener('keydown',function(e){
+        if(isOverview){if(e.key==='Escape')toggleOverview();return;}
+        if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1);}
+        else if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1);}
+        else if(e.key==='Escape')toggleOverview();
+    });
+    counter.addEventListener('click',toggleOverview);
+
+    var tx=0,ty=0;
+    document.addEventListener('touchstart',function(e){tx=e.changedTouches[0].clientX;ty=e.changedTouches[0].clientY;},{passive:true});
+    document.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){dx<0?go(cur+1):go(cur-1);}},{passive:true});
+
+    function toggleOverview(){
+        isOverview=!isOverview;
+        var ov=document.getElementById('overview-overlay');
+        if(isOverview){buildOverview();ov.classList.add('active');}else{ov.classList.remove('active');}
+    }
+    document.getElementById('overview-close').onclick=toggleOverview;
+
+    function buildOverview(){
+        var grid=document.getElementById('overview-grid');grid.innerHTML='';
+        var titles=['Title','We Know Valnet','Platform Behind Portfolio','Acquire Faster','Competitive Moat','Content Intelligence','Enterprise Foundation','Publishers Who Trust VIP','Next Steps'];
+        titles.forEach(function(t,i){
+            var d=document.createElement('div');d.className='overview-thumb'+(i+1===cur?' current':'');
+            d.innerHTML='<div class="overview-thumb-title">'+t+'</div><div class="overview-thumb-num">'+(i+1)+'</div>';
+            d.onclick=function(){go(i+1);toggleOverview();};
+            grid.appendChild(d);
+        });
+    }
+
+    /* ========== SLIDE 4: BRAND INTEGRATION EXPLORER ========== */
+    var brandData=[
+        {name:'Polygon',desc:'Premium gaming publication acquired from Vox Media in 2025.',old:'6-9 mo',new:'4-6 wk',benefits:['Shared analytics across entire gaming portfolio','Unified ad stack from day one','Editorial team productive within first week']},
+        {name:'How-To Geek',desc:'Leading technology explainer brand. Millions of monthly how-to searches.',old:'4-6 mo',new:'3-4 wk',benefits:['SEO authority preserved through clean URL migration','Shared tech vertical ad inventory with XDA and MakeUseOf','Content templates replicated across tech brands']},
+        {name:'Fextralife',desc:'Premier gaming wiki and community platform with deep engagement.',old:'8-12 mo',new:'6-8 wk',benefits:['Community features integrated with WordPress plugins','Wiki content structure maps to WordPress custom post types','User-generated content moderation at scale']},
+        {name:'Android Police',desc:'Authoritative mobile technology publication with loyal readership.',old:'4-6 mo',new:'3-4 wk',benefits:['Mobile-first theme shared with Pocket-lint and XDA','Breaking news workflow optimized for speed','Push notification infrastructure included']},
+        {name:'Collider',desc:'Entertainment news and analysis brand covering film, TV, and streaming.',old:'3-5 mo',new:'2-3 wk',benefits:['Screen portfolio shared design system with Screen Rant and CBR','Interview and review templates standardized','Video embed optimization for editorial content']},
+        {name:'Next Acquisition',desc:'Whatever brand you acquire next, WordPress VIP is ready on day one.',old:'3-12 mo',new:'2-8 wk',benefits:['Pre-built migration tooling for any source CMS','Instant access to Parse.ly, CDN, and security','Same-day editorial onboarding with existing workflows']}
+    ];
+
+    document.querySelectorAll('.brand-tile').forEach(function(tile){
+        tile.onclick=function(){
+            document.querySelectorAll('.brand-tile').forEach(function(t){t.classList.remove('active');});
+            tile.classList.add('active');
+            var d=brandData[+tile.dataset.brand];
+            document.getElementById('acq-title').textContent=d.name;
+            document.getElementById('acq-desc').textContent=d.desc;
+            document.getElementById('acq-old').textContent=d.old;
+            document.getElementById('acq-new').textContent=d.new;
+            var bEl=document.getElementById('acq-benefits');bEl.innerHTML='';
+            d.benefits.forEach(function(b){
+                var div=document.createElement('div');div.className='acq-benefit';
+                div.textContent=b;bEl.appendChild(div);
+            });
+        };
+    });
+
+    /* ========== SLIDE 6: PARSE.LY CEO DASHBOARD ========== */
+    var ceoData={
+        '7d':{v:'18.4M',vc:'+11.2%',pv:'72M',pc:'+8.6%',e:'2:38',ec:'+4.1%',rpm:'$14.20',rc:'+6.3%',
+            chart:[55,58,62,68,72,75,80,82,78,85,88,92,90,95,98,100],
+            brands:[{n:'Screen Rant',v:'12.4M',pct:100},{n:'Game Rant',v:'8.2M',pct:66},{n:'How-To Geek',v:'7.1M',pct:57},{n:'Polygon',v:'5.8M',pct:47},{n:'CBR',v:'5.2M',pct:42},{n:'Android Police',v:'4.9M',pct:40},{n:'MakeUseOf',v:'4.1M',pct:33},{n:'Collider',v:'3.6M',pct:29}]},
+        '30d':{v:'74M',vc:'+14.8%',pv:'290M',pc:'+12.1%',e:'2:42',ec:'+5.3%',rpm:'$15.10',rc:'+8.7%',
+            chart:[42,48,52,55,60,58,65,70,72,78,82,80,88,92,95,105],
+            brands:[{n:'Screen Rant',v:'48M',pct:100},{n:'Game Rant',v:'32M',pct:67},{n:'How-To Geek',v:'28M',pct:58},{n:'Polygon',v:'24M',pct:50},{n:'CBR',v:'21M',pct:44},{n:'Android Police',v:'19M',pct:40},{n:'MakeUseOf',v:'16M',pct:33},{n:'Collider',v:'14M',pct:29}]},
+        '90d':{v:'210M',vc:'+18.3%',pv:'840M',pc:'+15.6%',e:'2:35',ec:'+3.9%',rpm:'$14.80',rc:'+7.1%',
+            chart:[30,35,40,42,48,52,55,58,62,68,72,78,85,90,98,108],
+            brands:[{n:'Screen Rant',v:'142M',pct:100},{n:'Game Rant',v:'94M',pct:66},{n:'How-To Geek',v:'82M',pct:58},{n:'Polygon',v:'68M',pct:48},{n:'CBR',v:'61M',pct:43},{n:'Android Police',v:'56M',pct:39},{n:'MakeUseOf',v:'48M',pct:34},{n:'Collider',v:'42M',pct:30}]}
+    };
+
+    function drawCeoChart(pts){
+        var w=600,h=200,pL=20,pR=20,pT=20,pB=15;
+        var mx=Math.max.apply(null,pts),mn=Math.min.apply(null,pts)*0.8,rng=mx-mn||1;
+        var st=(w-pL-pR)/(pts.length-1);
+        var coords=pts.map(function(v,i){return{x:pL+i*st,y:pT+((mx-v)/rng)*(h-pT-pB)};});
+        var line='M'+coords.map(function(c){return c.x+','+c.y;}).join(' L');
+        var area=line+' L'+coords[coords.length-1].x+','+(h-pB)+' L'+coords[0].x+','+(h-pB)+' Z';
+        document.getElementById('ceo-line').setAttribute('d',line);
+        document.getElementById('ceo-area').setAttribute('d',area);
+    }
+
+    function animVal(el,txt){el.style.transition='opacity 0.15s';el.style.opacity='0';setTimeout(function(){el.textContent=txt;el.style.opacity='1';},150);}
+
+    function updateCeoDash(range){
+        var d=ceoData[range];if(!d)return;
+        animVal(document.getElementById('p-visitors'),d.v);
+        document.getElementById('p-visitors-c').textContent=d.vc;
+        animVal(document.getElementById('p-pageviews'),d.pv);
+        document.getElementById('p-pageviews-c').textContent=d.pc;
+        animVal(document.getElementById('p-engaged'),d.e);
+        document.getElementById('p-engaged-c').textContent=d.ec;
+        animVal(document.getElementById('p-rpm'),d.rpm);
+        document.getElementById('p-rpm-c').textContent=d.rc;
+        drawCeoChart(d.chart);
+        var bp=document.getElementById('brand-perf');bp.innerHTML='';
+        d.brands.forEach(function(b,i){
+            bp.innerHTML+='<div class="bp-row" style="opacity:0;animation:fadeInUp 0.3s ease '+(i*0.04)+'s forwards;"><span class="bp-rank">'+(i+1)+'</span><span class="bp-name">'+b.n+'</span><span class="bp-views">'+b.v+'</span><div class="bp-bar-wrap"><div class="bp-bar" style="width:'+b.pct+'%;"></div></div></div>';
+        });
+    }
+
+    document.querySelectorAll('.p-tab').forEach(function(tab){
+        tab.onclick=function(){
+            document.querySelectorAll('.p-tab').forEach(function(t){t.classList.remove('active');});
+            tab.classList.add('active');updateCeoDash(tab.dataset.range);
+        };
+    });
+    drawCeoChart(ceoData['7d'].chart);
+    updateCeoDash('7d');
+
+    /* ========== SLIDE 8: CUSTOMER CAROUSEL ========== */
+    var cTrack=document.getElementById('carousel-track'),cIdx=0,cTotal=4;
+    function goCard(i){
+        cIdx=i;
+        var card=cTrack.children[0];
+        if(card){var cardW=card.offsetWidth+20;cTrack.style.transform='translateX(-'+(i*cardW)+'px)';}
+        document.querySelectorAll('.carousel-dot').forEach(function(d,j){d.classList.toggle('active',j===i);});
+    }
+    document.querySelectorAll('.carousel-dot').forEach(function(dot){
+        dot.onclick=function(){goCard(+dot.dataset.index);};
+    });
+    function startCarousel(){
+        carouselTimer=setInterval(function(){goCard((cIdx+1)%cTotal);},4000);
+    }
+
+    go(1);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Version Media | WordPress VIP</title>
+    <style>
+        :root {
+            --vip-black: #13191E;
+            --vip-black-light: #1c2530;
+            --vip-white: #FFFFFF;
+            --vip-gold: #D8A45F;
+            --vip-gold-text: #9A6014;
+            --vip-gold-light: #EAE3DA;
+            --vip-turquoise: #3EA0AD;
+            --vip-turquoise-light: #B9E4EA;
+            --vip-turquoise-dark: #194146;
+            --vip-purple: #9C5CE1;
+            --vip-gray: #A8ABAD;
+            --vip-gray-light: #DBDCDD;
+            --vip-off-white: #F5F5F5;
+            --vip-red: #FF595E;
+            --vip-orange: #FB902F;
+            --vip-blueberry: #3858E9;
+            --parsely-green: #70AC1C;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; }
+        .deck { position:relative; width:100vw; height:100vh; }
+        .slide { position:absolute; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; justify-content:center; padding:5vh 6vw; opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s ease; overflow:hidden; }
+        .slide.active { opacity:1; visibility:visible; }
+        h1 { font-size:3.2vw; font-weight:700; letter-spacing:-0.03em; line-height:1.05; margin-bottom:1.5vh; }
+        h2 { font-size:2.4vw; font-weight:600; letter-spacing:-0.02em; line-height:1.1; margin-bottom:1.5vh; }
+        h3 { font-size:1.6vw; font-weight:600; letter-spacing:-0.01em; line-height:1.2; margin-bottom:1vh; }
+        p, li { font-size:1.3vw; font-weight:400; line-height:1.5; }
+        .caption { font-size:0.9vw; font-weight:500; letter-spacing:0.05em; line-height:1.4; text-transform:uppercase; }
+        .stat-number { font-size:5vw; font-weight:700; letter-spacing:-0.04em; line-height:1.0; }
+        .vip-logo { font-size:1.2vw; letter-spacing:-0.01em; margin-bottom:2vh; }
+        .vip-logo .logo-wp { font-weight:400; }
+        .vip-logo .logo-vip { font-weight:700; color:var(--vip-gold); }
+        .vip-logo-large { font-size:1.8vw; }
+        .gold-line { width:60px; height:2px; background:var(--vip-gold); margin:2vh 0; }
+        .gold-line-wide { width:120px; }
+        .gold-line-center { margin-left:auto; margin-right:auto; }
+
+        /* Geometric Patterns */
+        .geo-pattern { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.04; }
+        .geo-lines { background:repeating-linear-gradient(45deg,transparent,transparent 30px,var(--vip-gold) 30px,var(--vip-gold) 31px); }
+        .geo-moire { background:repeating-linear-gradient(0deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px),repeating-linear-gradient(60deg,transparent,transparent 20px,var(--vip-gold) 20px,var(--vip-gold) 21px); }
+        .geo-concentric { background:repeating-radial-gradient(circle at 80% 50%, transparent, transparent 25px, var(--vip-gold) 25px, var(--vip-gold) 26px); }
+        .geo-parallel { background:repeating-linear-gradient(135deg,transparent,transparent 15px,var(--vip-gold) 15px,var(--vip-gold) 16px); }
+
+        /* Corner Accents */
+        .corner-accent { position:absolute; width:40px; height:40px; border-color:var(--vip-gold); border-style:solid; border-width:0; }
+        .corner-tl { top:3vh; left:3vw; border-top-width:2px; border-left-width:2px; }
+        .corner-br { bottom:3vh; right:3vw; border-bottom-width:2px; border-right-width:2px; }
+        .corner-tr { top:3vh; right:3vw; border-top-width:2px; border-right-width:2px; }
+        .corner-bl { bottom:3vh; left:3vw; border-bottom-width:2px; border-left-width:2px; }
+
+        /* Slide Types */
+        .slide-dark { background:var(--vip-black); color:var(--vip-white); }
+        .slide-light { background:var(--vip-white); color:var(--vip-black); }
+        .slide-light h1,.slide-light h2,.slide-light h3 { color:var(--vip-black); }
+        .slide-gradient { background:linear-gradient(135deg,var(--vip-black) 0%,var(--vip-black-light) 100%); color:var(--vip-white); }
+        .slide-off-white { background:var(--vip-off-white); color:var(--vip-black); }
+        .slide-off-white h1,.slide-off-white h2,.slide-off-white h3 { color:var(--vip-black); }
+
+        /* Animations */
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0% { transform:scale(1); opacity:0.6; } 100% { transform:scale(2.5); opacity:0; } }
+        @keyframes countUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+        .slide.active .anim { animation:fadeInUp 0.6s ease forwards; }
+        .slide.active .d1 { animation-delay:0.1s; opacity:0; }
+        .slide.active .d2 { animation-delay:0.2s; opacity:0; }
+        .slide.active .d3 { animation-delay:0.3s; opacity:0; }
+        .slide.active .d4 { animation-delay:0.4s; opacity:0; }
+        .slide.active .d5 { animation-delay:0.5s; opacity:0; }
+        .slide.active .d6 { animation-delay:0.6s; opacity:0; }
+        .slide.active .d7 { animation-delay:0.7s; opacity:0; }
+        .slide.active .d8 { animation-delay:0.8s; opacity:0; }
+
+        /* Nav Controls */
+        .nav-controls { position:fixed; bottom:2.5vh; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:1.5vw; z-index:100; }
+        .nav-btn { width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); background:rgba(19,25,30,0.8); color:var(--vip-white); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; backdrop-filter:blur(10px); }
+        .nav-btn:hover { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .nav-controls.on-light .nav-btn { border-color:rgba(0,0,0,0.2); background:rgba(255,255,255,0.8); color:var(--vip-black); }
+        .nav-controls.on-light .nav-btn:hover { border-color:var(--vip-gold-text); color:var(--vip-gold-text); }
+        .nav-controls.on-light .slide-counter { color:rgba(0,0,0,0.5); }
+        .slide-counter { font-size:14px; color:rgba(255,255,255,0.5); font-weight:500; cursor:pointer; padding:6px 12px; border-radius:20px; transition:all 0.2s; user-select:none; }
+        .slide-counter:hover { color:var(--vip-gold); }
+        .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--vip-gold); transition:width 0.4s ease; z-index:100; }
+
+        /* Overview Mode */
+        .overview-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:200; display:none; padding:4vh 4vw; overflow-y:auto; }
+        .overview-overlay.active { display:block; }
+        .overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2vw; }
+        .overview-thumb { aspect-ratio:16/9; border-radius:6px; overflow:hidden; cursor:pointer; border:2px solid transparent; transition:all 0.2s; position:relative; background:var(--vip-black); display:flex; align-items:center; justify-content:center; padding:1vw; }
+        .overview-thumb:hover { border-color:var(--vip-gold); transform:scale(1.03); }
+        .overview-thumb.current { border-color:var(--vip-gold); }
+        .overview-thumb-title { font-size:0.9vw; font-weight:600; color:var(--vip-white); text-align:center; }
+        .overview-thumb-num { position:absolute; bottom:6px; right:8px; font-size:0.7vw; color:var(--vip-gray); }
+
+        /* Print */
+        @media print {
+            .nav-controls, .progress-bar, .overview-overlay, .slide-counter { display:none !important; }
+            .slide { position:relative !important; opacity:1 !important; visibility:visible !important; page-break-after:always; }
+        }
+
+        /* ====================== SLIDE 1: Title ====================== */
+        .title-content { position:relative; z-index:1; }
+        .title-customer { font-size:5vw; font-weight:700; letter-spacing:-0.04em; line-height:1; margin:3vh 0 2vh; }
+        .title-sub { font-size:1.6vw; font-weight:400; color:rgba(255,255,255,0.7); margin-bottom:1.5vh; }
+        .title-meta { font-size:1vw; color:rgba(255,255,255,0.4); margin-top:3vh; }
+        .title-gold-bar { position:absolute; right:6vw; top:15vh; width:3px; height:70vh; background:linear-gradient(to bottom, transparent, var(--vip-gold), transparent); opacity:0.3; }
+
+        /* ====================== SLIDE 2: Agenda ====================== */
+        .agenda-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:4vw; margin-top:2vh; align-items:start; }
+        .agenda-intro { font-size:1.3vw; color:rgba(255,255,255,0.6); line-height:1.6; margin-top:2vh; }
+        .agenda-list { list-style:none; counter-reset:agenda; }
+        .agenda-list li { counter-increment:agenda; padding:1.8vh 0; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:baseline; gap:1.2vw; font-size:1.2vw; color:rgba(255,255,255,0.85); }
+        .agenda-list li::before { content:counter(agenda, decimal-leading-zero); font-size:1.4vw; font-weight:700; color:var(--vip-gold); min-width:2.5vw; }
+        .agenda-list li:last-child { border-bottom:none; }
+
+        /* ====================== SLIDE 3: Your World ====================== */
+        .world-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:4vw; margin-top:2vh; align-items:center; }
+        .world-stat { margin-bottom:3vh; }
+        .world-stat .stat-number { color:var(--vip-gold); font-size:6vw; }
+        .world-stat .stat-label { font-size:1.6vw; color:rgba(255,255,255,0.7); margin-top:0.5vh; }
+        .world-narrative { font-size:1.2vw; color:rgba(255,255,255,0.7); line-height:1.7; margin-bottom:2vh; }
+        .world-cards { display:flex; flex-direction:column; gap:1.5vh; }
+        .world-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2vh 1.5vw; display:flex; align-items:center; gap:1.2vw; }
+        .world-card-icon { width:40px; height:40px; border-radius:8px; background:rgba(216,164,95,0.15); display:flex; align-items:center; justify-content:center; font-size:1.3vw; flex-shrink:0; }
+        .world-card h3 { font-size:1.1vw; margin-bottom:0.3vh; }
+        .world-card p { font-size:0.95vw; color:rgba(255,255,255,0.55); }
+
+        /* ====================== SLIDE 4: The Challenge ====================== */
+        .challenge-layout { display:grid; grid-template-columns:1fr 2px 1fr; gap:2.5vw; margin-top:2vh; align-items:start; }
+        .challenge-divider { background:var(--vip-gold); opacity:0.3; height:100%; min-height:35vh; }
+        .challenge-col h3 { font-size:1.4vw; margin-bottom:2vh; }
+        .challenge-col.current h3 { color:rgba(255,255,255,0.5); }
+        .challenge-col.future h3 { color:var(--vip-gold); }
+        .challenge-item { display:flex; align-items:flex-start; gap:0.8vw; padding:1vh 0; margin-bottom:0.5vh; }
+        .challenge-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8vw; flex-shrink:0; margin-top:0.2vh; }
+        .challenge-col.current .challenge-icon { background:rgba(255,89,94,0.15); color:var(--vip-red); }
+        .challenge-col.future .challenge-icon { background:rgba(62,160,173,0.15); color:var(--vip-turquoise); }
+        .challenge-item-text h4 { font-size:1.05vw; font-weight:600; margin-bottom:0.2vh; }
+        .challenge-item-text p { font-size:0.9vw; color:rgba(255,255,255,0.55); line-height:1.4; }
+        .challenge-col.current .challenge-item-text h4 { color:rgba(255,255,255,0.6); }
+        .challenge-col.future .challenge-item-text h4 { color:rgba(255,255,255,0.9); }
+        .challenge-footer { margin-top:2vh; padding:1.5vh 2vw; background:rgba(216,164,95,0.08); border-radius:8px; border-left:3px solid var(--vip-gold); grid-column:1/-1; }
+        .challenge-footer p { font-size:1.1vw; color:rgba(255,255,255,0.7); }
+
+        /* ====================== SLIDE 5: Comparison Matrix ====================== */
+        .compare-container { margin-top:1.5vh; }
+        .compare-tabs { display:flex; gap:0.6vw; margin-bottom:2vh; flex-wrap:wrap; }
+        .compare-tab { padding:0.8vh 1.4vw; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:transparent; color:rgba(255,255,255,0.6); font-size:0.95vw; font-weight:500; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+        .compare-tab.active { background:var(--vip-gold); color:var(--vip-black); border-color:var(--vip-gold); }
+        .compare-tab:hover:not(.active) { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .compare-table-wrap { border:1px solid rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; }
+        .compare-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+        .compare-table th { padding:1.2vh 1.2vw; font-size:0.95vw; font-weight:600; text-align:left; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.1); }
+        .compare-table th:first-child { width:40%; }
+        .compare-table th:nth-child(2) { width:30%; color:rgba(255,255,255,0.4); }
+        .compare-table th:nth-child(3) { width:30%; color:var(--vip-gold); }
+        .compare-table td { padding:1vh 1.2vw; font-size:0.95vw; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .compare-table tr:nth-child(odd) td { background:rgba(255,255,255,0.02); }
+        .compare-table tr:last-child td { border-bottom:none; }
+        .compare-table td:first-child { color:rgba(255,255,255,0.8); }
+        .compare-row { display:table-row; }
+        .compare-row.hidden { display:none; }
+        .indicator { font-size:1.1vw; display:inline-flex; align-items:center; gap:0.4vw; }
+        .indicator.check { color:var(--vip-turquoise); }
+        .indicator.partial { color:var(--vip-orange); }
+        .indicator.cross { color:var(--vip-red); opacity:0.6; }
+        .indicator-note { font-size:0.75vw; color:rgba(255,255,255,0.4); }
+
+        /* ====================== SLIDE 6: CDN Explorer ====================== */
+        .cdn-layout { display:grid; grid-template-columns:1.6fr 1fr; gap:2vw; margin-top:1vh; align-items:start; }
+        .cdn-map-container { position:relative; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5vh; overflow:hidden; }
+        .cdn-map-container svg { width:100%; height:auto; }
+        .cdn-node { cursor:pointer; }
+        .cdn-node circle.node-dot { fill:var(--vip-turquoise); }
+        .cdn-node circle.node-ring { fill:none; stroke:var(--vip-turquoise); stroke-width:1; opacity:0.4; }
+        .cdn-node circle.node-pulse { fill:var(--vip-turquoise); opacity:0; }
+        .cdn-node text { fill:rgba(255,255,255,0.7); font-size:8px; font-family:inherit; }
+        @keyframes cdnPulse { 0% { r:5; opacity:0.4; } 100% { r:15; opacity:0; } }
+        .cdn-node:hover circle.node-pulse { animation:cdnPulse 1.2s ease-out infinite; }
+        .cdn-tooltip { position:absolute; background:var(--vip-black); border:1px solid var(--vip-gold); border-radius:8px; padding:1vh 1vw; z-index:10; pointer-events:none; display:none; min-width:160px; }
+        .cdn-tooltip.visible { display:block; }
+        .cdn-tooltip h4 { font-size:0.85vw; color:var(--vip-gold); margin-bottom:0.3vh; }
+        .cdn-tooltip p { font-size:0.75vw; color:rgba(255,255,255,0.7); line-height:1.4; }
+        .cdn-stats { display:flex; flex-direction:column; gap:1.2vh; }
+        .cdn-stat-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.2vw; }
+        .cdn-stat-card .stat-val { font-size:1.8vw; font-weight:700; color:var(--vip-turquoise); }
+        .cdn-stat-card .stat-label { font-size:0.8vw; color:rgba(255,255,255,0.5); margin-top:0.2vh; }
+        .cdn-stat-card.gold .stat-val { color:var(--vip-gold); }
+
+        /* ====================== SLIDE 7: Collaborative Editing ====================== */
+        .collab-layout { display:grid; grid-template-columns:1.3fr 1fr; gap:2.5vw; margin-top:1.5vh; align-items:start; }
+        .editor-panel { background:var(--vip-white); border-radius:10px; overflow:hidden; color:var(--vip-black); }
+        .editor-toolbar { display:flex; align-items:center; gap:0.5vw; padding:0.8vh 1vw; background:#f0f0f0; border-bottom:1px solid #ddd; }
+        .toolbar-btn { width:28px; height:28px; border-radius:4px; border:1px solid #ccc; background:white; display:flex; align-items:center; justify-content:center; font-size:0.7vw; font-weight:700; color:#555; cursor:default; }
+        .toolbar-divider { width:1px; height:20px; background:#ddd; margin:0 0.3vw; }
+        .editor-avatars { display:flex; margin-left:auto; gap:-0.3vw; }
+        .editor-avatar { width:24px; height:24px; border-radius:50%; border:2px solid white; display:flex; align-items:center; justify-content:center; font-size:0.5vw; font-weight:700; color:white; margin-left:-6px; }
+        .editor-avatar:first-child { margin-left:0; }
+        .editor-body { padding:2vh 1.5vw; min-height:28vh; position:relative; }
+        .editor-body .typed-line { min-height:1.6em; font-size:1vw; line-height:1.6; color:var(--vip-black); }
+        .editor-body .typed-headline { font-size:1.4vw; font-weight:700; min-height:1.8em; margin-bottom:0.5vh; color:var(--vip-black); }
+        .editor-body .typed-note { font-size:0.85vw; color:#888; min-height:1.4em; margin-top:1vh; padding:0.5vh 0.8vw; border-left:3px solid var(--vip-turquoise); background:rgba(62,160,173,0.06); }
+        .cursor-indicator { display:inline-block; width:2px; height:1em; animation:blink 0.8s infinite; vertical-align:text-bottom; }
+        .cursor-blue { background:#3858E9; }
+        .cursor-green { background:#70AC1C; }
+        .cursor-purple { background:#9C5CE1; }
+        .cursor-label { position:absolute; font-size:0.55vw; font-weight:600; padding:1px 4px; border-radius:3px; color:white; white-space:nowrap; top:-12px; left:0; }
+        .collab-features { display:flex; flex-direction:column; gap:1vh; }
+        .collab-feature { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:1.2vh 1vw; cursor:pointer; transition:all 0.3s; }
+        .collab-feature:hover { border-color:var(--vip-gold); background:rgba(216,164,95,0.06); }
+        .collab-feature.expanded { border-color:var(--vip-turquoise); background:rgba(62,160,173,0.06); }
+        .collab-feature-header { display:flex; align-items:center; gap:0.6vw; }
+        .collab-feature-icon { font-size:1.1vw; }
+        .collab-feature h4 { font-size:0.95vw; font-weight:600; }
+        .collab-feature-detail { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
+        .collab-feature.expanded .collab-feature-detail { max-height:80px; }
+        .collab-feature-detail p { font-size:0.8vw; color:rgba(255,255,255,0.55); padding-top:0.6vh; line-height:1.4; }
+
+        /* ====================== SLIDE 8: Parse.ly Dashboard ====================== */
+        .parsely-layout { display:grid; grid-template-columns:1.4fr 1fr; gap:2vw; margin-top:1vh; align-items:start; }
+        .parsely-dashboard { background:var(--vip-white); border-radius:10px; overflow:hidden; color:var(--vip-black); }
+        .parsely-header { display:flex; align-items:center; justify-content:space-between; padding:1.2vh 1.5vw; background:linear-gradient(135deg,#f8f8f8,#fff); border-bottom:1px solid #eee; }
+        .parsely-brand { display:flex; align-items:center; gap:0.5vw; }
+        .parsely-brand-icon { width:20px; height:20px; background:var(--parsely-green); border-radius:4px; display:flex; align-items:center; justify-content:center; }
+        .parsely-brand-icon span { color:white; font-size:0.7vw; font-weight:700; }
+        .parsely-brand-name { font-size:1vw; font-weight:600; color:var(--vip-black); }
+        .parsely-tabs { display:flex; gap:0.3vw; }
+        .parsely-tab { padding:0.4vh 0.8vw; border-radius:4px; font-size:0.7vw; font-weight:600; cursor:pointer; border:none; background:transparent; color:#999; transition:all 0.2s; font-family:inherit; }
+        .parsely-tab.active { background:var(--parsely-green); color:white; }
+        .parsely-tab:hover:not(.active) { background:#eee; color:#555; }
+        .parsely-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:0.8vw; padding:1.2vh 1.2vw; }
+        .parsely-kpi { text-align:center; padding:0.8vh 0.5vw; }
+        .parsely-kpi-val { font-size:1.3vw; font-weight:700; color:var(--vip-black); }
+        .parsely-kpi-label { font-size:0.6vw; color:#999; text-transform:uppercase; letter-spacing:0.05em; margin-top:0.2vh; }
+        .parsely-kpi-change { font-size:0.6vw; font-weight:600; margin-top:0.1vh; }
+        .parsely-kpi-change.up { color:var(--parsely-green); }
+        .parsely-kpi-change.down { color:var(--vip-red); }
+        .parsely-chart { padding:0 1.2vw 1vh; }
+        .parsely-chart svg { width:100%; height:auto; }
+        .parsely-sidebar { display:flex; flex-direction:column; gap:1.5vh; }
+        .parsely-trending { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.2vw; }
+        .parsely-trending h4 { font-size:0.9vw; color:var(--vip-gold); margin-bottom:1vh; }
+        .trending-item { display:flex; align-items:flex-start; gap:0.6vw; padding:0.6vh 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .trending-item:last-child { border-bottom:none; }
+        .trending-rank { font-size:0.8vw; font-weight:700; color:var(--vip-gold); min-width:1.2vw; }
+        .trending-info h5 { font-size:0.8vw; font-weight:500; color:rgba(255,255,255,0.8); line-height:1.3; }
+        .trending-info span { font-size:0.65vw; color:rgba(255,255,255,0.4); }
+        .parsely-sources { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.5vh 1.2vw; }
+        .parsely-sources h4 { font-size:0.9vw; color:var(--vip-gold); margin-bottom:1vh; }
+        .source-row { display:flex; align-items:center; gap:0.6vw; margin-bottom:0.7vh; }
+        .source-label { font-size:0.75vw; color:rgba(255,255,255,0.6); min-width:3.5vw; }
+        .source-bar-bg { flex:1; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+        .source-bar-fill { height:100%; border-radius:3px; transition:width 0.6s ease; }
+        .source-pct { font-size:0.7vw; color:rgba(255,255,255,0.5); min-width:2vw; text-align:right; }
+
+        /* ====================== SLIDE 9: Customer Carousel ====================== */
+        .carousel-container { margin-top:2vh; position:relative; }
+        .carousel-track-wrap { overflow:hidden; border-radius:12px; }
+        .carousel-track { display:flex; gap:1.5vw; transition:transform 0.5s ease; }
+        .carousel-card { min-width:22vw; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:2.5vh 1.8vw; flex-shrink:0; }
+        .carousel-card-company { font-size:1.5vw; font-weight:700; margin-bottom:0.3vh; }
+        .carousel-card-industry { font-size:0.7vw; font-weight:600; color:var(--vip-gold); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1.5vh; }
+        .carousel-card-quote { font-size:0.95vw; font-style:italic; color:rgba(255,255,255,0.7); line-height:1.5; border-left:3px solid var(--vip-gold); padding-left:1vw; margin-bottom:1.5vh; }
+        .carousel-card-metrics { display:flex; gap:1.5vw; }
+        .carousel-metric { text-align:center; }
+        .carousel-metric-val { font-size:1.3vw; font-weight:700; color:var(--vip-turquoise); }
+        .carousel-metric-label { font-size:0.65vw; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.05em; }
+        .carousel-dots { display:flex; justify-content:center; gap:0.5vw; margin-top:2vh; }
+        .carousel-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2); cursor:pointer; transition:all 0.3s; }
+        .carousel-dot.active { width:24px; border-radius:4px; background:var(--vip-gold); }
+        .carousel-nav { position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,0.15); background:rgba(19,25,30,0.8); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; transition:all 0.2s; z-index:5; }
+        .carousel-nav:hover { border-color:var(--vip-gold); color:var(--vip-gold); }
+        .carousel-nav.prev { left:-1vw; }
+        .carousel-nav.next { right:-1vw; }
+
+        /* ====================== SLIDE 10: ROI Calculator ====================== */
+        .roi-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:2vh; }
+        .roi-sliders { display:flex; flex-direction:column; gap:2vh; }
+        .roi-slider-group label { display:flex; justify-content:space-between; font-size:1vw; color:rgba(255,255,255,0.7); margin-bottom:0.5vh; }
+        .roi-slider-group label span { color:var(--vip-gold); font-weight:600; }
+        input[type="range"] { -webkit-appearance:none; width:100%; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; outline:none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--vip-gold); cursor:pointer; border:2px solid var(--vip-black); }
+        input[type="range"]::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--vip-gold); cursor:pointer; border:2px solid var(--vip-black); }
+        .roi-results { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw; }
+        .roi-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:2vh 1.2vw; text-align:center; }
+        .roi-card .roi-val { font-size:2.2vw; font-weight:700; color:var(--vip-turquoise); margin-bottom:0.5vh; }
+        .roi-card .roi-label { font-size:0.85vw; color:rgba(255,255,255,0.6); }
+        .roi-card.featured { grid-column:1/-1; background:rgba(216,164,95,0.1); border-color:var(--vip-gold); }
+        .roi-card.featured .roi-val { font-size:3vw; color:var(--vip-gold); }
+
+        /* ====================== SLIDE 11: Next Steps ====================== */
+        .steps-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; margin-top:3vh; align-items:start; }
+        .steps-intro { font-size:1.2vw; color:rgba(255,255,255,0.6); line-height:1.7; margin-top:1vh; }
+        .steps-list { display:flex; flex-direction:column; gap:1.5vh; }
+        .step-item { display:flex; gap:1.2vw; align-items:flex-start; padding:1.5vh 1.2vw; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; transition:border-color 0.2s; }
+        .step-item:hover { border-color:var(--vip-gold); }
+        .step-num { width:36px; height:36px; border-radius:50%; background:rgba(216,164,95,0.15); color:var(--vip-gold); display:flex; align-items:center; justify-content:center; font-size:1vw; font-weight:700; flex-shrink:0; }
+        .step-content h4 { font-size:1.05vw; font-weight:600; margin-bottom:0.2vh; }
+        .step-content p { font-size:0.85vw; color:rgba(255,255,255,0.5); }
+
+        /* ====================== SLIDE 12: CTA / Book a Conversation ====================== */
+        .cta-layout { display:grid; grid-template-columns:1fr 1fr; gap:3vw; align-items:center; position:relative; z-index:1; width:100%; }
+        .cta-left h2 { font-size:2.2vw; line-height:1.15; }
+        .cta-desc { font-size:1.1vw; color:rgba(255,255,255,0.6); line-height:1.6; margin-bottom:2.5vh; max-width:28vw; }
+        .cta-contact-name { font-size:1vw; color:var(--vip-gold); font-weight:600; margin-bottom:0.8vh; }
+        .cta-contact-email { font-size:0.9vw; color:rgba(255,255,255,0.4); }
+        .cta-contact-email a { color:rgba(255,255,255,0.4); text-decoration:none; transition:color 0.2s ease; }
+        .cta-contact-email a:hover { color:var(--vip-gold); }
+        .cta-url { font-size:0.95vw; color:var(--vip-gold); letter-spacing:0.02em; text-decoration:none; transition:opacity 0.2s ease; margin-top:1vh; display:inline-block; }
+        .cta-url:hover { opacity:0.75; text-decoration:underline; }
+        .cta-calendar { background:white; border-radius:12px; overflow:hidden; min-height:38vh; display:flex; flex-direction:column; }
+        .cta-cal-header { padding:1.5vh 1.5vw; border-bottom:1px solid #eee; }
+        .cta-cal-header h3 { color:var(--vip-gold-text); font-size:1.3vw; font-weight:600; }
+        .cta-cal-body { flex:1; display:flex; align-items:center; justify-content:center; }
+    </style>
+</head>
+<body>
+    <div class="deck">
+
+        <!-- ==================== SLIDE 1: Title ==================== -->
+        <div class="slide slide-dark active" id="slide-1">
+            <div class="geo-pattern geo-moire"></div>
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <div class="title-gold-bar"></div>
+            <div class="title-content">
+                <div class="vip-logo anim d1">
+                    <span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span>
+                </div>
+                <div class="gold-line anim d2"></div>
+                <div class="title-customer anim d3">Best Version Media</div>
+                <div class="title-sub anim d4">Scaling Your Community Network with WordPress VIP</div>
+                <div class="title-meta anim d5">February 2026</div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2: Agenda ==================== -->
+        <div class="slide slide-gradient" id="slide-2">
+            <div class="geo-pattern geo-parallel"></div>
+            <div class="corner-accent corner-tr"></div>
+            <div class="agenda-layout">
+                <div>
+                    <h2 class="anim d1">What We Will Explore</h2>
+                    <div class="gold-line anim d2"></div>
+                    <p class="agenda-intro anim d3">A look at how WordPress VIP can power the next chapter of your community publishing network.</p>
+                </div>
+                <div>
+                    <ol class="agenda-list">
+                        <li class="anim d2">Your community network and growth trajectory</li>
+                        <li class="anim d3">Platform challenges and what comes next</li>
+                        <li class="anim d4">Head-to-head platform comparison</li>
+                        <li class="anim d5">Infrastructure built for scale and reliability</li>
+                        <li class="anim d6">Content creation and collaboration tools</li>
+                        <li class="anim d7">Content intelligence with Parse.ly analytics</li>
+                        <li class="anim d8">Trusted by leading publishers worldwide</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 3: Your World ==================== -->
+        <div class="slide slide-dark" id="slide-3">
+            <div class="geo-pattern geo-concentric"></div>
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <h2 class="anim d1">Your World</h2>
+            <div class="gold-line anim d2"></div>
+            <div class="world-layout">
+                <div>
+                    <div class="world-stat anim d3">
+                        <div class="stat-number">1,300+</div>
+                        <div class="stat-label">Local Communities Served</div>
+                    </div>
+                    <p class="world-narrative anim d4">Best Version Media has built something remarkable: a hyperlocal publishing network connecting neighbors, businesses, and communities across the country. Each community has its own micro website, its own voice, and its own audience.</p>
+                    <p class="world-narrative anim d5">Your growth story is one of consistent expansion, adding communities and deepening the connections that make local media indispensable.</p>
+                </div>
+                <div class="world-cards">
+                    <div class="world-card anim d4">
+                        <div class="world-card-icon">&#9965;</div>
+                        <div>
+                            <h3>Hyperlocal Publishing</h3>
+                            <p>Each community gets a dedicated micro website with local content and advertisers</p>
+                        </div>
+                    </div>
+                    <div class="world-card anim d5">
+                        <div class="world-card-icon">&#9734;</div>
+                        <div>
+                            <h3>Community First</h3>
+                            <p>Content written by and for local residents, celebrating what makes each neighborhood unique</p>
+                        </div>
+                    </div>
+                    <div class="world-card anim d6">
+                        <div class="world-card-icon">&#8599;</div>
+                        <div>
+                            <h3>Continuous Growth</h3>
+                            <p>Expanding network footprint with scalable operations and consistent quality</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 4: The Challenge ==================== -->
+        <div class="slide slide-gradient" id="slide-4">
+            <div class="geo-pattern geo-lines"></div>
+            <h2 class="anim d1">The Challenge</h2>
+            <div class="gold-line anim d2"></div>
+            <div class="challenge-layout">
+                <div class="challenge-col current anim d3">
+                    <h3>Current State</h3>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10005;</div>
+                        <div class="challenge-item-text">
+                            <h4>Duda Platform Limitations</h4>
+                            <p>Template-based builder lacks enterprise multisite capabilities for 1,300+ properties</p>
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10005;</div>
+                        <div class="challenge-item-text">
+                            <h4>AWS Reliability Concerns</h4>
+                            <p>Infrastructure outage last fall disrupted operations and eroded confidence</p>
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10005;</div>
+                        <div class="challenge-item-text">
+                            <h4>Template Constraints</h4>
+                            <p>Limited customization options restrict brand expression and content flexibility</p>
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10005;</div>
+                        <div class="challenge-item-text">
+                            <h4>No Collaborative Editing</h4>
+                            <p>Teams cannot work simultaneously on content across community sites</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="challenge-divider anim d3"></div>
+                <div class="challenge-col future anim d4">
+                    <h3>What You Need</h3>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10003;</div>
+                        <div class="challenge-item-text">
+                            <h4>Enterprise Multisite</h4>
+                            <p>Purpose-built architecture for managing thousands of sites from a single platform</p>
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10003;</div>
+                        <div class="challenge-item-text">
+                            <h4>99.99% Uptime SLA</h4>
+                            <p>Contractual reliability guarantee backed by enterprise-grade infrastructure</p>
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10003;</div>
+                        <div class="challenge-item-text">
+                            <h4>Real-Time Collaboration</h4>
+                            <p>Multiple editors working together with live cursors, comments, and workflows</p>
+                        </div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-icon">&#10003;</div>
+                        <div class="challenge-item-text">
+                            <h4>Scalable Platform</h4>
+                            <p>Infrastructure that grows with your community network without breaking</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="challenge-footer anim d5">
+                    <p>You have built something remarkable across 1,300+ communities. Your platform should match your ambition.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5: Platform Comparison ==================== -->
+        <div class="slide slide-dark" id="slide-5">
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <h2 class="anim d1">Platform Comparison</h2>
+            <p style="font-size:1vw; color:rgba(255,255,255,0.5); margin-bottom:1vh;" class="anim d2">How Duda and WordPress VIP compare across key enterprise capabilities</p>
+            <div class="gold-line anim d2"></div>
+            <div class="compare-container anim d3">
+                <div class="compare-tabs" id="compareTabs">
+                    <button class="compare-tab active" data-cat="platform">Platform</button>
+                    <button class="compare-tab" data-cat="content">Content</button>
+                    <button class="compare-tab" data-cat="performance">Performance</button>
+                    <button class="compare-tab" data-cat="ecosystem">Ecosystem</button>
+                    <button class="compare-tab" data-cat="security">Security</button>
+                </div>
+                <div class="compare-table-wrap">
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th>Capability</th>
+                                <th>Duda</th>
+                                <th>WordPress VIP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compareBody">
+                            <!-- Platform -->
+                            <tr class="compare-row" data-cat="platform">
+                                <td>Enterprise Multisite</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Limited</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row" data-cat="platform">
+                                <td>Headless Architecture</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row" data-cat="platform">
+                                <td>Custom Content Models</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row" data-cat="platform">
+                                <td>API-First</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Basic</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row" data-cat="platform">
+                                <td>White-Label</td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <!-- Content -->
+                            <tr class="compare-row hidden" data-cat="content">
+                                <td>Real-Time Collaboration</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="content">
+                                <td>Editorial Workflows</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="content">
+                                <td>Built-in Analytics</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003; <span class="indicator-note">Parse.ly</span></span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="content">
+                                <td>Block Editor</td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="content">
+                                <td>Revision History</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Basic</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <!-- Performance -->
+                            <tr class="compare-row hidden" data-cat="performance">
+                                <td>99.99% Uptime SLA</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="performance">
+                                <td>Global Edge CDN</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Limited</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="performance">
+                                <td>Auto-Scaling</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Limited</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="performance">
+                                <td>DDoS Protection</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Basic</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="performance">
+                                <td>Sub-second TTFB</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Variable</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <!-- Ecosystem -->
+                            <tr class="compare-row hidden" data-cat="ecosystem">
+                                <td>Plugin Ecosystem</td>
+                                <td><span class="indicator partial">&#9679; <span class="indicator-note">Limited</span></span></td>
+                                <td><span class="indicator check">&#10003; <span class="indicator-note">59K+</span></span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="ecosystem">
+                                <td>Custom Development</td>
+                                <td><span class="indicator partial">&#9679;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="ecosystem">
+                                <td>Third-Party Integrations</td>
+                                <td><span class="indicator partial">&#9679;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="ecosystem">
+                                <td>Open Source</td>
+                                <td><span class="indicator cross">&#10005; <span class="indicator-note">Proprietary</span></span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="ecosystem">
+                                <td>Developer Talent Pool</td>
+                                <td><span class="indicator partial">&#9679;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <!-- Security -->
+                            <tr class="compare-row hidden" data-cat="security">
+                                <td>SOC 2 Type II</td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="security">
+                                <td>ISO 27001</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="security">
+                                <td>WAF &amp; Threat Detection</td>
+                                <td><span class="indicator partial">&#9679;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="security">
+                                <td>Code Review Process</td>
+                                <td><span class="indicator cross">&#10005;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                            <tr class="compare-row hidden" data-cat="security">
+                                <td>Incident Response SLA</td>
+                                <td><span class="indicator partial">&#9679;</span></td>
+                                <td><span class="indicator check">&#10003;</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6: CDN Explorer ==================== -->
+        <div class="slide slide-gradient" id="slide-6">
+            <div class="geo-pattern geo-parallel"></div>
+            <div class="corner-accent corner-tr"></div>
+            <div class="corner-accent corner-bl"></div>
+            <h2 class="anim d1">Infrastructure Built for Scale</h2>
+            <div class="gold-line anim d2"></div>
+            <div class="cdn-layout">
+                <div class="cdn-map-container anim d3" id="cdnMapContainer">
+                    <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" id="cdnMap">
+                        <!-- Simplified world map outlines -->
+                        <g opacity="0.15" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1">
+                            <!-- North America -->
+                            <path d="M120,80 L180,60 L230,65 L260,90 L250,120 L260,150 L240,180 L220,200 L200,210 L180,200 L150,180 L120,160 L100,140 L90,120 L95,95 Z"/>
+                            <!-- South America -->
+                            <path d="M210,230 L230,220 L250,230 L260,260 L270,290 L260,330 L240,360 L220,380 L200,370 L190,340 L195,310 L200,280 L195,250 Z"/>
+                            <!-- Europe -->
+                            <path d="M360,70 L380,60 L420,65 L440,80 L430,100 L440,120 L420,140 L400,150 L380,140 L360,130 L350,110 L355,90 Z"/>
+                            <!-- Africa -->
+                            <path d="M370,160 L400,155 L430,165 L450,190 L460,220 L455,260 L440,300 L420,330 L400,340 L380,330 L370,300 L360,260 L365,220 L360,190 Z"/>
+                            <!-- Asia -->
+                            <path d="M460,60 L520,50 L580,55 L640,70 L680,90 L700,120 L690,150 L670,170 L640,180 L600,175 L560,170 L520,160 L490,140 L470,120 L460,100 Z"/>
+                            <!-- Australia -->
+                            <path d="M620,280 L660,270 L700,280 L720,300 L710,330 L690,340 L650,340 L630,325 L620,300 Z"/>
+                        </g>
+                        <!-- Connection lines -->
+                        <g opacity="0.08" stroke="var(--vip-turquoise)" stroke-width="0.5">
+                            <line x1="170" y1="130" x2="390" y2="100"/>
+                            <line x1="390" y1="100" x2="550" y2="110"/>
+                            <line x1="550" y1="110" x2="670" y2="290"/>
+                            <line x1="170" y1="130" x2="230" y2="260"/>
+                            <line x1="390" y1="100" x2="420" y2="200"/>
+                            <line x1="550" y1="110" x2="650" y2="130"/>
+                        </g>
+                        <!-- CDN Nodes -->
+                        <g class="cdn-node" data-city="Ashburn, VA" data-latency="2ms" data-type="Primary Hub" data-capacity="High Capacity">
+                            <circle class="node-pulse" cx="195" cy="120" r="5"/>
+                            <circle class="node-ring" cx="195" cy="120" r="10"/>
+                            <circle class="node-dot" cx="195" cy="120" r="4"/>
+                            <text x="195" y="138" text-anchor="middle">Ashburn</text>
+                        </g>
+                        <g class="cdn-node" data-city="San Jose, CA" data-latency="5ms" data-type="Edge PoP" data-capacity="High Capacity">
+                            <circle class="node-pulse" cx="115" cy="135" r="5"/>
+                            <circle class="node-ring" cx="115" cy="135" r="10"/>
+                            <circle class="node-dot" cx="115" cy="135" r="4"/>
+                            <text x="115" y="153" text-anchor="middle">San Jose</text>
+                        </g>
+                        <g class="cdn-node" data-city="Chicago, IL" data-latency="4ms" data-type="Edge PoP" data-capacity="High Capacity">
+                            <circle class="node-pulse" cx="170" cy="105" r="5"/>
+                            <circle class="node-ring" cx="170" cy="105" r="10"/>
+                            <circle class="node-dot" cx="170" cy="105" r="4"/>
+                            <text x="170" y="98" text-anchor="middle">Chicago</text>
+                        </g>
+                        <g class="cdn-node" data-city="London, UK" data-latency="8ms" data-type="Primary Hub" data-capacity="High Capacity">
+                            <circle class="node-pulse" cx="370" cy="90" r="5"/>
+                            <circle class="node-ring" cx="370" cy="90" r="10"/>
+                            <circle class="node-dot" cx="370" cy="90" r="4"/>
+                            <text x="370" y="83" text-anchor="middle">London</text>
+                        </g>
+                        <g class="cdn-node" data-city="Frankfurt, DE" data-latency="6ms" data-type="Edge PoP" data-capacity="High Capacity">
+                            <circle class="node-pulse" cx="405" cy="95" r="5"/>
+                            <circle class="node-ring" cx="405" cy="95" r="10"/>
+                            <circle class="node-dot" cx="405" cy="95" r="4"/>
+                            <text x="405" y="113" text-anchor="middle">Frankfurt</text>
+                        </g>
+                        <g class="cdn-node" data-city="Singapore" data-latency="12ms" data-type="Edge PoP" data-capacity="Standard">
+                            <circle class="node-pulse" cx="620" cy="200" r="5"/>
+                            <circle class="node-ring" cx="620" cy="200" r="10"/>
+                            <circle class="node-dot" cx="620" cy="200" r="4"/>
+                            <text x="620" y="218" text-anchor="middle">Singapore</text>
+                        </g>
+                        <g class="cdn-node" data-city="Tokyo, JP" data-latency="10ms" data-type="Primary Hub" data-capacity="High Capacity">
+                            <circle class="node-pulse" cx="690" cy="120" r="5"/>
+                            <circle class="node-ring" cx="690" cy="120" r="10"/>
+                            <circle class="node-dot" cx="690" cy="120" r="4"/>
+                            <text x="690" y="113" text-anchor="middle">Tokyo</text>
+                        </g>
+                        <g class="cdn-node" data-city="S&atilde;o Paulo, BR" data-latency="15ms" data-type="Edge PoP" data-capacity="Standard">
+                            <circle class="node-pulse" cx="240" cy="310" r="5"/>
+                            <circle class="node-ring" cx="240" cy="310" r="10"/>
+                            <circle class="node-dot" cx="240" cy="310" r="4"/>
+                            <text x="240" y="328" text-anchor="middle">S. Paulo</text>
+                        </g>
+                        <g class="cdn-node" data-city="Sydney, AU" data-latency="14ms" data-type="Edge PoP" data-capacity="Standard">
+                            <circle class="node-pulse" cx="690" cy="320" r="5"/>
+                            <circle class="node-ring" cx="690" cy="320" r="10"/>
+                            <circle class="node-dot" cx="690" cy="320" r="4"/>
+                            <text x="690" y="338" text-anchor="middle">Sydney</text>
+                        </g>
+                        <g class="cdn-node" data-city="Mumbai, IN" data-latency="11ms" data-type="Edge PoP" data-capacity="Standard">
+                            <circle class="node-pulse" cx="540" cy="175" r="5"/>
+                            <circle class="node-ring" cx="540" cy="175" r="10"/>
+                            <circle class="node-dot" cx="540" cy="175" r="4"/>
+                            <text x="540" y="193" text-anchor="middle">Mumbai</text>
+                        </g>
+                    </svg>
+                    <div class="cdn-tooltip" id="cdnTooltip">
+                        <h4 id="cdnTipCity"></h4>
+                        <p id="cdnTipInfo"></p>
+                    </div>
+                </div>
+                <div class="cdn-stats anim d4">
+                    <div class="cdn-stat-card gold">
+                        <div class="stat-val">30+</div>
+                        <div class="stat-label">Edge Locations Worldwide</div>
+                    </div>
+                    <div class="cdn-stat-card">
+                        <div class="stat-val">&lt;50ms</div>
+                        <div class="stat-label">Global TTFB Average</div>
+                    </div>
+                    <div class="cdn-stat-card gold">
+                        <div class="stat-val">99.99%</div>
+                        <div class="stat-label">Uptime SLA Guarantee</div>
+                    </div>
+                    <div class="cdn-stat-card">
+                        <div class="stat-val">Auto</div>
+                        <div class="stat-label">Scaling on Demand</div>
+                    </div>
+                    <div class="cdn-stat-card gold">
+                        <!-- PLACEHOLDER: Verify pages served stat -->
+                        <div class="stat-val">1B+</div>
+                        <div class="stat-label">Pages Served Monthly</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7: Collaborative Editing ==================== -->
+        <div class="slide slide-dark" id="slide-7">
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <h2 class="anim d1">Content Creation Reimagined</h2>
+            <div class="gold-line anim d2"></div>
+            <div class="collab-layout">
+                <div class="editor-panel anim d3">
+                    <div class="editor-toolbar">
+                        <div class="toolbar-btn" style="font-weight:800;">B</div>
+                        <div class="toolbar-btn" style="font-style:italic;">I</div>
+                        <div class="toolbar-btn">H1</div>
+                        <div class="toolbar-btn">H2</div>
+                        <div class="toolbar-divider"></div>
+                        <div class="toolbar-btn">&#128279;</div>
+                        <div class="toolbar-btn">&#128247;</div>
+                        <div class="editor-avatars">
+                            <div class="editor-avatar" style="background:#3858E9;">SK</div>
+                            <div class="editor-avatar" style="background:#70AC1C;">MR</div>
+                            <div class="editor-avatar" style="background:#9C5CE1;">JL</div>
+                        </div>
+                    </div>
+                    <div class="editor-body" id="editorBody">
+                        <div class="typed-headline" id="typedHeadline"></div>
+                        <div class="typed-line" id="typedBody"></div>
+                        <div class="typed-note" id="typedNote" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="collab-features anim d4">
+                    <div class="collab-feature" data-detail="See exactly where each team member is editing in real time, with color-coded cursors and name labels.">
+                        <div class="collab-feature-header">
+                            <span class="collab-feature-icon">&#9678;</span>
+                            <h4>Real-Time Cursors</h4>
+                        </div>
+                        <div class="collab-feature-detail"><p></p></div>
+                    </div>
+                    <div class="collab-feature" data-detail="Prevent editing conflicts by automatically locking content blocks when another editor is working on them.">
+                        <div class="collab-feature-header">
+                            <span class="collab-feature-icon">&#128274;</span>
+                            <h4>Block Locking</h4>
+                        </div>
+                        <div class="collab-feature-detail"><p></p></div>
+                    </div>
+                    <div class="collab-feature" data-detail="Leave contextual feedback directly on content blocks. Tag teammates and resolve threads without leaving the editor.">
+                        <div class="collab-feature-header">
+                            <span class="collab-feature-icon">&#128172;</span>
+                            <h4>Inline Comments</h4>
+                        </div>
+                        <div class="collab-feature-detail"><p></p></div>
+                    </div>
+                    <div class="collab-feature" data-detail="Full version history with the ability to compare, restore, and audit every change made to any piece of content.">
+                        <div class="collab-feature-header">
+                            <span class="collab-feature-icon">&#128337;</span>
+                            <h4>Revision History</h4>
+                        </div>
+                        <div class="collab-feature-detail"><p></p></div>
+                    </div>
+                    <div class="collab-feature" data-detail="Custom approval chains, scheduled publishing, role-based permissions, and automated status transitions.">
+                        <div class="collab-feature-header">
+                            <span class="collab-feature-icon">&#9881;</span>
+                            <h4>Editorial Workflows</h4>
+                        </div>
+                        <div class="collab-feature-detail"><p></p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 8: Parse.ly Dashboard ==================== -->
+        <div class="slide slide-gradient" id="slide-8">
+            <div class="geo-pattern geo-lines"></div>
+            <div class="corner-accent corner-tr"></div>
+            <h2 class="anim d1">Content Intelligence</h2>
+            <p style="font-size:1vw; color:rgba(255,255,255,0.5); margin-bottom:0.5vh;" class="anim d2">Parse.ly analytics, included with every WordPress VIP plan</p>
+            <div class="gold-line anim d2"></div>
+            <div class="parsely-layout">
+                <div class="parsely-dashboard anim d3">
+                    <div class="parsely-header">
+                        <div class="parsely-brand">
+                            <div class="parsely-brand-icon"><span>P</span></div>
+                            <span class="parsely-brand-name">Parse.ly</span>
+                        </div>
+                        <div class="parsely-tabs" id="parselyTabs">
+                            <button class="parsely-tab" data-range="1H">1H</button>
+                            <button class="parsely-tab active" data-range="24H">24H</button>
+                            <button class="parsely-tab" data-range="7D">7D</button>
+                            <button class="parsely-tab" data-range="30D">30D</button>
+                        </div>
+                    </div>
+                    <div class="parsely-kpis" id="parselyKPIs">
+                        <div class="parsely-kpi">
+                            <div class="parsely-kpi-val" id="kpiVisitors">24.8K</div>
+                            <div class="parsely-kpi-label">Visitors</div>
+                            <div class="parsely-kpi-change up" id="kpiVisitorsChg">+12.4%</div>
+                        </div>
+                        <div class="parsely-kpi">
+                            <div class="parsely-kpi-val" id="kpiPageviews">89.2K</div>
+                            <div class="parsely-kpi-label">Page Views</div>
+                            <div class="parsely-kpi-change up" id="kpiPageviewsChg">+8.7%</div>
+                        </div>
+                        <div class="parsely-kpi">
+                            <div class="parsely-kpi-val" id="kpiEngTime">2m 34s</div>
+                            <div class="parsely-kpi-label">Avg. Engaged Time</div>
+                            <div class="parsely-kpi-change up" id="kpiEngTimeChg">+5.2%</div>
+                        </div>
+                        <div class="parsely-kpi">
+                            <div class="parsely-kpi-val" id="kpiRecirc">18.6%</div>
+                            <div class="parsely-kpi-label">Recirculation</div>
+                            <div class="parsely-kpi-change up" id="kpiRecircChg">+3.1%</div>
+                        </div>
+                    </div>
+                    <div class="parsely-chart">
+                        <svg viewBox="0 0 500 120" id="parselyChart">
+                            <defs>
+                                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#70AC1C" stop-opacity="0.4"/>
+                                    <stop offset="100%" stop-color="#70AC1C" stop-opacity="0.02"/>
+                                </linearGradient>
+                            </defs>
+                            <path id="chartArea" fill="url(#chartGrad)" d="M0,100 Q50,80 100,70 T200,50 T300,60 T400,40 T500,30 L500,120 L0,120 Z"/>
+                            <path id="chartLine" fill="none" stroke="#70AC1C" stroke-width="2" d="M0,100 Q50,80 100,70 T200,50 T300,60 T400,40 T500,30"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="parsely-sidebar anim d4">
+                    <div class="parsely-trending">
+                        <h4>Trending Now</h4>
+                        <!-- PLACEHOLDER: Replace with actual BVM article headlines -->
+                        <div class="trending-item">
+                            <span class="trending-rank">1</span>
+                            <div class="trending-info">
+                                <h5>Summer Festival Guide Drives Record Engagement</h5>
+                                <span>4.2K views</span>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-rank">2</span>
+                            <div class="trending-info">
+                                <h5>Local Business Spotlight Series Grows 340%</h5>
+                                <span>3.8K views</span>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-rank">3</span>
+                            <div class="trending-info">
+                                <h5>New Community Cookbook Feature Goes Viral</h5>
+                                <span>3.1K views</span>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-rank">4</span>
+                            <div class="trending-info">
+                                <h5>Youth Sports Coverage Hits All-Time High</h5>
+                                <span>2.7K views</span>
+                            </div>
+                        </div>
+                        <div class="trending-item">
+                            <span class="trending-rank">5</span>
+                            <div class="trending-info">
+                                <h5>Neighborhood Renovation Series Sparks Conversation</h5>
+                                <span>2.1K views</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="parsely-sources">
+                        <h4>Traffic Sources</h4>
+                        <div class="source-row">
+                            <span class="source-label">Direct</span>
+                            <div class="source-bar-bg"><div class="source-bar-fill" id="srcDirect" style="width:42%; background:var(--vip-turquoise);"></div></div>
+                            <span class="source-pct" id="srcDirectPct">42%</span>
+                        </div>
+                        <div class="source-row">
+                            <span class="source-label">Search</span>
+                            <div class="source-bar-bg"><div class="source-bar-fill" id="srcSearch" style="width:28%; background:var(--parsely-green);"></div></div>
+                            <span class="source-pct" id="srcSearchPct">28%</span>
+                        </div>
+                        <div class="source-row">
+                            <span class="source-label">Social</span>
+                            <div class="source-bar-bg"><div class="source-bar-fill" id="srcSocial" style="width:18%; background:var(--vip-purple);"></div></div>
+                            <span class="source-pct" id="srcSocialPct">18%</span>
+                        </div>
+                        <div class="source-row">
+                            <span class="source-label">Referral</span>
+                            <div class="source-bar-bg"><div class="source-bar-fill" id="srcReferral" style="width:12%; background:var(--vip-orange);"></div></div>
+                            <span class="source-pct" id="srcReferralPct">12%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9: Customer Carousel ==================== -->
+        <div class="slide slide-dark" id="slide-9">
+            <div class="geo-pattern geo-moire"></div>
+            <div class="corner-accent corner-tl"></div>
+            <h2 class="anim d1">Trusted by Leading Publishers</h2>
+            <div class="gold-line anim d2"></div>
+            <div class="carousel-container anim d3">
+                <div class="carousel-track-wrap">
+                    <div class="carousel-track" id="carouselTrack">
+                        <!-- PLACEHOLDER: Verify customer metrics below -->
+                        <div class="carousel-card">
+                            <div class="carousel-card-company">TechCrunch</div>
+                            <div class="carousel-card-industry">Technology Media</div>
+                            <div class="carousel-card-quote">"WordPress VIP gives us the performance and reliability our audience demands, with the editorial flexibility our team needs."</div>
+                            <div class="carousel-card-metrics">
+                                <div class="carousel-metric">
+                                    <!-- PLACEHOLDER: Verify TechCrunch visitor count -->
+                                    <div class="carousel-metric-val">100M+</div>
+                                    <div class="carousel-metric-label">Monthly Visitors</div>
+                                </div>
+                                <div class="carousel-metric">
+                                    <div class="carousel-metric-val">99.99%</div>
+                                    <div class="carousel-metric-label">Uptime</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-card">
+                            <div class="carousel-card-company">Bloomberg Media</div>
+                            <div class="carousel-card-industry">Financial Publishing</div>
+                            <div class="carousel-card-quote">"The platform handles our scale and editorial complexity while maintaining the speed our readers expect."</div>
+                            <div class="carousel-card-metrics">
+                                <div class="carousel-metric">
+                                    <!-- PLACEHOLDER: Verify Bloomberg editor count -->
+                                    <div class="carousel-metric-val">500+</div>
+                                    <div class="carousel-metric-label">Editors</div>
+                                </div>
+                                <div class="carousel-metric">
+                                    <div class="carousel-metric-val">Global</div>
+                                    <div class="carousel-metric-label">Distribution</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-card">
+                            <div class="carousel-card-company">PMC / Variety / Rolling Stone</div>
+                            <div class="carousel-card-industry">Entertainment &amp; Culture</div>
+                            <div class="carousel-card-quote">"Managing 30+ media properties on a single platform transformed our operations and content velocity."</div>
+                            <div class="carousel-card-metrics">
+                                <div class="carousel-metric">
+                                    <!-- PLACEHOLDER: Verify PMC property count -->
+                                    <div class="carousel-metric-val">30+</div>
+                                    <div class="carousel-metric-label">Properties</div>
+                                </div>
+                                <div class="carousel-metric">
+                                    <div class="carousel-metric-val">1 Platform</div>
+                                    <div class="carousel-metric-label">Unified CMS</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-card">
+                            <div class="carousel-card-company">News Corp</div>
+                            <div class="carousel-card-industry">News &amp; Publishing</div>
+                            <div class="carousel-card-quote">"Enterprise multisite at this scale requires a partner, not just a platform. WordPress VIP delivers both."</div>
+                            <div class="carousel-card-metrics">
+                                <div class="carousel-metric">
+                                    <!-- PLACEHOLDER: Verify News Corp market count -->
+                                    <div class="carousel-metric-val">50+</div>
+                                    <div class="carousel-metric-label">Markets</div>
+                                </div>
+                                <div class="carousel-metric">
+                                    <div class="carousel-metric-val">Enterprise</div>
+                                    <div class="carousel-metric-label">Scale</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-card">
+                            <div class="carousel-card-company">Al Jazeera</div>
+                            <div class="carousel-card-industry">Global News Network</div>
+                            <div class="carousel-card-quote">"Reaching audiences across 80+ languages demands infrastructure that never sleeps. WordPress VIP is that foundation."</div>
+                            <div class="carousel-card-metrics">
+                                <div class="carousel-metric">
+                                    <!-- PLACEHOLDER: Verify Al Jazeera language count -->
+                                    <div class="carousel-metric-val">80+</div>
+                                    <div class="carousel-metric-label">Languages</div>
+                                </div>
+                                <div class="carousel-metric">
+                                    <div class="carousel-metric-val">24/7</div>
+                                    <div class="carousel-metric-label">Coverage</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-nav prev" id="carouselPrev">&#8592;</button>
+                <button class="carousel-nav next" id="carouselNext">&#8594;</button>
+                <div class="carousel-dots" id="carouselDots"></div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 10: ROI Calculator ==================== -->
+        <div class="slide slide-gradient" id="slide-10">
+            <div class="geo-pattern geo-concentric"></div>
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <h2 class="anim d1">Your Potential Impact</h2>
+            <p style="font-size:1vw; color:rgba(255,255,255,0.5); margin-bottom:0.5vh;" class="anim d2">Adjust the sliders to reflect your organization and see estimated results</p>
+            <div class="gold-line anim d2"></div>
+            <div class="roi-layout anim d3">
+                <div class="roi-sliders">
+                    <div class="roi-slider-group">
+                        <label>Community Sites <span id="roiSitesVal">1,300</span></label>
+                        <input type="range" id="roiSites" min="100" max="2000" value="1300" step="50">
+                    </div>
+                    <div class="roi-slider-group">
+                        <label>Content Team Size <span id="roiTeamVal">30</span></label>
+                        <input type="range" id="roiTeam" min="5" max="100" value="30" step="1">
+                    </div>
+                    <div class="roi-slider-group">
+                        <label>Avg. Site Build Time (hours) <span id="roiBuildVal">20</span></label>
+                        <input type="range" id="roiBuild" min="5" max="40" value="20" step="1">
+                    </div>
+                    <div class="roi-slider-group">
+                        <label>Monthly Infrastructure Cost <span id="roiInfraVal">$25,000</span></label>
+                        <input type="range" id="roiInfra" min="5000" max="100000" value="25000" step="1000">
+                    </div>
+                </div>
+                <div class="roi-results">
+                    <div class="roi-card">
+                        <div class="roi-val" id="roiHoursSaved">15,600</div>
+                        <div class="roi-label">Hours Saved (Site Launches)</div>
+                    </div>
+                    <div class="roi-card">
+                        <div class="roi-val" id="roiProductivity">24%</div>
+                        <div class="roi-label">Team Productivity Gain</div>
+                    </div>
+                    <div class="roi-card">
+                        <div class="roi-val" id="roiInfraSavings">$7,500</div>
+                        <div class="roi-label">Monthly Infra Savings</div>
+                    </div>
+                    <div class="roi-card featured">
+                        <div class="roi-val" id="roiAnnualImpact">$1,260,000</div>
+                        <div class="roi-label">Estimated Annual Impact</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 11: Next Steps ==================== -->
+        <div class="slide slide-dark" id="slide-11">
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <h2 class="anim d1">Next Steps</h2>
+            <div class="gold-line anim d2"></div>
+            <div class="steps-layout">
+                <div>
+                    <p class="steps-intro anim d3">A structured path from discovery to migration, designed to minimize risk and maximize velocity.</p>
+                </div>
+                <div class="steps-list">
+                    <div class="step-item anim d3">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h4>Technical Discovery Session</h4>
+                            <p>Week 1-2: Deep dive into your current architecture, content models, and integration requirements</p>
+                        </div>
+                    </div>
+                    <div class="step-item anim d4">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h4>Multisite Architecture Review</h4>
+                            <p>Week 3-4: Design the optimal multisite configuration for 1,300+ community properties</p>
+                        </div>
+                    </div>
+                    <div class="step-item anim d5">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h4>Proof of Concept</h4>
+                            <p>Week 5-8: Build and validate with a representative subset of community sites</p>
+                        </div>
+                    </div>
+                    <div class="step-item anim d6">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h4>Migration Planning</h4>
+                            <p>Week 9-12: Develop a phased migration roadmap with rollback strategies and success metrics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 12: Book a Conversation ==================== -->
+        <div class="slide slide-gradient" id="slide-12">
+            <div class="geo-pattern geo-moire"></div>
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-br"></div>
+            <div class="cta-layout">
+                <div class="cta-left">
+                    <div class="vip-logo vip-logo-large anim d1">
+                        <span class="logo-wp">WordPress </span><span class="logo-vip">VIP</span>
+                    </div>
+                    <h2 class="anim d2">Let's explore what WordPress VIP can do for Best Version Media</h2>
+                    <div class="gold-line anim d3"></div>
+                    <p class="cta-desc anim d4">Your community network deserves a platform built for the next decade of growth. Book time to continue the conversation and we'll dive deeper into multisite architecture, content operations, and your migration path.</p>
+                    <!-- PLACEHOLDER: Replace with actual contact details -->
+                    <div class="cta-contact-name anim d5">Nate Kelly &middot; WordPress VIP</div>
+                    <div class="cta-contact-email anim d5"><a href="mailto:nate.kelly@wpvip.com">nate.kelly@wpvip.com</a></div>
+                    <a href="https://wpvip.com" target="_blank" rel="noopener noreferrer" class="cta-url anim d6">wpvip.com</a>
+                </div>
+                <div class="anim d4">
+                    <div class="cta-calendar">
+                        <div class="cta-cal-header"><h3>Book a Conversation</h3></div>
+                        <div class="cta-cal-body" style="padding:0;">
+                            <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border:0;width:100%;height:100%;min-height:500px;background:white;" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end .deck -->
+
+    <!-- Navigation Controls -->
+    <div class="nav-controls" id="navControls">
+        <button class="nav-btn" id="prevBtn" aria-label="Previous slide">&#8592;</button>
+        <span class="slide-counter" id="slideCounter">1 / 12</span>
+        <button class="nav-btn" id="nextBtn" aria-label="Next slide">&#8594;</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Overview Mode -->
+    <div class="overview-overlay" id="overview">
+        <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+
+    <script>
+        (function() {
+            const TOTAL = 12;
+            let current = 0;
+            let overviewOpen = false;
+            const slides = document.querySelectorAll('.slide');
+            const counter = document.getElementById('slideCounter');
+            const progress = document.getElementById('progressBar');
+            const navControls = document.getElementById('navControls');
+            const overview = document.getElementById('overview');
+            const overviewGrid = document.getElementById('overviewGrid');
+
+            const slideTitles = [
+                'Best Version Media',
+                'What We Will Explore',
+                'Your World',
+                'The Challenge',
+                'Platform Comparison',
+                'Infrastructure Built for Scale',
+                'Content Creation Reimagined',
+                'Content Intelligence',
+                'Trusted by Leading Publishers',
+                'Your Potential Impact',
+                'Next Steps',
+                'Thank You'
+            ];
+
+            // Light slides for nav styling
+            const lightSlides = [];
+
+            function goTo(n) {
+                if (n < 0 || n >= TOTAL) return;
+                slides[current].classList.remove('active');
+                current = n;
+                slides[current].classList.add('active');
+                counter.textContent = (current + 1) + ' / ' + TOTAL;
+                progress.style.width = ((current + 1) / TOTAL * 100) + '%';
+                // Nav light/dark
+                if (lightSlides.includes(current)) {
+                    navControls.classList.add('on-light');
+                } else {
+                    navControls.classList.remove('on-light');
+                }
+                // Trigger slide-specific animations
+                onSlideEnter(current);
+            }
+
+            function next() { goTo(current + 1); }
+            function prev() { goTo(current - 1); }
+
+            // Keyboard
+            document.addEventListener('keydown', function(e) {
+                if (overviewOpen) {
+                    if (e.key === 'Escape') toggleOverview();
+                    return;
+                }
+                if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+                else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+                else if (e.key === 'Escape') { e.preventDefault(); toggleOverview(); }
+            });
+
+            // Click nav
+            document.getElementById('prevBtn').addEventListener('click', prev);
+            document.getElementById('nextBtn').addEventListener('click', next);
+            counter.addEventListener('click', toggleOverview);
+
+            // Touch swipe
+            let touchStartX = 0;
+            document.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; });
+            document.addEventListener('touchend', function(e) {
+                const diff = touchStartX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+            });
+
+            // Overview
+            function toggleOverview() {
+                overviewOpen = !overviewOpen;
+                if (overviewOpen) {
+                    overviewGrid.innerHTML = '';
+                    for (let i = 0; i < TOTAL; i++) {
+                        const thumb = document.createElement('div');
+                        thumb.className = 'overview-thumb' + (i === current ? ' current' : '');
+                        thumb.innerHTML = '<div class="overview-thumb-title">' + slideTitles[i] + '</div><div class="overview-thumb-num">' + (i+1) + '</div>';
+                        thumb.addEventListener('click', function() { goTo(i); toggleOverview(); });
+                        overviewGrid.appendChild(thumb);
+                    }
+                    overview.classList.add('active');
+                } else {
+                    overview.classList.remove('active');
+                }
+            }
+
+            // Slide enter callback
+            function onSlideEnter(idx) {
+                // Dispatch custom event for interactive modules
+                document.dispatchEvent(new CustomEvent('slideEnter', { detail: { slide: idx } }));
+            }
+
+            // Initialize
+            goTo(0);
+
+            // ========== COMPARISON MATRIX TABS ==========
+            (function() {
+                var tabs = document.querySelectorAll('#compareTabs .compare-tab');
+                var rows = document.querySelectorAll('#compareBody .compare-row');
+                tabs.forEach(function(tab) {
+                    tab.addEventListener('click', function() {
+                        var cat = this.getAttribute('data-cat');
+                        tabs.forEach(function(t) { t.classList.remove('active'); });
+                        this.classList.add('active');
+                        rows.forEach(function(row) {
+                            if (row.getAttribute('data-cat') === cat) {
+                                row.classList.remove('hidden');
+                                row.style.display = 'table-row';
+                            } else {
+                                row.classList.add('hidden');
+                                row.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            })();
+
+            // ========== CDN EXPLORER TOOLTIPS ==========
+            (function() {
+                var container = document.getElementById('cdnMapContainer');
+                var tooltip = document.getElementById('cdnTooltip');
+                var tipCity = document.getElementById('cdnTipCity');
+                var tipInfo = document.getElementById('cdnTipInfo');
+                var nodes = document.querySelectorAll('.cdn-node');
+                var svgEl = document.getElementById('cdnMap');
+
+                nodes.forEach(function(node) {
+                    node.addEventListener('mouseenter', function(e) {
+                        var city = this.getAttribute('data-city');
+                        var latency = this.getAttribute('data-latency');
+                        var type = this.getAttribute('data-type');
+                        var capacity = this.getAttribute('data-capacity');
+                        tipCity.textContent = city;
+                        tipInfo.innerHTML = 'Latency: ' + latency + '<br>Type: ' + type + '<br>Capacity: ' + capacity;
+
+                        // Position using SVG viewBox ratio * container offset dimensions
+                        var dot = this.querySelector('.node-dot');
+                        var cx = parseFloat(dot.getAttribute('cx'));
+                        var cy = parseFloat(dot.getAttribute('cy'));
+                        var cw = container.offsetWidth;
+                        var ch = container.offsetHeight;
+                        var px = (cx / 800) * cw;
+                        var py = (cy / 450) * ch;
+
+                        tooltip.classList.add('visible');
+                        var tw = tooltip.offsetWidth;
+                        var th = tooltip.offsetHeight;
+
+                        // Clamp: flip if overflow
+                        var left = px + 15;
+                        var top = py - th / 2;
+                        if (left + tw > cw) left = px - tw - 15;
+                        if (top < 0) top = 5;
+                        if (top + th > ch) top = ch - th - 5;
+                        if (left < 0) left = 5;
+
+                        tooltip.style.left = left + 'px';
+                        tooltip.style.top = top + 'px';
+                    });
+                    node.addEventListener('mouseleave', function() {
+                        tooltip.classList.remove('visible');
+                    });
+                });
+            })();
+
+            // ========== COLLABORATIVE EDITING TYPEWRITER ==========
+            (function() {
+                var headlineEl = document.getElementById('typedHeadline');
+                var bodyEl = document.getElementById('typedBody');
+                var noteEl = document.getElementById('typedNote');
+                var headlineText = 'Spring Community Festival Preview';
+                var bodyText = 'Residents of Maple Grove are invited to the annual Spring Festival this Saturday at Riverside Park. The event will feature live music from local bands, a farmers market showcasing neighborhood vendors, and family activities throughout the afternoon.';
+                var noteText = '@Sarah: Can we add the vendor registration link before publishing?';
+                var typing = false;
+                var timeout_ids = [];
+
+                function clearTyping() {
+                    timeout_ids.forEach(function(id) { clearTimeout(id); });
+                    timeout_ids = [];
+                    headlineEl.innerHTML = '';
+                    bodyEl.innerHTML = '';
+                    noteEl.innerHTML = '';
+                    noteEl.style.display = 'none';
+                    typing = false;
+                }
+
+                function typeText(el, text, speed, cursorClass, callback) {
+                    var i = 0;
+                    function tick() {
+                        if (i <= text.length) {
+                            el.innerHTML = text.substring(0, i) + '<span class="cursor-indicator ' + cursorClass + '"></span>';
+                            i++;
+                            var tid = setTimeout(tick, speed);
+                            timeout_ids.push(tid);
+                        } else {
+                            el.innerHTML = text;
+                            if (callback) {
+                                var tid2 = setTimeout(callback, 500);
+                                timeout_ids.push(tid2);
+                            }
+                        }
+                    }
+                    tick();
+                }
+
+                function startTyping() {
+                    if (typing) return;
+                    typing = true;
+                    clearTyping();
+                    typing = true;
+                    var tid = setTimeout(function() {
+                        typeText(headlineEl, headlineText, 35, 'cursor-blue', function() {
+                            var tid2 = setTimeout(function() {
+                                typeText(bodyEl, bodyText, 18, 'cursor-green', function() {
+                                    noteEl.style.display = 'block';
+                                    var tid3 = setTimeout(function() {
+                                        typeText(noteEl, noteText, 25, 'cursor-purple', function() {
+                                            typing = false;
+                                        });
+                                    }, 400);
+                                    timeout_ids.push(tid3);
+                                });
+                            }, 500);
+                            timeout_ids.push(tid2);
+                        });
+                    }, 300);
+                    timeout_ids.push(tid);
+                }
+
+                // Trigger on slide enter
+                document.addEventListener('slideEnter', function(e) {
+                    if (e.detail.slide === 6) { // slide-7 is index 6
+                        clearTyping();
+                        startTyping();
+                    }
+                });
+
+                // Expandable feature cards
+                var features = document.querySelectorAll('.collab-feature');
+                features.forEach(function(f) {
+                    var detail = f.getAttribute('data-detail');
+                    var detailP = f.querySelector('.collab-feature-detail p');
+                    if (detailP && detail) detailP.textContent = detail;
+                    f.addEventListener('click', function() {
+                        var wasExpanded = this.classList.contains('expanded');
+                        features.forEach(function(ff) { ff.classList.remove('expanded'); });
+                        if (!wasExpanded) this.classList.add('expanded');
+                    });
+                });
+            })();
+
+            // ========== PARSE.LY TIME RANGE TABS ==========
+            (function() {
+                var data = {
+                    '1H': {
+                        visitors: '1.2K', visitorsChg: '+18.2%', visitorsDir: 'up',
+                        pageviews: '4.8K', pageviewsChg: '+15.6%', pageviewsDir: 'up',
+                        engTime: '3m 12s', engTimeChg: '+8.4%', engTimeDir: 'up',
+                        recirc: '22.1%', recircChg: '+4.5%', recircDir: 'up',
+                        sources: { direct: 38, search: 25, social: 24, referral: 13 },
+                        chart: 'M0,90 Q50,70 100,80 T200,60 T300,50 T400,55 T500,35'
+                    },
+                    '24H': {
+                        visitors: '24.8K', visitorsChg: '+12.4%', visitorsDir: 'up',
+                        pageviews: '89.2K', pageviewsChg: '+8.7%', pageviewsDir: 'up',
+                        engTime: '2m 34s', engTimeChg: '+5.2%', engTimeDir: 'up',
+                        recirc: '18.6%', recircChg: '+3.1%', recircDir: 'up',
+                        sources: { direct: 42, search: 28, social: 18, referral: 12 },
+                        chart: 'M0,100 Q50,80 100,70 T200,50 T300,60 T400,40 T500,30'
+                    },
+                    '7D': {
+                        visitors: '142K', visitorsChg: '+6.8%', visitorsDir: 'up',
+                        pageviews: '520K', pageviewsChg: '+4.2%', pageviewsDir: 'up',
+                        engTime: '2m 18s', engTimeChg: '-1.3%', engTimeDir: 'down',
+                        recirc: '16.4%', recircChg: '+1.8%', recircDir: 'up',
+                        sources: { direct: 44, search: 30, social: 16, referral: 10 },
+                        chart: 'M0,80 Q50,90 100,60 T200,70 T300,40 T400,50 T500,45'
+                    },
+                    '30D': {
+                        visitors: '580K', visitorsChg: '+22.1%', visitorsDir: 'up',
+                        pageviews: '2.1M', pageviewsChg: '+18.4%', pageviewsDir: 'up',
+                        engTime: '2m 05s', engTimeChg: '-3.2%', engTimeDir: 'down',
+                        recirc: '15.2%', recircChg: '+0.6%', recircDir: 'up',
+                        sources: { direct: 45, search: 32, social: 14, referral: 9 },
+                        chart: 'M0,95 Q50,70 100,85 T200,45 T300,55 T400,35 T500,25'
+                    }
+                };
+
+                var tabs = document.querySelectorAll('#parselyTabs .parsely-tab');
+                tabs.forEach(function(tab) {
+                    tab.addEventListener('click', function() {
+                        var range = this.getAttribute('data-range');
+                        var d = data[range];
+                        if (!d) return;
+                        tabs.forEach(function(t) { t.classList.remove('active'); });
+                        this.classList.add('active');
+
+                        document.getElementById('kpiVisitors').textContent = d.visitors;
+                        document.getElementById('kpiVisitorsChg').textContent = d.visitorsChg;
+                        document.getElementById('kpiVisitorsChg').className = 'parsely-kpi-change ' + d.visitorsDir;
+                        document.getElementById('kpiPageviews').textContent = d.pageviews;
+                        document.getElementById('kpiPageviewsChg').textContent = d.pageviewsChg;
+                        document.getElementById('kpiPageviewsChg').className = 'parsely-kpi-change ' + d.pageviewsDir;
+                        document.getElementById('kpiEngTime').textContent = d.engTime;
+                        document.getElementById('kpiEngTimeChg').textContent = d.engTimeChg;
+                        document.getElementById('kpiEngTimeChg').className = 'parsely-kpi-change ' + d.engTimeDir;
+                        document.getElementById('kpiRecirc').textContent = d.recirc;
+                        document.getElementById('kpiRecircChg').textContent = d.recircChg;
+                        document.getElementById('kpiRecircChg').className = 'parsely-kpi-change ' + d.recircDir;
+
+                        // Update sources
+                        document.getElementById('srcDirect').style.width = d.sources.direct + '%';
+                        document.getElementById('srcDirectPct').textContent = d.sources.direct + '%';
+                        document.getElementById('srcSearch').style.width = d.sources.search + '%';
+                        document.getElementById('srcSearchPct').textContent = d.sources.search + '%';
+                        document.getElementById('srcSocial').style.width = d.sources.social + '%';
+                        document.getElementById('srcSocialPct').textContent = d.sources.social + '%';
+                        document.getElementById('srcReferral').style.width = d.sources.referral + '%';
+                        document.getElementById('srcReferralPct').textContent = d.sources.referral + '%';
+
+                        // Update chart
+                        var chartPath = d.chart;
+                        document.getElementById('chartLine').setAttribute('d', chartPath);
+                        document.getElementById('chartArea').setAttribute('d', chartPath + ' L500,120 L0,120 Z');
+                    });
+                });
+            })();
+
+            // ========== CUSTOMER CAROUSEL ==========
+            (function() {
+                var track = document.getElementById('carouselTrack');
+                var cards = track.querySelectorAll('.carousel-card');
+                var dotsContainer = document.getElementById('carouselDots');
+                var prevBtn = document.getElementById('carouselPrev');
+                var nextBtn = document.getElementById('carouselNext');
+                var currentCard = 0;
+                var totalCards = cards.length;
+                var autoTimer = null;
+
+                // Create dots
+                for (var i = 0; i < totalCards; i++) {
+                    var dot = document.createElement('div');
+                    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('data-idx', i);
+                    dot.addEventListener('click', function() {
+                        goToCard(parseInt(this.getAttribute('data-idx')));
+                    });
+                    dotsContainer.appendChild(dot);
+                }
+
+                function goToCard(idx) {
+                    if (idx < 0) idx = totalCards - 1;
+                    if (idx >= totalCards) idx = 0;
+                    currentCard = idx;
+                    // Calculate offset: card width + gap
+                    var cardEl = cards[0];
+                    var cardWidth = cardEl.offsetWidth;
+                    var gap = parseFloat(getComputedStyle(track).gap) || 0;
+                    var offset = idx * (cardWidth + gap);
+                    track.style.transform = 'translateX(-' + offset + 'px)';
+                    var dots = dotsContainer.querySelectorAll('.carousel-dot');
+                    dots.forEach(function(d, di) {
+                        d.className = 'carousel-dot' + (di === currentCard ? ' active' : '');
+                    });
+                }
+
+                prevBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    goToCard(currentCard - 1);
+                    resetAutoAdvance();
+                });
+                nextBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    goToCard(currentCard + 1);
+                    resetAutoAdvance();
+                });
+
+                function startAutoAdvance() {
+                    stopAutoAdvance();
+                    autoTimer = setInterval(function() {
+                        // Only auto-advance if on the carousel slide
+                        if (current === 8) { // slide-9 is index 8
+                            goToCard(currentCard + 1);
+                        }
+                    }, 4000);
+                }
+
+                function stopAutoAdvance() {
+                    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+                }
+
+                function resetAutoAdvance() {
+                    stopAutoAdvance();
+                    startAutoAdvance();
+                }
+
+                document.addEventListener('slideEnter', function(e) {
+                    if (e.detail.slide === 8) {
+                        goToCard(0);
+                        startAutoAdvance();
+                    } else {
+                        stopAutoAdvance();
+                    }
+                });
+            })();
+
+            // ========== ROI CALCULATOR ==========
+            (function() {
+                var sitesSlider = document.getElementById('roiSites');
+                var teamSlider = document.getElementById('roiTeam');
+                var buildSlider = document.getElementById('roiBuild');
+                var infraSlider = document.getElementById('roiInfra');
+
+                function formatNumber(n) {
+                    if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
+                    if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+                    return '$' + Math.round(n);
+                }
+
+                function formatHours(n) {
+                    return Math.round(n).toLocaleString();
+                }
+
+                function calculate() {
+                    var sites = parseInt(sitesSlider.value);
+                    var team = parseInt(teamSlider.value);
+                    var buildTime = parseInt(buildSlider.value);
+                    var infraCost = parseInt(infraSlider.value);
+
+                    // Update labels
+                    document.getElementById('roiSitesVal').textContent = sites.toLocaleString();
+                    document.getElementById('roiTeamVal').textContent = team;
+                    document.getElementById('roiBuildVal').textContent = buildTime;
+                    document.getElementById('roiInfraVal').textContent = '$' + infraCost.toLocaleString();
+
+                    // Calculations per spec
+                    var hoursSaved = sites * buildTime * 0.6; // 60% reduction
+                    var productivity = Math.round(20 + (team / 100) * 15); // percent gain
+                    var infraSavings = infraCost * 0.30; // 30% savings monthly
+                    var annualImpact = (infraSavings * 12) + (hoursSaved * 75); // $75 avg hourly
+
+                    // Update results
+                    document.getElementById('roiHoursSaved').textContent = formatHours(hoursSaved);
+                    document.getElementById('roiProductivity').textContent = productivity + '%';
+                    document.getElementById('roiInfraSavings').textContent = formatNumber(infraSavings) + '/mo';
+                    document.getElementById('roiAnnualImpact').textContent = formatNumber(annualImpact);
+                }
+
+                sitesSlider.addEventListener('input', calculate);
+                teamSlider.addEventListener('input', calculate);
+                buildSlider.addEventListener('input', calculate);
+                infraSlider.addEventListener('input', calculate);
+
+                // Initial calculation
+                calculate();
+            })();
+
+        })();
+    </script>
+</body>
+</html>

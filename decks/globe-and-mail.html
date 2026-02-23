@@ -70,16 +70,25 @@
     }
     .nav-btn {
       width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(19,25,30,0.75);
+      border: 1px solid rgba(255,255,255,0.2);
       color: white; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s; font-size: 14px;
       font-family: inherit; line-height: 1;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .nav-btn:hover { background: rgba(255,255,255,0.18); }
+    .nav-btn:hover { background: rgba(19,25,30,0.95); }
+    #nav-controls {
+      background: rgba(19,25,30,0.65);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 40px; padding: 6px 10px;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
     #slide-counter {
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.7);
       font-size: 11px; cursor: pointer;
       letter-spacing: 0.08em;
       min-width: 44px; text-align: center;
@@ -531,7 +540,7 @@
     .comp-table td { padding: 9px 16px; }
     .td-cap { font-size: 10px; color: rgba(255,255,255,0.7); text-align: left; }
     .td-arc { font-size: 10px; text-align: center; color: rgba(255,255,255,0.4); }
-    .td-vip { font-size: 10px; text-align: center; }
+    .td-vip { font-size: 10px; text-align: center; color: rgba(255,255,255,0.85); }
     .ci-check { color: var(--vip-turquoise); }
     .ci-cross { color: rgba(255,89,94,0.7); }
     .ci-partial { color: var(--vip-orange); }
@@ -793,56 +802,47 @@
       <div class="slide-num">02 / 12</div>
     </div>
 
-    <!-- =================== SLIDE 3: THE ARC XP MOMENT =================== -->
+    <!-- =================== SLIDE 3: RESILIENT PUBLISHING =================== -->
     <div class="slide" id="slide-3">
       <div class="geo-bg"></div>
       <div style="padding:52px 72px; position:relative; height:100%;">
-        <div class="eyebrow eyebrow-gold">Your Current Situation</div>
-        <div class="s3-headline">Your platform partner is facing<br>its own disruption.</div>
+        <div class="eyebrow eyebrow-gold">A Smarter Publishing Strategy</div>
+        <div class="s3-headline">A backup site should be<br>a platform, not a placeholder.</div>
         <div class="gold-line s3-divider"></div>
-        <div class="s3-cols">
-          <div class="s3-col">
-            <div class="s3-col-label">What Changed at Arc XP</div>
-            <div class="s3-fact">
-              <div class="s3-icon warn">!</div>
-              <div class="s3-fact-text"><strong>75 positions eliminated</strong> across Arc XP's engineering and support teams in early 2026.</div>
+        <div style="display:grid; grid-template-columns:1fr 248px; gap:36px; align-items:start;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-left:3px solid var(--vip-turquoise); border-radius:0 8px 8px 0; padding:18px 20px;">
+              <div style="font-size:13px; font-weight:700; color:white; margin-bottom:6px;">Always-On Reliability</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6); line-height:1.6;">A 99.99% uptime SLA backed by a global edge network means your readers always find you. Whether it is breaking news at 2 AM or the morning edition at peak traffic, The Globe and Mail is available.</div>
             </div>
-            <div class="s3-fact">
-              <div class="s3-icon warn">!</div>
-              <div class="s3-fact-text"><strong>Support bandwidth significantly reduced</strong> at the exact moment when you are evaluating your options and need responsiveness.</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-left:3px solid var(--vip-gold); border-radius:0 8px 8px 0; padding:18px 20px;">
+              <div style="font-size:13px; font-weight:700; color:white; margin-bottom:6px;">Zero-Compromise Editorial Experience</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6); line-height:1.6;">Your editorial team works exactly the same way on the backup site as on primary. Gutenberg blocks, real-time collaboration, editorial workflows. No retraining, no workflow disruption. Just publishing.</div>
             </div>
-            <div class="s3-fact">
-              <div class="s3-icon warn">!</div>
-              <div class="s3-fact-text"><strong>Arc XP is a commercial venture of the Washington Post,</strong> a newspaper managing its own financial pressures. Their CMS business is not their mission.</div>
-            </div>
-            <div class="s3-fact">
-              <div class="s3-icon warn">!</div>
-              <div class="s3-fact-text"><strong>Cost without corresponding value</strong> has been a persistent frustration. Proprietary infrastructure with limited developer flexibility adds overhead your team absorbs.</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-left:3px solid rgba(156,92,225,0.8); border-radius:0 8px 8px 0; padding:18px 20px;">
+              <div style="font-size:13px; font-weight:700; color:white; margin-bottom:6px;">A Platform That Grows With You</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6); line-height:1.6;">Start with a backup site. Discover what enterprise WordPress can do for The Globe and Mail. Expand at your pace, on your terms. The backup site is the lowest-risk way to experience VIP firsthand.</div>
             </div>
           </div>
-          <div class="s3-vdivider"></div>
-          <div class="s3-col">
-            <div class="s3-col-label">What This Means for You</div>
-            <div class="s3-fact">
-              <div class="s3-icon info">&#10003;</div>
-              <div class="s3-fact-text">Migration evaluations are most effective when your current vendor is distracted. <strong>Now is the right window to explore alternatives</strong> without disruption pressure.</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="background:rgba(62,160,173,0.1); border:1px solid rgba(62,160,173,0.2); border-radius:10px; padding:20px 18px; text-align:center;">
+              <div style="font-size:36px; font-weight:700; color:var(--vip-turquoise); letter-spacing:-0.03em; line-height:1.0;">99.99%</div>
+              <div style="font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">Uptime SLA</div>
             </div>
-            <div class="s3-fact">
-              <div class="s3-icon info">&#10003;</div>
-              <div class="s3-fact-text">Your editorial and IT teams deserve a partner with a <strong>growing, not shrinking, support organization.</strong> That is not a luxury. It is a requirement.</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:16px 18px; text-align:center;">
+              <div style="font-size:28px; font-weight:700; color:var(--vip-gold); letter-spacing:-0.03em; line-height:1.0;">&lt;100ms</div>
+              <div style="font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">Global TTFB</div>
             </div>
-            <div class="s3-fact">
-              <div class="s3-icon info">&#10003;</div>
-              <div class="s3-fact-text">A platform built <strong>exclusively for publishers</strong> by a standalone profitable company is a fundamentally different bet than a CMS built to fund a newspaper.</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:16px 18px; text-align:center;">
+              <div style="font-size:28px; font-weight:700; color:white; letter-spacing:-0.03em; line-height:1.0;">2,000+</div>
+              <div style="font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">Enterprise publishers</div>
             </div>
-            <div class="s3-fact">
-              <div class="s3-icon info">&#10003;</div>
-              <div class="s3-fact-text">The Globe and Mail at 100M+ visits per six months needs a <strong>partner whose product roadmap is shaped entirely by publisher needs,</strong> not internal WaPo requirements.</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:16px 18px; text-align:center;">
+              <div style="font-size:28px; font-weight:700; color:white; letter-spacing:-0.03em; line-height:1.0;">24/7</div>
+              <div style="font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">Expert support</div>
             </div>
           </div>
         </div>
-        <!-- PLACEHOLDER: Verify Arc XP headcount details via Axios article (access blocked) -->
-        <div class="s3-source">Source: Axios, February 4, 2026 | Arc XP layoffs</div>
       </div>
       <div class="slide-num">03 / 12</div>
     </div>
@@ -881,8 +881,8 @@
         <div class="eyebrow eyebrow-gold">About WordPress VIP</div>
         <div class="s5-layout">
           <div>
-            <div class="s5-headline">Built for publishers.<br><em>Not a side project.</em></div>
-            <div class="s5-body">WordPress VIP is the enterprise hosting and support platform for the world's most ambitious digital publishers. We are not a CMS built to fund a newspaper. We are a standalone, profitable business with a single focus: making WordPress work at enterprise scale for organizations like The Globe and Mail.</div>
+            <div class="s5-headline">Built for publishers.<br><em>Full stop.</em></div>
+            <div class="s5-body">WordPress VIP is the enterprise hosting and support platform for the world's most ambitious digital publishers. A standalone, profitable business with a single focus: making WordPress work at enterprise scale for organizations like The Globe and Mail. Whether you are running a backup site or your full digital operation, we are built for it.</div>
             <div class="gold-line" style="width:80px; margin-bottom:22px;"></div>
             <div class="s5-stats">
               <div class="s5-stat">
@@ -1073,8 +1073,9 @@
 <span class="code-line">&nbsp;</span>
 <span class="code-line"><span class="c-gold">  Live: theglobeandmail.com</span></span>
             </div>
-            <div class="s7-warn-box">
-              <p><strong>A note on Arc XP's developer support:</strong> The reduction of 75 engineering and support roles means the team maintaining your current platform's developer tooling and responding to your tickets is significantly smaller than it was. WordPress VIP's developer support organization is growing, with dedicated engineers assigned to enterprise accounts.</p>
+            <div style="background:rgba(62,160,173,0.07); border:1px solid rgba(62,160,173,0.2); border-radius:8px; padding:14px 16px;">
+              <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--vip-turquoise); margin-bottom:8px;">Why developers choose VIP</div>
+              <p style="font-size:11px; color:#444; line-height:1.55;"><strong style="color:var(--vip-black);">57,000+ active contributors</strong> maintain the WordPress core. Your team inherits the work of a global community on security, performance, and new capabilities. No proprietary toolchain to learn. No single vendor controlling your codebase.</p>
             </div>
           </div>
         </div>
@@ -1088,7 +1089,7 @@
       <div style="padding:44px 60px; height:100%; position:relative;">
         <div class="s8-top">
           <div class="eyebrow eyebrow-gold">Platform Comparison</div>
-          <div class="s8-headline">Arc XP vs. WordPress VIP</div>
+          <div class="s8-headline">How the platforms compare</div>
           <div style="height:2px;background:var(--vip-gold);width:120px;margin:8px 0 14px;"></div>
         </div>
         <div class="comp-tabs" id="comp-tabs">
@@ -1277,41 +1278,41 @@
         <div class="eyebrow eyebrow-gold">How We Work Together</div>
         <div class="s11-layout">
           <div>
-            <div class="s11-headline">A migration path built<br>for your scale.</div>
+            <div class="s11-headline">Start with a backup site.<br>Build from there.</div>
             <div style="height:2px;background:var(--vip-gold);width:120px;margin:10px 0 16px;"></div>
-            <div class="s11-body">We do not do big-bang migrations. Every Globe and Mail transition is staged, validated, and supported at every step by VIP engineers who understand enterprise publishing infrastructure.</div>
+            <div class="s11-body">The backup site is your proving ground. We set it up quickly, support it fully, and let The Globe and Mail's own team decide what comes next. No pressure. No big-bang commitment.</div>
             <div style="height:20px;"></div>
             <div class="mig-steps">
               <div class="ms">
                 <div class="ms-num">1</div>
                 <div class="ms-content">
                   <div class="ms-title">Technical Discovery</div>
-                  <div class="ms-sub">Architecture review, content audit, integration mapping with your IT and editorial leads.</div>
+                  <div class="ms-sub">Architecture review and integration mapping with your IT leads. We scope the backup site requirements in detail.</div>
                   <div class="ms-timing">Weeks 1 to 2</div>
                 </div>
               </div>
               <div class="ms">
                 <div class="ms-num">2</div>
                 <div class="ms-content">
-                  <div class="ms-title">Environment Setup</div>
-                  <div class="ms-sub">VIP-CLI local dev, staging environment, automated testing pipeline. Your team builds confidence before any content moves.</div>
+                  <div class="ms-title">Backup Site Environment</div>
+                  <div class="ms-sub">VIP staging and production environments configured. Content sync pipeline established. Your team validates the setup.</div>
                   <div class="ms-timing">Weeks 3 to 4</div>
                 </div>
               </div>
               <div class="ms">
                 <div class="ms-num">3</div>
                 <div class="ms-content">
-                  <div class="ms-title">Phased Content Migration</div>
-                  <div class="ms-sub">Structured content transfer with URL preservation, SEO continuity validation, and parallel running environments.</div>
-                  <div class="ms-timing">Weeks 5 to 10</div>
+                  <div class="ms-title">Live Backup and Testing</div>
+                  <div class="ms-sub">Backup site goes live alongside your primary CMS. Failover tested. Editorial team explores the platform at their own pace.</div>
+                  <div class="ms-timing">Weeks 5 to 8</div>
                 </div>
               </div>
               <div class="ms">
                 <div class="ms-num">4</div>
                 <div class="ms-content">
-                  <div class="ms-title">Launch and Hypercare</div>
-                  <div class="ms-sub">Go-live with 30-day hypercare period. A dedicated support engineer is on call for your team throughout.</div>
-                  <div class="ms-timing">Week 11 onwards</div>
+                  <div class="ms-title">Evaluate and Decide</div>
+                  <div class="ms-sub">With real experience in hand, your team decides the next step. Expand to additional properties, or stay with a resilient backup. Either way, you win.</div>
+                  <div class="ms-timing">Week 9 onwards</div>
                 </div>
               </div>
             </div>
@@ -1365,7 +1366,7 @@
       <div style="padding:52px 72px; height:100%; position:relative;">
         <div class="s12-top">
           <div class="eyebrow eyebrow-gold">After March 12</div>
-          <div class="s12-headline">A clear path to the<br>right decision.</div>
+          <div class="s12-headline">Four steps to a live<br>backup site.</div>
           <div style="height:2px;background:var(--vip-gold);width:160px;margin:10px 0 22px;"></div>
         </div>
         <div class="s12-layout">
@@ -1374,16 +1375,16 @@
               <div class="ns">
                 <div class="ns-n">1</div>
                 <div>
-                  <div class="ns-title">Technical Deep Dive</div>
-                  <div class="ns-sub">A working session with your engineering leads and our VIP solutions architects. Walk through your Arc XP stack and explore the migration path in detail.</div>
+                  <div class="ns-title">Technical Requirements Session</div>
+                  <div class="ns-sub">A working session with your engineering leads and our VIP solutions architects. Map the backup site requirements, integrations, and failover criteria.</div>
                   <div class="ns-date">March 2026</div>
                 </div>
               </div>
               <div class="ns">
                 <div class="ns-n">2</div>
                 <div>
-                  <div class="ns-title">Pilot Environment</div>
-                  <div class="ns-sub">Stand up a VIP staging environment running on Globe and Mail content. Your team experiences the platform firsthand before any commitment.</div>
+                  <div class="ns-title">Backup Site Pilot</div>
+                  <div class="ns-sub">Stand up a VIP environment with Globe and Mail content. Your editorial and IT teams experience the platform on real content, no commitment required.</div>
                   <div class="ns-date">April 2026</div>
                 </div>
               </div>
@@ -1391,15 +1392,15 @@
                 <div class="ns-n">3</div>
                 <div>
                   <div class="ns-title">Publisher Reference Calls</div>
-                  <div class="ns-sub">Connect with two or three publishers who migrated from Arc XP to WordPress VIP. Hear directly about the process, timeline, and outcomes.</div>
+                  <div class="ns-sub">Connect with publishers currently running VIP alongside an existing CMS. Hear firsthand how they evaluated, deployed, and expanded their use of the platform.</div>
                   <div class="ns-date">April 2026</div>
                 </div>
               </div>
               <div class="ns">
                 <div class="ns-n">4</div>
                 <div>
-                  <div class="ns-title">Tailored Proposal</div>
-                  <div class="ns-sub">A proposal with migration timeline, technical support plan, and commercial terms built specifically for The Globe and Mail's scale and requirements.</div>
+                  <div class="ns-title">Backup Site Proposal</div>
+                  <div class="ns-sub">A scoped proposal for the backup site: timeline, technical support plan, and commercial terms. Sized for where you are now, designed to grow with you.</div>
                   <div class="ns-date">May 2026</div>
                 </div>
               </div>
@@ -1552,8 +1553,8 @@
       ['24/7 dedicated engineering support', 'cross', 'check'],
       ['Committed 99.99% uptime SLA', 'partial', 'check'],
       ['Dedicated customer success manager', 'cross', 'check'],
-      ['Support team stability (post-2026 layoffs)', 'cross', 'check'],
-      ['Migration and onboarding included', 'partial', 'check']
+      ['Long-term support team stability', 'partial', 'check'],
+      ['Migration and onboarding assistance', 'partial', 'check']
     ],
     developer: [
       ['GitHub-native CI/CD deployments', 'cross', 'check'],
@@ -1570,26 +1571,26 @@
       ['Native mobile editorial app', 'cross', 'check']
     ],
     platform: [
-      ['Publisher-only company focus', 'cross', 'check'],
-      ['Standalone profitable business', 'cross', 'check'],
+      ['Publisher-focused platform strategy', 'partial', 'check'],
+      ['Independent, dedicated CMS company', 'partial', 'check'],
       ['SOC 2 Type II + ISO 27001 certified', 'partial', 'check'],
       ['Global CDN and edge network', 'check', 'check'],
-      ['Long-term product roadmap stability', 'partial', 'check']
+      ['Active long-term product roadmap', 'partial', 'check']
     ],
     value: [
-      ['Content analytics included (Parse.ly)', 'cross', 'check'],
+      ['Content analytics included', 'cross', 'check'],
       ['Transparent enterprise pricing', 'partial', 'check'],
       ['Multi-site publishing support', 'check', 'check'],
-      ['60,000+ plugin ecosystem', 'partial', 'check'],
-      ['Active feature development post-2026', 'partial', 'check']
+      ['60,000+ plugin and tool ecosystem', 'partial', 'check'],
+      ['Dedicated backup site deployment', 'cross', 'check']
     ]
   };
 
   const compLabels = {
-    support: ['Arc XP (Reduced)', 'WordPress VIP'],
+    support: ['Arc XP', 'WordPress VIP'],
     developer: ['Arc XP', 'WordPress VIP'],
     editorial: ['Arc XP', 'WordPress VIP'],
-    platform: ['Arc XP (WaPo)', 'WordPress VIP'],
+    platform: ['Arc XP', 'WordPress VIP'],
     value: ['Arc XP', 'WordPress VIP']
   };
 

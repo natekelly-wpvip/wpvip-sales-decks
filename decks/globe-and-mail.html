@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Globe and Mail | WordPress VIP</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --vip-black: #13191E;
+      --vip-white: #FFFFFF;
+      --vip-gold: #D8A45F;
+      --vip-gold-text: #9A6014;
+      --vip-gold-light: #EAE3DA;
+      --vip-turquoise: #3EA0AD;
+      --vip-turquoise-light: #B9E4EA;
+      --vip-turquoise-dark: #194146;
+      --vip-gray: #A8ABAD;
+      --vip-gray-light: #DBDCDD;
+      --vip-off-white: #F5F5F5;
+      --parsely-green: #70AC1C;
+      --vip-red: #FF595E;
+      --vip-orange: #FB902F;
+    }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #080c0f;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    /* === DECK WRAPPER + SCALER === */
+    .deck-wrapper {
+      width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .deck-scaler {
+      width: 1280px; height: 720px;
+      transform-origin: top left;
+      position: relative;
+    }
+
+    /* === SLIDES === */
+    .slide {
+      position: absolute; top: 0; left: 0;
+      width: 1280px; height: 720px;
+      overflow: hidden;
+      opacity: 0; transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .slide.active {
+      opacity: 1; pointer-events: all; z-index: 1;
+    }
+
+    /* === PROGRESS BAR === */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--vip-gold);
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+
+    /* === NAVIGATION === */
+    #nav-controls {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 12px;
+      z-index: 100;
+    }
+    .nav-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; font-size: 14px;
+      font-family: inherit; line-height: 1;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.18); }
+    #slide-counter {
+      color: rgba(255,255,255,0.5);
+      font-size: 11px; cursor: pointer;
+      letter-spacing: 0.08em;
+      min-width: 44px; text-align: center;
+      user-select: none;
+    }
+    #slide-counter:hover { color: var(--vip-gold); }
+
+    /* === OVERVIEW === */
+    #overview {
+      display: none; position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(10, 14, 18, 0.97);
+      z-index: 200; overflow-y: auto; padding: 48px 40px 80px;
+    }
+    #overview.visible { display: block; }
+    .overview-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px; max-width: 1040px; margin-left: auto; margin-right: auto;
+    }
+    .overview-label {
+      color: rgba(255,255,255,0.4); font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    #overview-close {
+      color: rgba(255,255,255,0.5); background: none; border: none;
+      font-size: 22px; cursor: pointer; font-family: inherit;
+      line-height: 1; padding: 4px 8px;
+    }
+    #overview-close:hover { color: white; }
+    .overview-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 16px; max-width: 1040px;
+      margin: 0 auto;
+    }
+    .ov-thumb {
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 6px; overflow: hidden;
+      aspect-ratio: 16/9;
+      position: relative; transition: border-color 0.2s;
+      background: var(--vip-black);
+    }
+    .ov-thumb:hover { border-color: rgba(216,164,95,0.5); }
+    .ov-thumb.ov-active { border-color: var(--vip-gold); }
+    .ov-inner {
+      width: 1280px; height: 720px;
+      transform: scale(0.185);
+      transform-origin: top left;
+      pointer-events: none;
+    }
+    .ov-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.7); padding: 4px 8px;
+      font-size: 9px; color: rgba(255,255,255,0.6);
+      letter-spacing: 0.06em;
+    }
+
+    /* === PRINT === */
+    @media print {
+      #nav-controls, #progress-bar, #overview { display: none !important; }
+      .slide { opacity: 1 !important; position: relative !important; page-break-after: always; }
+    }
+
+    /* === SHARED ELEMENTS === */
+    .vip-logo { font-size: 13px; letter-spacing: 0.04em; line-height: 1; }
+    .logo-wp { color: rgba(255,255,255,0.65); font-weight: 400; }
+    .logo-vip { color: var(--vip-gold); font-weight: 700; margin-left: 3px; }
+
+    .gold-line { height: 2px; background: var(--vip-gold); }
+    .slide-num {
+      position: absolute; bottom: 22px; right: 28px;
+      font-size: 10px; color: rgba(255,255,255,0.2);
+      letter-spacing: 0.1em;
+    }
+    .slide-num-dark {
+      position: absolute; bottom: 22px; right: 28px;
+      font-size: 10px; color: rgba(0,0,0,0.2);
+      letter-spacing: 0.1em;
+    }
+    .geo-bg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: repeating-linear-gradient(
+        -45deg, transparent 0, transparent 28px,
+        rgba(216,164,95,0.035) 28px, rgba(216,164,95,0.035) 29px
+      );
+      pointer-events: none;
+    }
+    .eyebrow {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      margin-bottom: 10px; font-weight: 600;
+    }
+    .eyebrow-gold { color: var(--vip-gold); }
+    .eyebrow-gold-text { color: var(--vip-gold-text); }
+
+    /* =========================================================
+       SLIDE 1: TITLE
+    ========================================================= */
+    #slide-1 {
+      background: var(--vip-black);
+      padding: 56px 72px;
+      display: flex; flex-direction: column;
+    }
+    .s1-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 0;
+    }
+    .s1-date { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.08em; }
+    .s1-body {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; padding-top: 0;
+    }
+    .s1-eyebrow {
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--vip-gold); margin-bottom: 18px; font-weight: 600;
+    }
+    .s1-divider { width: 48px; margin-bottom: 20px; }
+    .s1-title {
+      font-size: 5.8vw; font-weight: 700; color: white;
+      line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 22px;
+    }
+    .s1-sub {
+      font-size: 1.15vw; color: rgba(255,255,255,0.5);
+      max-width: 580px; line-height: 1.55;
+    }
+    .s1-footer {
+      margin-top: auto; padding-top: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .s1-contact {
+      font-size: 11px; color: rgba(255,255,255,0.3);
+      letter-spacing: 0.04em; line-height: 1.7;
+    }
+    .s1-right-glow {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 320px;
+      background: linear-gradient(135deg, rgba(62,160,173,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .s1-corner-bl {
+      position: absolute; bottom: 44px; left: 72px;
+      width: 32px; height: 32px;
+      border-left: 2px solid rgba(216,164,95,0.35);
+      border-bottom: 2px solid rgba(216,164,95,0.35);
+    }
+
+    /* =========================================================
+       SLIDE 2: TRAFFIC REALITY
+    ========================================================= */
+    #slide-2 {
+      background: var(--vip-black);
+      padding: 52px 72px;
+    }
+    .s2-top { margin-bottom: 28px; }
+    .s2-headline {
+      font-size: 2.9vw; font-weight: 700; color: white;
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 8px;
+    }
+    .s2-headline span { color: var(--vip-gold); }
+    .s2-sub {
+      font-size: 1.0vw; color: rgba(255,255,255,0.45); max-width: 680px; line-height: 1.5;
+    }
+    .s2-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .s-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 22px 18px;
+    }
+    .sc-num {
+      font-size: 2.9vw; font-weight: 700; color: white;
+      line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 5px;
+    }
+    .sc-num .teal { color: var(--vip-turquoise); }
+    .sc-label {
+      font-size: 0.78vw; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.07em; line-height: 1.4;
+    }
+    .sc-delta { font-size: 0.78vw; color: var(--vip-turquoise); margin-top: 5px; }
+    .s2-insight {
+      background: rgba(62,160,173,0.07);
+      border-left: 3px solid var(--vip-turquoise);
+      border-radius: 0 6px 6px 0; padding: 14px 20px;
+      max-width: 920px;
+    }
+    .s2-insight p {
+      font-size: 0.92vw; color: rgba(255,255,255,0.7); line-height: 1.55;
+    }
+    .s2-insight strong { color: var(--vip-turquoise); }
+
+    /* =========================================================
+       SLIDE 3: THE ARC XP MOMENT
+    ========================================================= */
+    #slide-3 {
+      background: var(--vip-black);
+      padding: 52px 72px;
+    }
+    .s3-headline {
+      font-size: 2.7vw; font-weight: 700; color: white;
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 8px;
+    }
+    .s3-divider { width: 200px; margin-bottom: 28px; }
+    .s3-cols {
+      display: grid; grid-template-columns: 1fr 1px 1fr;
+      gap: 0; height: 400px;
+    }
+    .s3-vdivider { background: rgba(216,164,95,0.15); }
+    .s3-col { padding: 0 40px; }
+    .s3-col:first-child { padding-left: 0; }
+    .s3-col-label {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-bottom: 18px; font-weight: 600;
+    }
+    .s3-fact { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+    .s3-icon {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 11px; margin-top: 1px;
+    }
+    .s3-icon.warn { background: rgba(255,89,94,0.15); color: var(--vip-red); }
+    .s3-icon.info { background: rgba(62,160,173,0.15); color: var(--vip-turquoise); }
+    .s3-fact-text { font-size: 0.92vw; color: rgba(255,255,255,0.7); line-height: 1.55; }
+    .s3-fact-text strong { color: white; font-weight: 600; }
+    .s3-source {
+      position: absolute; bottom: 28px; left: 72px;
+      font-size: 9px; color: rgba(255,255,255,0.2); letter-spacing: 0.05em;
+    }
+
+    /* =========================================================
+       SLIDE 4: WHAT YOU NEED (WHITE BG)
+    ========================================================= */
+    #slide-4 { background: var(--vip-white); padding: 52px 72px; }
+    .s4-headline {
+      font-size: 2.6vw; font-weight: 700; color: var(--vip-black);
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 8px;
+    }
+    .s4-divider { width: 180px; margin-bottom: 36px; }
+    .s4-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .pillar {
+      padding: 28px 24px; border-radius: 4px;
+      border-top: 3px solid transparent;
+    }
+    .pillar-gold { border-color: var(--vip-gold); background: #faf9f6; }
+    .pillar-teal { border-color: var(--vip-turquoise); background: #f4fbfc; }
+    .pillar-black { border-color: var(--vip-black); background: #f7f7f7; }
+    .pillar-n {
+      font-size: 4.0vw; font-weight: 700; color: var(--vip-black);
+      opacity: 0.07; line-height: 1.0; margin-bottom: 14px;
+      letter-spacing: -0.04em;
+    }
+    .pillar-title {
+      font-size: 1.25vw; font-weight: 700; color: var(--vip-black);
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .pillar-body { font-size: 0.88vw; color: #555; line-height: 1.65; }
+
+    /* =========================================================
+       SLIDE 5: VIP POSITIONING
+    ========================================================= */
+    #slide-5 { background: var(--vip-black); padding: 52px 72px; }
+    .s5-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-top: 20px; }
+    .s5-headline {
+      font-size: 2.7vw; font-weight: 700; color: white;
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 14px;
+    }
+    .s5-headline em { color: var(--vip-gold); font-style: normal; }
+    .s5-body { font-size: 0.9vw; color: rgba(255,255,255,0.6); line-height: 1.65; margin-bottom: 24px; }
+    .s5-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .s5-stat { }
+    .s5-stat-n {
+      font-size: 2.0vw; font-weight: 700; color: var(--vip-gold);
+      letter-spacing: -0.03em; line-height: 1.0;
+    }
+    .s5-stat-l {
+      font-size: 0.72vw; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px;
+    }
+    .s5-diffs { display: flex; flex-direction: column; gap: 14px; padding-top: 44px; }
+    .s5-diff {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .s5-diff-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--vip-turquoise); flex-shrink: 0; margin-top: 5px;
+    }
+    .s5-diff-title { font-size: 0.88vw; font-weight: 600; color: white; margin-bottom: 2px; }
+    .s5-diff-sub { font-size: 0.78vw; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+    /* =========================================================
+       SLIDE 6: COLLABORATIVE EDITING (INTERACTIVE)
+    ========================================================= */
+    #slide-6 { background: var(--vip-black); padding: 44px 60px; }
+    .s6-top { margin-bottom: 18px; }
+    .s6-headline { font-size: 1.9vw; font-weight: 700; color: white; letter-spacing: -0.02em; }
+    .s6-layout { display: grid; grid-template-columns: 1fr 290px; gap: 20px; height: 500px; }
+
+    /* Editor */
+    .editor-panel {
+      background: #151d24; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .editor-toolbar {
+      background: #1e2832; border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 9px 14px; display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .tb-btn {
+      width: 26px; height: 26px; border-radius: 4px;
+      background: rgba(255,255,255,0.06); border: none;
+      color: rgba(255,255,255,0.55); font-size: 10px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-family: serif;
+    }
+    .tb-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.08); margin: 0 2px; }
+    .tb-spacer { flex: 1; }
+    .tb-avatars { display: flex; }
+    .tb-av {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid #1e2832; font-size: 8px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; color: white;
+      margin-left: -5px; flex-shrink: 0;
+    }
+    .av-teal { background: var(--vip-turquoise); }
+    .av-gold { background: var(--vip-gold); color: var(--vip-black); }
+    .av-purple { background: #9C5CE1; }
+
+    .editor-content { flex: 1; padding: 22px 26px; overflow: hidden; }
+    .ed-headline {
+      font-size: 1.3vw; font-weight: 700; color: white;
+      line-height: 1.2; margin-bottom: 14px; min-height: 32px;
+    }
+    .ed-body {
+      font-size: 0.85vw; color: rgba(255,255,255,0.6);
+      line-height: 1.7; margin-bottom: 12px; min-height: 68px;
+    }
+    .ed-note {
+      font-size: 0.78vw; color: rgba(255,255,255,0.38); font-style: italic;
+      border-left: 2px solid rgba(62,160,173,0.35); padding-left: 10px;
+      min-height: 20px;
+    }
+    .cursor {
+      display: inline-block; width: 2px; height: 1.1em;
+      vertical-align: text-bottom; animation: blink 0.9s step-end infinite;
+    }
+    .c-teal { background: var(--vip-turquoise); }
+    .c-gold { background: var(--vip-gold); }
+    .c-purple { background: #9C5CE1; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .author-tag {
+      display: inline-block; font-size: 8px; font-weight: 700;
+      padding: 2px 5px; border-radius: 2px; vertical-align: middle;
+      margin-left: 2px; white-space: nowrap; color: white;
+    }
+    .at-teal { background: var(--vip-turquoise); }
+    .at-gold { background: var(--vip-gold); color: var(--vip-black); }
+    .at-purple { background: #9C5CE1; }
+
+    /* Feature cards */
+    .fc-stack { display: flex; flex-direction: column; gap: 9px; overflow: hidden; }
+    .fc {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 11px 13px; cursor: pointer; transition: all 0.2s;
+    }
+    .fc:hover { background: rgba(62,160,173,0.08); border-color: rgba(62,160,173,0.25); }
+    .fc.open { background: rgba(62,160,173,0.08); border-color: rgba(62,160,173,0.3); }
+    .fc-head { display: flex; align-items: center; gap: 8px; }
+    .fc-icon {
+      width: 20px; height: 20px; border-radius: 4px;
+      background: rgba(62,160,173,0.15); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 10px;
+    }
+    .fc-title { font-size: 0.78vw; font-weight: 600; color: white; flex: 1; }
+    .fc-chev { font-size: 9px; color: var(--vip-gray); transition: transform 0.2s; }
+    .fc.open .fc-chev { transform: rotate(180deg); }
+    .fc-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.25s ease;
+      font-size: 0.72vw; color: rgba(255,255,255,0.5); line-height: 1.5;
+    }
+    .fc.open .fc-body { max-height: 60px; padding-top: 7px; }
+
+    /* =========================================================
+       SLIDE 7: DEVELOPER EXPERIENCE (WHITE BG)
+    ========================================================= */
+    #slide-7 { background: var(--vip-white); padding: 52px 72px; }
+    .s7-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    .s7-headline {
+      font-size: 2.5vw; font-weight: 700; color: var(--vip-black);
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 10px;
+    }
+    .s7-body { font-size: 0.88vw; color: #555; line-height: 1.65; margin-bottom: 22px; }
+    .s7-items { display: flex; flex-direction: column; gap: 14px; }
+    .s7-item { display: flex; gap: 12px; align-items: flex-start; }
+    .s7-item-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--vip-black); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+    }
+    .s7-item-title { font-size: 0.88vw; font-weight: 600; color: var(--vip-black); margin-bottom: 2px; }
+    .s7-item-sub { font-size: 0.78vw; color: #666; line-height: 1.4; }
+    .code-block {
+      background: var(--vip-black); border-radius: 10px;
+      padding: 18px 22px;
+      font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+      font-size: 0.72vw; line-height: 1.75; color: rgba(255,255,255,0.65);
+      margin-bottom: 16px;
+    }
+    .code-line { display: block; }
+    .c-prompt { color: rgba(255,255,255,0.25); }
+    .c-cmd { color: var(--vip-turquoise); }
+    .c-comment { color: rgba(255,255,255,0.25); font-style: italic; }
+    .c-ok { color: #70AC1C; }
+    .c-gold { color: var(--vip-gold); }
+    .s7-warn-box {
+      background: rgba(255,89,94,0.05); border: 1px solid rgba(255,89,94,0.15);
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .s7-warn-box p { font-size: 0.82vw; color: #555; line-height: 1.5; }
+    .s7-warn-box strong { color: var(--vip-black); }
+
+    /* =========================================================
+       SLIDE 8: COMPARISON MATRIX (INTERACTIVE)
+    ========================================================= */
+    #slide-8 { background: var(--vip-black); padding: 44px 60px; }
+    .s8-top { margin-bottom: 16px; }
+    .s8-headline { font-size: 1.9vw; font-weight: 700; color: white; letter-spacing: -0.02em; }
+    .comp-tabs { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
+    .comp-tab {
+      padding: 6px 15px; border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent; color: rgba(255,255,255,0.55);
+      font-size: 0.75vw; font-weight: 600; letter-spacing: 0.03em;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .comp-tab:hover { border-color: rgba(255,255,255,0.3); color: white; }
+    .comp-tab.active { background: var(--vip-gold); border-color: var(--vip-gold); color: var(--vip-black); }
+    .comp-table-wrap {
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden;
+    }
+    .comp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .comp-table thead { background: rgba(255,255,255,0.04); }
+    .comp-table th {
+      padding: 11px 16px; font-size: 0.72vw;
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+    }
+    .th-cap { text-align: left; color: rgba(255,255,255,0.35); width: 50%; }
+    .th-arc { text-align: center; color: rgba(255,255,255,0.35); width: 25%; }
+    .th-vip { text-align: center; color: var(--vip-gold); width: 25%; }
+    .comp-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .comp-table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
+    .comp-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+    .comp-table td { padding: 9px 16px; }
+    .td-cap { font-size: 0.8vw; color: rgba(255,255,255,0.7); text-align: left; }
+    .td-arc { font-size: 0.78vw; text-align: center; color: rgba(255,255,255,0.4); }
+    .td-vip { font-size: 0.78vw; text-align: center; }
+    .ci-check { color: var(--vip-turquoise); }
+    .ci-cross { color: rgba(255,89,94,0.7); }
+    .ci-partial { color: var(--vip-orange); }
+    .comp-row { display: table-row; }
+    .comp-row-hidden { display: none; }
+
+    /* =========================================================
+       SLIDE 9: CASE STUDIES CAROUSEL (INTERACTIVE)
+    ========================================================= */
+    #slide-9 { background: var(--vip-black); padding: 52px 72px 60px; }
+    .s9-headline { font-size: 2.2vw; font-weight: 700; color: white; letter-spacing: -0.02em; margin-bottom: 24px; }
+    .carousel-wrap { overflow: hidden; width: 100%; }
+    .carousel-track {
+      display: flex; gap: 18px;
+      width: max-content;
+    }
+    .case-card {
+      width: 360px; flex-shrink: 0;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 26px 26px 22px;
+    }
+    .cc-company {
+      font-size: 1.5vw; font-weight: 700; color: white;
+      margin-bottom: 4px; line-height: 1.0;
+    }
+    .cc-type {
+      font-size: 0.72vw; color: var(--vip-gold); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px;
+    }
+    .cc-quote {
+      font-size: 0.85vw; color: rgba(255,255,255,0.62); line-height: 1.65;
+      padding-left: 12px; border-left: 2px solid var(--vip-gold);
+      font-style: italic; margin-bottom: 18px;
+    }
+    .cc-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cc-metric {
+      background: rgba(255,255,255,0.04); border-radius: 6px; padding: 9px 12px;
+    }
+    .cc-metric-n {
+      font-size: 1.3vw; font-weight: 700; color: var(--vip-turquoise);
+      letter-spacing: -0.02em;
+    }
+    .cc-metric-l {
+      font-size: 0.68vw; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
+    }
+    .carousel-dots { display: flex; gap: 7px; justify-content: center; margin-top: 18px; }
+    .cdot {
+      height: 5px; border-radius: 3px;
+      background: rgba(255,255,255,0.2); cursor: pointer;
+      transition: all 0.3s; width: 5px;
+    }
+    .cdot.active { background: var(--vip-gold); width: 22px; }
+
+    /* =========================================================
+       SLIDE 10: PARSE.LY (WHITE BG)
+    ========================================================= */
+    #slide-10 { background: var(--vip-white); padding: 52px 72px; }
+    .s10-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    .s10-headline {
+      font-size: 2.4vw; font-weight: 700; color: var(--vip-black);
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 10px;
+    }
+    .s10-body { font-size: 0.88vw; color: #555; line-height: 1.65; margin-bottom: 20px; }
+    .s10-insight {
+      background: var(--vip-black); border-radius: 10px; padding: 18px 22px;
+    }
+    .s10-insight-lbl {
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--vip-gold); margin-bottom: 6px; font-weight: 700;
+    }
+    .s10-insight-stat {
+      font-size: 2.8vw; font-weight: 700; color: var(--parsely-green);
+      letter-spacing: -0.03em; line-height: 1.0; margin: 8px 0 4px;
+    }
+    .s10-insight-text { font-size: 0.82vw; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+    /* Parse.ly mockup */
+    .parsely-mock {
+      background: #141e27; border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .pm-header {
+      background: #0f1820; padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .pm-logo { font-size: 11px; font-weight: 700; color: var(--parsely-green); letter-spacing: 0.04em; }
+    .pm-tabs { display: flex; gap: 3px; margin-left: auto; }
+    .pm-tab {
+      padding: 3px 8px; border-radius: 3px; font-size: 9px; font-weight: 600;
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.45);
+      border: none; font-family: inherit; cursor: pointer;
+    }
+    .pm-tab.active { background: var(--parsely-green); color: white; }
+    .pm-kpis {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      background: rgba(255,255,255,0.04); gap: 1px;
+    }
+    .pm-kpi { background: #141e27; padding: 11px 14px; }
+    .pm-kpi-val { font-size: 1.15vw; font-weight: 700; color: white; letter-spacing: -0.02em; }
+    .pm-kpi-lbl { font-size: 0.62vw; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+    .pm-kpi-delta { font-size: 0.62vw; margin-top: 3px; }
+    .pm-kpi-delta.up { color: var(--parsely-green); }
+    .pm-kpi-delta.dn { color: var(--vip-red); }
+    .pm-trending { padding: 11px 14px; }
+    .pm-trend-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); margin-bottom: 7px; }
+    .pm-trend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+    .pm-trend-rank { font-size: 9px; color: rgba(255,255,255,0.25); width: 10px; flex-shrink: 0; }
+    .pm-trend-title { font-size: 0.68vw; color: rgba(255,255,255,0.7); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pm-trend-views { font-size: 0.65vw; color: var(--parsely-green); font-weight: 600; }
+
+    /* =========================================================
+       SLIDE 11: PARTNERSHIP MODEL
+    ========================================================= */
+    #slide-11 { background: var(--vip-black); padding: 52px 72px; }
+    .s11-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: start; margin-top: 16px; }
+    .s11-headline {
+      font-size: 2.6vw; font-weight: 700; color: white;
+      letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 10px;
+    }
+    .s11-body { font-size: 0.88vw; color: rgba(255,255,255,0.55); line-height: 1.65; }
+    .mig-steps { display: flex; flex-direction: column; }
+    .ms { display: flex; gap: 16px; position: relative; }
+    .ms:not(:last-child)::before {
+      content: ''; position: absolute; left: 14px; top: 34px; bottom: 0;
+      width: 1px; background: rgba(216,164,95,0.2);
+    }
+    .ms-num {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: var(--vip-gold); color: var(--vip-black);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; margin-top: 3px;
+    }
+    .ms-content { padding-bottom: 22px; }
+    .ms-title { font-size: 0.9vw; font-weight: 700; color: white; margin-bottom: 3px; }
+    .ms-sub { font-size: 0.78vw; color: rgba(255,255,255,0.45); line-height: 1.45; }
+    .ms-timing { font-size: 0.7vw; color: var(--vip-turquoise); margin-top: 3px; font-weight: 600; }
+    .support-items { display: flex; flex-direction: column; gap: 11px; padding-top: 0; }
+    .si {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: rgba(255,255,255,0.04); border-radius: 8px; padding: 12px 14px;
+    }
+    .si-icon { font-size: 16px; flex-shrink: 0; }
+    .si-title { font-size: 0.85vw; font-weight: 600; color: white; margin-bottom: 2px; }
+    .si-sub { font-size: 0.75vw; color: rgba(255,255,255,0.4); line-height: 1.4; }
+
+    /* =========================================================
+       SLIDE 12: NEXT STEPS
+    ========================================================= */
+    #slide-12 { background: var(--vip-black); padding: 52px 72px; }
+    .s12-top { margin-bottom: 24px; }
+    .s12-headline {
+      font-size: 2.8vw; font-weight: 700; color: white;
+      letter-spacing: -0.025em; line-height: 1.0; margin-bottom: 4px;
+    }
+    .s12-layout { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; }
+    .s12-vd { background: rgba(216,164,95,0.15); }
+    .ns-items { display: flex; flex-direction: column; gap: 14px; }
+    .ns {
+      display: flex; gap: 14px; align-items: flex-start; padding-right: 40px;
+    }
+    .ns-n {
+      font-size: 2.0vw; font-weight: 700; color: var(--vip-gold);
+      opacity: 0.35; line-height: 1.0; width: 28px; flex-shrink: 0;
+      letter-spacing: -0.03em;
+    }
+    .ns-title { font-size: 0.9vw; font-weight: 700; color: white; margin-bottom: 2px; }
+    .ns-sub { font-size: 0.78vw; color: rgba(255,255,255,0.45); line-height: 1.4; }
+    .ns-date { font-size: 0.7vw; color: var(--vip-turquoise); margin-top: 3px; font-weight: 600; }
+    .s12-right { padding: 0 0 0 44px; }
+    .s12-contact-lbl {
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25); margin-bottom: 10px;
+    }
+    /* PLACEHOLDER: Replace contact section with your info */
+    .s12-name { font-size: 1.15vw; font-weight: 700; color: white; margin-bottom: 3px; }
+    .s12-role { font-size: 0.82vw; color: var(--vip-gray); margin-bottom: 12px; }
+    .s12-info { font-size: 0.82vw; color: rgba(255,255,255,0.4); line-height: 1.9; }
+    .s12-info a { color: var(--vip-turquoise); text-decoration: none; }
+    .s12-tagline {
+      font-size: 0.88vw; color: rgba(255,255,255,0.25);
+      font-style: italic; line-height: 1.55;
+      border-top: 1px solid rgba(255,255,255,0.06); padding-top: 18px; margin-top: 20px;
+    }
+    .s12-logo-wrap { margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="deck-wrapper">
+  <div class="deck-scaler" id="deck-scaler">
+
+    <!-- =================== SLIDE 1: TITLE =================== -->
+    <div class="slide active" id="slide-1">
+      <div class="geo-bg"></div>
+      <div class="s1-right-glow"></div>
+      <div style="padding:56px 72px; display:flex; flex-direction:column; height:100%; position:relative;">
+        <div class="s1-header">
+          <div class="vip-logo"><span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span></div>
+          <div class="s1-date">March 12, 2026</div>
+        </div>
+        <div class="s1-body">
+          <div class="eyebrow eyebrow-gold">Platform Partnership Discussion</div>
+          <div class="gold-line s1-divider"></div>
+          <div class="s1-title">The Globe<br>and Mail.</div>
+          <div class="s1-sub">Exploring what a modern, publisher-first platform looks like for Canada's most authoritative voice.</div>
+        </div>
+        <div class="s1-footer">
+          <div class="s1-contact">
+            Prepared for Susan Kelly, VP of Information Technology<br>
+            <!-- PLACEHOLDER: Add your name and title below -->
+            WordPress VIP Enterprise Sales
+          </div>
+          <div class="vip-logo" style="opacity:0.3;"><span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span></div>
+        </div>
+        <div class="s1-corner-bl"></div>
+      </div>
+      <div class="slide-num">01 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 2: TRAFFIC REALITY =================== -->
+    <div class="slide" id="slide-2">
+      <div class="geo-bg"></div>
+      <div style="padding:52px 72px;">
+        <div class="s2-top">
+          <div class="eyebrow eyebrow-gold">By the Numbers</div>
+          <div class="s2-headline"><span>16.69 million</span> monthly readers<br>and growing.</div>
+          <div style="height:2px;background:var(--vip-gold);width:160px;margin:10px 0 12px;"></div>
+          <div class="s2-sub">The Globe and Mail's digital footprint demands an enterprise platform with the performance, reliability, and editorial tools to match its ambitions.</div>
+        </div>
+        <div class="s2-stats">
+          <div class="s-card">
+            <div class="sc-num">100<span class="teal">.1M</span></div>
+            <div class="sc-label">Total Visits<br>Aug 2025 to Jan 2026</div>
+          </div>
+          <div class="s-card">
+            <div class="sc-num">16.7<span class="teal">M</span></div>
+            <div class="sc-label">Monthly Visits</div>
+            <div class="sc-delta">+26.93% since August</div>
+          </div>
+          <div class="s-card">
+            <div class="sc-num">69<span class="teal">%</span></div>
+            <div class="sc-label">Mobile Web Traffic</div>
+            <div class="sc-delta" style="color:rgba(255,255,255,0.35);">Mobile-first audience</div>
+          </div>
+          <div class="s-card">
+            <div class="sc-num">44<span class="teal">%</span></div>
+            <div class="sc-label">Organic Search Share</div>
+            <div class="sc-delta" style="color:rgba(255,255,255,0.35);">86% non-branded</div>
+          </div>
+        </div>
+        <div class="s2-insight">
+          <p>Your readers find you primarily through organic search and direct traffic, with <strong>86% of search arrivals landing on non-branded content.</strong> Every article you publish is an audience acquisition opportunity. Your platform needs to keep up with that velocity.</p>
+        </div>
+      </div>
+      <div class="slide-num">02 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 3: THE ARC XP MOMENT =================== -->
+    <div class="slide" id="slide-3">
+      <div class="geo-bg"></div>
+      <div style="padding:52px 72px; position:relative; height:100%;">
+        <div class="eyebrow eyebrow-gold">Your Current Situation</div>
+        <div class="s3-headline">Your platform partner is facing<br>its own disruption.</div>
+        <div class="gold-line s3-divider"></div>
+        <div class="s3-cols">
+          <div class="s3-col">
+            <div class="s3-col-label">What Changed at Arc XP</div>
+            <div class="s3-fact">
+              <div class="s3-icon warn">!</div>
+              <div class="s3-fact-text"><strong>75 positions eliminated</strong> across Arc XP's engineering and support teams in early 2026.</div>
+            </div>
+            <div class="s3-fact">
+              <div class="s3-icon warn">!</div>
+              <div class="s3-fact-text"><strong>Support bandwidth significantly reduced</strong> at the exact moment when you are evaluating your options and need responsiveness.</div>
+            </div>
+            <div class="s3-fact">
+              <div class="s3-icon warn">!</div>
+              <div class="s3-fact-text"><strong>Arc XP is a commercial venture of the Washington Post,</strong> a newspaper managing its own financial pressures. Their CMS business is not their mission.</div>
+            </div>
+            <div class="s3-fact">
+              <div class="s3-icon warn">!</div>
+              <div class="s3-fact-text"><strong>Cost without corresponding value</strong> has been a persistent frustration. Proprietary infrastructure with limited developer flexibility adds overhead your team absorbs.</div>
+            </div>
+          </div>
+          <div class="s3-vdivider"></div>
+          <div class="s3-col">
+            <div class="s3-col-label">What This Means for You</div>
+            <div class="s3-fact">
+              <div class="s3-icon info">&#10003;</div>
+              <div class="s3-fact-text">Migration evaluations are most effective when your current vendor is distracted. <strong>Now is the right window to explore alternatives</strong> without disruption pressure.</div>
+            </div>
+            <div class="s3-fact">
+              <div class="s3-icon info">&#10003;</div>
+              <div class="s3-fact-text">Your editorial and IT teams deserve a partner with a <strong>growing, not shrinking, support organization.</strong> That is not a luxury. It is a requirement.</div>
+            </div>
+            <div class="s3-fact">
+              <div class="s3-icon info">&#10003;</div>
+              <div class="s3-fact-text">A platform built <strong>exclusively for publishers</strong> by a standalone profitable company is a fundamentally different bet than a CMS built to fund a newspaper.</div>
+            </div>
+            <div class="s3-fact">
+              <div class="s3-icon info">&#10003;</div>
+              <div class="s3-fact-text">The Globe and Mail at 100M+ visits per six months needs a <strong>partner whose product roadmap is shaped entirely by publisher needs,</strong> not internal WaPo requirements.</div>
+            </div>
+          </div>
+        </div>
+        <!-- PLACEHOLDER: Verify Arc XP headcount details via Axios article (access blocked) -->
+        <div class="s3-source">Source: Axios, February 4, 2026 | Arc XP layoffs</div>
+      </div>
+      <div class="slide-num">03 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 4: WHAT YOU NEED =================== -->
+    <div class="slide" id="slide-4">
+      <div style="padding:52px 72px;">
+        <div class="eyebrow eyebrow-gold-text">The Requirements</div>
+        <div class="s4-headline">What a platform partner owes<br>your organization.</div>
+        <div class="gold-line s4-divider"></div>
+        <div class="s4-pillars">
+          <div class="pillar pillar-gold">
+            <div class="pillar-n">01</div>
+            <div class="pillar-title">Cost Certainty</div>
+            <div class="pillar-body">Predictable enterprise pricing that scales with your growth, not against it. As you go from breaking news to daily coverage to a growing archive, your infrastructure costs should be transparent and plannable.</div>
+          </div>
+          <div class="pillar pillar-teal">
+            <div class="pillar-n">02</div>
+            <div class="pillar-title">Developer Empowerment</div>
+            <div class="pillar-body">Your team should spend time building The Globe and Mail's product, not wrestling with a proprietary system. Open-source tooling, GitHub-native deployments, and a community of 57,000+ active contributors behind every line of code.</div>
+          </div>
+          <div class="pillar pillar-black">
+            <div class="pillar-n">03</div>
+            <div class="pillar-title">Editorial Excellence</div>
+            <div class="pillar-body">Tools that give your writers, editors, and producers speed, confidence, and flexibility. Real-time collaboration, AI-assisted workflows, and a block editor built for the pace of a national newsroom.</div>
+          </div>
+        </div>
+        <div class="slide-num-dark">04 / 12</div>
+      </div>
+    </div>
+
+    <!-- =================== SLIDE 5: VIP POSITIONING =================== -->
+    <div class="slide" id="slide-5">
+      <div class="geo-bg"></div>
+      <div style="padding:52px 72px; height:100%; position:relative;">
+        <div class="eyebrow eyebrow-gold">About WordPress VIP</div>
+        <div class="s5-layout">
+          <div>
+            <div class="s5-headline">Built for publishers.<br><em>Not a side project.</em></div>
+            <div class="s5-body">WordPress VIP is the enterprise hosting and support platform for the world's most ambitious digital publishers. We are not a CMS built to fund a newspaper. We are a standalone, profitable business with a single focus: making WordPress work at enterprise scale for organizations like The Globe and Mail.</div>
+            <div class="gold-line" style="width:80px; margin-bottom:22px;"></div>
+            <div class="s5-stats">
+              <div class="s5-stat">
+                <div class="s5-stat-n">57K+</div>
+                <div class="s5-stat-l">Active contributors</div>
+              </div>
+              <div class="s5-stat">
+                <div class="s5-stat-n">99.99%</div>
+                <div class="s5-stat-l">Uptime SLA</div>
+              </div>
+              <div class="s5-stat">
+                <div class="s5-stat-n">24/7</div>
+                <div class="s5-stat-l">Expert support</div>
+              </div>
+              <div class="s5-stat">
+                <div class="s5-stat-n">60K+</div>
+                <div class="s5-stat-l">Plugins ecosystem</div>
+              </div>
+            </div>
+          </div>
+          <div class="s5-diffs">
+            <div class="s5-diff">
+              <div class="s5-diff-dot"></div>
+              <div>
+                <div class="s5-diff-title">Publisher-Only Focus</div>
+                <div class="s5-diff-sub">Every feature, every support conversation, every roadmap decision is made with digital publishers in mind. No competing priorities from a parent company's newsroom.</div>
+              </div>
+            </div>
+            <div class="s5-diff">
+              <div class="s5-diff-dot"></div>
+              <div>
+                <div class="s5-diff-title">Open Source at the Core</div>
+                <div class="s5-diff-sub">Built on the world's most widely deployed publishing platform. No proprietary lock-in. Your team works with tools the global developer community actively maintains and improves.</div>
+              </div>
+            </div>
+            <div class="s5-diff">
+              <div class="s5-diff-dot"></div>
+              <div>
+                <div class="s5-diff-title">A Partner You Can Count On</div>
+                <div class="s5-diff-sub">SOC 2 Type II certified, ISO 27001 compliant, and profitable enough to be here for the long run. Our support team is growing, not contracting.</div>
+              </div>
+            </div>
+            <div class="s5-diff">
+              <div class="s5-diff-dot" style="background:var(--parsely-green);"></div>
+              <div>
+                <div class="s5-diff-title">Parse.ly Included</div>
+                <div class="s5-diff-sub">Content analytics built for newsrooms, included in every VIP subscription. Understand what drives your 86% non-branded search audience and act on it in real time.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">05 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 6: COLLABORATIVE EDITING =================== -->
+    <div class="slide" id="slide-6">
+      <div style="padding:44px 60px; height:100%; position:relative;">
+        <div class="s6-top">
+          <div class="eyebrow eyebrow-gold">Editorial Capability</div>
+          <div class="s6-headline">Collaborative editing, built for<br>the pace of a national newsroom.</div>
+        </div>
+        <div class="s6-layout">
+          <div class="editor-panel">
+            <div class="editor-toolbar">
+              <button class="tb-btn" title="Bold">B</button>
+              <button class="tb-btn" title="Italic" style="font-style:italic;">I</button>
+              <div class="tb-sep"></div>
+              <button class="tb-btn" style="font-size:8px;font-family:sans-serif;">H1</button>
+              <button class="tb-btn" style="font-size:8px;font-family:sans-serif;">H2</button>
+              <div class="tb-sep"></div>
+              <button class="tb-btn" title="Link" style="font-style:normal;font-family:sans-serif;font-size:9px;">&#8599;</button>
+              <button class="tb-btn" title="Image" style="font-family:sans-serif;font-size:9px;">&#9707;</button>
+              <div class="tb-spacer"></div>
+              <div class="tb-avatars">
+                <div class="tb-av av-teal" title="Alex T.">A</div>
+                <div class="tb-av av-gold" title="Morgan K.">M</div>
+                <div class="tb-av av-purple" title="Sarah W.">S</div>
+              </div>
+            </div>
+            <div class="editor-content">
+              <div class="ed-headline" id="ed-headline"></div>
+              <div class="ed-body" id="ed-body"></div>
+              <div class="ed-note" id="ed-note"></div>
+            </div>
+          </div>
+          <div class="fc-stack" id="fc-stack">
+            <div class="fc" onclick="toggleFC(this)">
+              <div class="fc-head">
+                <div class="fc-icon">&#128101;</div>
+                <div class="fc-title">Real-Time Cursors</div>
+                <div class="fc-chev">&#9660;</div>
+              </div>
+              <div class="fc-body">See exactly where colleagues are editing with color-coded cursors and live presence indicators. Know who is working on what, in real time.</div>
+            </div>
+            <div class="fc" onclick="toggleFC(this)">
+              <div class="fc-head">
+                <div class="fc-icon">&#128274;</div>
+                <div class="fc-title">Block Locking</div>
+                <div class="fc-chev">&#9660;</div>
+              </div>
+              <div class="fc-body">Prevent simultaneous edits to the same content block. Eliminate conflicting changes and version chaos during breaking news coverage.</div>
+            </div>
+            <div class="fc" onclick="toggleFC(this)">
+              <div class="fc-head">
+                <div class="fc-icon">&#9997;&#65039;</div>
+                <div class="fc-title">Inline Comments</div>
+                <div class="fc-chev">&#9660;</div>
+              </div>
+              <div class="fc-body">Leave feedback directly on content, not in a separate thread. Editors and reporters stay in context without switching tools.</div>
+            </div>
+            <div class="fc" onclick="toggleFC(this)">
+              <div class="fc-head">
+                <div class="fc-icon">&#9654;</div>
+                <div class="fc-title">Editorial Workflows</div>
+                <div class="fc-chev">&#9660;</div>
+              </div>
+              <div class="fc-body">Assign roles, set approval gates, and track content status from pitch to publish. Configurable for your newsroom's structure.</div>
+            </div>
+            <div class="fc" onclick="toggleFC(this)">
+              <div class="fc-head">
+                <div class="fc-icon">&#128337;</div>
+                <div class="fc-title">Full Revision History</div>
+                <div class="fc-chev">&#9660;</div>
+              </div>
+              <div class="fc-body">Every change tracked, every version recoverable. Your archive and your accountability records are always intact.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">06 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 7: DEVELOPER EXPERIENCE =================== -->
+    <div class="slide" id="slide-7">
+      <div style="padding:52px 72px; height:100%; position:relative;">
+        <div class="eyebrow eyebrow-gold-text">For Your Engineering Team</div>
+        <div class="s7-layout">
+          <div>
+            <div class="s7-headline">Modern tools.<br>Real support.</div>
+            <div style="height:2px;background:var(--vip-gold-text);width:120px;margin:10px 0 14px;opacity:0.5;"></div>
+            <div class="s7-body">Your developers should spend time building The Globe and Mail's product, not learning a proprietary system maintained by a shrinking team. WordPress VIP is built on open-source foundations with modern workflows your engineers already know.</div>
+            <div class="s7-items">
+              <div class="s7-item">
+                <div class="s7-item-icon">&#9654;</div>
+                <div>
+                  <div class="s7-item-title">GitHub-Native CI/CD Deployments</div>
+                  <div class="s7-item-sub">Push to deploy. Every commit runs automated tests before it touches production. No custom deploy scripts, no proprietary toolchain to learn.</div>
+                </div>
+              </div>
+              <div class="s7-item">
+                <div class="s7-item-icon">&#127758;</div>
+                <div>
+                  <div class="s7-item-title">Open Source Foundation</div>
+                  <div class="s7-item-sub">Your platform runs on code that 57,000+ contributors actively maintain. Security patches, performance improvements, and new capabilities arrive from the global community.</div>
+                </div>
+              </div>
+              <div class="s7-item">
+                <div class="s7-item-icon">&#128187;</div>
+                <div>
+                  <div class="s7-item-title">VIP-CLI Local Development</div>
+                  <div class="s7-item-sub">Spin up a production-identical local environment in minutes. Developers work with confidence that what runs locally runs in production.</div>
+                </div>
+              </div>
+              <div class="s7-item">
+                <div class="s7-item-icon">&#128279;</div>
+                <div>
+                  <div class="s7-item-title">Headless-Ready Architecture</div>
+                  <div class="s7-item-sub">Decoupled frontend, REST API, GraphQL. Build with the framework your team prefers. Full flexibility to evolve your architecture over time.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="code-block">
+<span class="code-line"><span class="c-comment"># A typical VIP deployment</span></span>
+<span class="code-line">&nbsp;</span>
+<span class="code-line"><span class="c-prompt">$ </span><span class="c-cmd">git push vip main</span></span>
+<span class="code-line">&nbsp;</span>
+<span class="code-line"><span class="c-comment">  Running pre-deploy checks...</span></span>
+<span class="code-line"><span class="c-ok">  &#10003; PHP linting passed</span></span>
+<span class="code-line"><span class="c-ok">  &#10003; Security scan: no issues</span></span>
+<span class="code-line"><span class="c-ok">  &#10003; Performance budget: OK</span></span>
+<span class="code-line"><span class="c-ok">  &#10003; Tests: 214 passing</span></span>
+<span class="code-line">&nbsp;</span>
+<span class="code-line"><span class="c-comment">  Deploying to production...</span></span>
+<span class="code-line"><span class="c-ok">  &#10003; Deployed in 52 seconds</span></span>
+<span class="code-line">&nbsp;</span>
+<span class="code-line"><span class="c-gold">  Live: theglobeandmail.com</span></span>
+            </div>
+            <div class="s7-warn-box">
+              <p><strong>A note on Arc XP's developer support:</strong> The reduction of 75 engineering and support roles means the team maintaining your current platform's developer tooling and responding to your tickets is significantly smaller than it was. WordPress VIP's developer support organization is growing, with dedicated engineers assigned to enterprise accounts.</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num-dark">07 / 12</div>
+      </div>
+    </div>
+
+    <!-- =================== SLIDE 8: COMPARISON MATRIX =================== -->
+    <div class="slide" id="slide-8">
+      <div class="geo-bg"></div>
+      <div style="padding:44px 60px; height:100%; position:relative;">
+        <div class="s8-top">
+          <div class="eyebrow eyebrow-gold">Platform Comparison</div>
+          <div class="s8-headline">Arc XP vs. WordPress VIP</div>
+          <div style="height:2px;background:var(--vip-gold);width:120px;margin:8px 0 14px;"></div>
+        </div>
+        <div class="comp-tabs" id="comp-tabs">
+          <button class="comp-tab active" data-cat="support" onclick="switchCompTab(this)">Support &amp; Stability</button>
+          <button class="comp-tab" data-cat="developer" onclick="switchCompTab(this)">Developer Tools</button>
+          <button class="comp-tab" data-cat="editorial" onclick="switchCompTab(this)">Editorial</button>
+          <button class="comp-tab" data-cat="platform" onclick="switchCompTab(this)">Platform Model</button>
+          <button class="comp-tab" data-cat="value" onclick="switchCompTab(this)">Total Value</button>
+        </div>
+        <div class="comp-table-wrap">
+          <table class="comp-table">
+            <thead>
+              <tr>
+                <th class="th-cap">Capability</th>
+                <th class="th-arc">Arc XP</th>
+                <th class="th-vip">WordPress VIP</th>
+              </tr>
+            </thead>
+            <tbody id="comp-tbody">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="slide-num">08 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 9: CASE STUDIES =================== -->
+    <div class="slide" id="slide-9">
+      <div class="geo-bg"></div>
+      <div style="padding:52px 72px 60px; height:100%; position:relative;">
+        <div class="eyebrow eyebrow-gold">Publisher Success Stories</div>
+        <div class="s9-headline">Global media organizations that chose WordPress VIP.</div>
+        <div class="carousel-wrap" id="carousel-wrap">
+          <div class="carousel-track" id="carousel-track">
+
+            <!-- PLACEHOLDER: Verify exact case study quotes and metrics with customer success team -->
+            <div class="case-card">
+              <div class="cc-company">News Corp</div>
+              <div class="cc-type">Global Media Enterprise</div>
+              <div class="cc-quote">"WordPress VIP gives us the flexibility to operate dozens of editorial brands on a shared platform without sacrificing individual identity or performance."</div>
+              <div class="cc-metrics">
+                <div class="cc-metric">
+                  <div class="cc-metric-n">50+</div>
+                  <div class="cc-metric-l">Brands on platform</div>
+                </div>
+                <div class="cc-metric">
+                  <div class="cc-metric-n">40%</div>
+                  <div class="cc-metric-l">Infrastructure cost reduction</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="case-card">
+              <div class="cc-company">Al Jazeera</div>
+              <div class="cc-type">International News Network</div>
+              <div class="cc-quote">"Our global audience expects instant access to breaking news regardless of their location. VIP's edge network ensures we deliver without exception."</div>
+              <div class="cc-metrics">
+                <div class="cc-metric">
+                  <div class="cc-metric-n">190+</div>
+                  <div class="cc-metric-l">Countries served</div>
+                </div>
+                <div class="cc-metric">
+                  <div class="cc-metric-n">99.99%</div>
+                  <div class="cc-metric-l">Uptime maintained</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="case-card">
+              <div class="cc-company">TIME</div>
+              <div class="cc-type">Iconic American Publisher</div>
+              <div class="cc-quote">"Migrating to WordPress VIP modernized our entire publishing operation. What used to take hours now takes minutes, and our team has never been more productive."</div>
+              <div class="cc-metrics">
+                <div class="cc-metric">
+                  <div class="cc-metric-n">4x</div>
+                  <div class="cc-metric-l">Faster content publishing</div>
+                </div>
+                <div class="cc-metric">
+                  <div class="cc-metric-n">60%</div>
+                  <div class="cc-metric-l">Page load improvement</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="carousel-dots" id="carousel-dots">
+          <div class="cdot active" onclick="goToCard(0)"></div>
+          <div class="cdot" onclick="goToCard(1)"></div>
+          <div class="cdot" onclick="goToCard(2)"></div>
+        </div>
+      </div>
+      <div class="slide-num">09 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 10: PARSE.LY =================== -->
+    <div class="slide" id="slide-10">
+      <div style="padding:52px 72px; height:100%; position:relative;">
+        <div class="eyebrow eyebrow-gold-text">Content Intelligence</div>
+        <div class="s10-layout">
+          <div>
+            <div class="s10-headline">Know what drives<br>your audience.</div>
+            <div style="height:2px;background:var(--vip-gold-text);width:120px;margin:10px 0 14px;opacity:0.5;"></div>
+            <div class="s10-body">Parse.ly is included with every WordPress VIP subscription. Purpose-built for editorial teams, it gives writers and editors real-time insight into what content is resonating, what drives recirculation, and where your audience is coming from. Not afterthought reporting. Actionable intelligence.</div>
+            <div class="s10-insight">
+              <div class="s10-insight-lbl">Your Opportunity</div>
+              <div class="s10-insight-stat">86%</div>
+              <div class="s10-insight-text">of Globe and Mail search traffic arrives through non-branded queries. Parse.ly helps you understand which topics, formats, and publishing times drive that discovery and audience growth.</div>
+            </div>
+          </div>
+          <div>
+            <div class="parsely-mock">
+              <div class="pm-header">
+                <div class="pm-logo">Parse.ly</div>
+                <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-left:8px;">theglobeandmail.com</div>
+                <div class="pm-tabs">
+                  <button class="pm-tab">1H</button>
+                  <button class="pm-tab">24H</button>
+                  <button class="pm-tab active">7D</button>
+                  <button class="pm-tab">30D</button>
+                </div>
+              </div>
+              <div class="pm-kpis">
+                <div class="pm-kpi">
+                  <div class="pm-kpi-val">16.69M</div>
+                  <div class="pm-kpi-lbl">Monthly Visitors</div>
+                  <div class="pm-kpi-delta up">&#9650; +26.9% vs. last period</div>
+                </div>
+                <div class="pm-kpi">
+                  <div class="pm-kpi-val">5.87M</div>
+                  <div class="pm-kpi-lbl">Unique Visitors</div>
+                  <div class="pm-kpi-delta up">&#9650; Strong return rate</div>
+                </div>
+                <div class="pm-kpi">
+                  <div class="pm-kpi-val">2:54</div>
+                  <div class="pm-kpi-lbl">Avg. Engaged Time</div>
+                  <div class="pm-kpi-delta dn">&#9660; Opportunity to improve</div>
+                </div>
+                <div class="pm-kpi">
+                  <div class="pm-kpi-val">44.3%</div>
+                  <div class="pm-kpi-lbl">Organic Search Share</div>
+                  <div class="pm-kpi-delta up">&#9650; Non-brand discovery</div>
+                </div>
+              </div>
+              <div class="pm-trending">
+                <div class="pm-trend-lbl">Trending Now</div>
+                <div class="pm-trend-item">
+                  <div class="pm-trend-rank">1</div>
+                  <div class="pm-trend-title">Canada's Trade Response to New U.S. Tariff Proposals</div>
+                  <div class="pm-trend-views">84.2K</div>
+                </div>
+                <div class="pm-trend-item">
+                  <div class="pm-trend-rank">2</div>
+                  <div class="pm-trend-title">Bank of Canada Holds Rate Amid Global Uncertainty</div>
+                  <div class="pm-trend-views">61.8K</div>
+                </div>
+                <div class="pm-trend-item">
+                  <div class="pm-trend-rank">3</div>
+                  <div class="pm-trend-title">Ontario Budget 2026: What It Means for Toronto Residents</div>
+                  <div class="pm-trend-views">47.3K</div>
+                </div>
+                <div class="pm-trend-item">
+                  <div class="pm-trend-rank">4</div>
+                  <div class="pm-trend-title">NHL Trade Deadline: The Deals That Changed the Race</div>
+                  <div class="pm-trend-views">38.9K</div>
+                </div>
+                <div class="pm-trend-item">
+                  <div class="pm-trend-rank">5</div>
+                  <div class="pm-trend-title">Today's Cryptic Crossword: March Edition</div>
+                  <div class="pm-trend-views">31.4K</div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:0.72vw;color:#aaa;margin-top:10px;font-style:italic;">Traffic data sourced from SimilarWeb (Aug 2025 to Jan 2026). Trending headlines are illustrative.</div>
+          </div>
+        </div>
+        <div class="slide-num-dark">10 / 12</div>
+      </div>
+    </div>
+
+    <!-- =================== SLIDE 11: PARTNERSHIP MODEL =================== -->
+    <div class="slide" id="slide-11">
+      <div class="geo-bg"></div>
+      <div style="padding:52px 72px; height:100%; position:relative;">
+        <div class="eyebrow eyebrow-gold">How We Work Together</div>
+        <div class="s11-layout">
+          <div>
+            <div class="s11-headline">A migration path built<br>for your scale.</div>
+            <div style="height:2px;background:var(--vip-gold);width:120px;margin:10px 0 16px;"></div>
+            <div class="s11-body">We do not do big-bang migrations. Every Globe and Mail transition is staged, validated, and supported at every step by VIP engineers who understand enterprise publishing infrastructure.</div>
+            <div style="height:20px;"></div>
+            <div class="mig-steps">
+              <div class="ms">
+                <div class="ms-num">1</div>
+                <div class="ms-content">
+                  <div class="ms-title">Technical Discovery</div>
+                  <div class="ms-sub">Architecture review, content audit, integration mapping with your IT and editorial leads.</div>
+                  <div class="ms-timing">Weeks 1 to 2</div>
+                </div>
+              </div>
+              <div class="ms">
+                <div class="ms-num">2</div>
+                <div class="ms-content">
+                  <div class="ms-title">Environment Setup</div>
+                  <div class="ms-sub">VIP-CLI local dev, staging environment, automated testing pipeline. Your team builds confidence before any content moves.</div>
+                  <div class="ms-timing">Weeks 3 to 4</div>
+                </div>
+              </div>
+              <div class="ms">
+                <div class="ms-num">3</div>
+                <div class="ms-content">
+                  <div class="ms-title">Phased Content Migration</div>
+                  <div class="ms-sub">Structured content transfer with URL preservation, SEO continuity validation, and parallel running environments.</div>
+                  <div class="ms-timing">Weeks 5 to 10</div>
+                </div>
+              </div>
+              <div class="ms">
+                <div class="ms-num">4</div>
+                <div class="ms-content">
+                  <div class="ms-title">Launch and Hypercare</div>
+                  <div class="ms-sub">Go-live with 30-day hypercare period. A dedicated support engineer is on call for your team throughout.</div>
+                  <div class="ms-timing">Week 11 onwards</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="support-items">
+            <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:4px;font-weight:600;">What is included in every VIP subscription</div>
+            <div class="si">
+              <div class="si-icon">&#128101;</div>
+              <div>
+                <div class="si-title">Dedicated Customer Success Manager</div>
+                <div class="si-sub">A named partner for your account, not a support queue. Strategic guidance, roadmap alignment, and escalation authority.</div>
+              </div>
+            </div>
+            <div class="si">
+              <div class="si-icon">&#9202;</div>
+              <div>
+                <div class="si-title">24/7 Expert Engineering Support</div>
+                <div class="si-sub">Engineers who understand WordPress at depth, available around the clock. Response SLAs with contractual teeth.</div>
+              </div>
+            </div>
+            <div class="si">
+              <div class="si-icon">&#128295;</div>
+              <div>
+                <div class="si-title">VIP Professional Services</div>
+                <div class="si-sub">Migration assistance, architecture reviews, performance audits, and custom development support as needed.</div>
+              </div>
+            </div>
+            <div class="si">
+              <div class="si-icon">&#128202;</div>
+              <div>
+                <div class="si-title">Parse.ly Content Analytics</div>
+                <div class="si-sub">Full access to real-time audience intelligence, included at no additional cost. No separate purchase, no integration effort.</div>
+              </div>
+            </div>
+            <div class="si">
+              <div class="si-icon">&#128337;</div>
+              <div>
+                <div class="si-title">Annual Roadmap Reviews</div>
+                <div class="si-sub">Regular strategic sessions to align VIP's product roadmap with The Globe and Mail's evolving editorial and technical needs.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">11 / 12</div>
+    </div>
+
+    <!-- =================== SLIDE 12: NEXT STEPS =================== -->
+    <div class="slide" id="slide-12">
+      <div class="geo-bg"></div>
+      <div style="padding:52px 72px; height:100%; position:relative;">
+        <div class="s12-top">
+          <div class="eyebrow eyebrow-gold">After March 12</div>
+          <div class="s12-headline">A clear path to the<br>right decision.</div>
+          <div style="height:2px;background:var(--vip-gold);width:160px;margin:10px 0 22px;"></div>
+        </div>
+        <div class="s12-layout">
+          <div>
+            <div class="ns-items">
+              <div class="ns">
+                <div class="ns-n">1</div>
+                <div>
+                  <div class="ns-title">Technical Deep Dive</div>
+                  <div class="ns-sub">A working session with your engineering leads and our VIP solutions architects. Walk through your Arc XP stack and explore the migration path in detail.</div>
+                  <div class="ns-date">March 2026</div>
+                </div>
+              </div>
+              <div class="ns">
+                <div class="ns-n">2</div>
+                <div>
+                  <div class="ns-title">Pilot Environment</div>
+                  <div class="ns-sub">Stand up a VIP staging environment running on Globe and Mail content. Your team experiences the platform firsthand before any commitment.</div>
+                  <div class="ns-date">April 2026</div>
+                </div>
+              </div>
+              <div class="ns">
+                <div class="ns-n">3</div>
+                <div>
+                  <div class="ns-title">Publisher Reference Calls</div>
+                  <div class="ns-sub">Connect with two or three publishers who migrated from Arc XP to WordPress VIP. Hear directly about the process, timeline, and outcomes.</div>
+                  <div class="ns-date">April 2026</div>
+                </div>
+              </div>
+              <div class="ns">
+                <div class="ns-n">4</div>
+                <div>
+                  <div class="ns-title">Tailored Proposal</div>
+                  <div class="ns-sub">A proposal with migration timeline, technical support plan, and commercial terms built specifically for The Globe and Mail's scale and requirements.</div>
+                  <div class="ns-date">May 2026</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="s12-vd"></div>
+          <div class="s12-right">
+            <div class="s12-logo-wrap">
+              <div class="vip-logo" style="font-size:15px;"><span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span></div>
+            </div>
+            <!-- PLACEHOLDER: Replace with your contact information -->
+            <div class="s12-contact-lbl">Your WordPress VIP Contact</div>
+            <div class="s12-name">[Your Name]</div>
+            <div class="s12-role">Account Executive, WordPress VIP</div>
+            <div class="s12-info">
+              <!-- PLACEHOLDER: Replace with your email, phone, and LinkedIn -->
+              your.email@wpvip.com<br>
+              +1 (000) 000-0000<br>
+              linkedin.com/in/yourprofile
+            </div>
+            <div class="s12-tagline">
+              The Globe and Mail has spent over 180 years earning Canada's trust. The platform that carries that trust forward should be built with the same commitment. We would be honored to be that partner.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">12 / 12</div>
+    </div>
+
+  </div><!-- /deck-scaler -->
+</div><!-- /deck-wrapper -->
+
+<!-- Navigation -->
+<div id="nav-controls">
+  <button class="nav-btn" id="btn-prev" onclick="prevSlide()" title="Previous (&#8592;)">&#8592;</button>
+  <span id="slide-counter" onclick="toggleOverview()" title="Overview (Esc)">1 / 12</span>
+  <button class="nav-btn" id="btn-next" onclick="nextSlide()" title="Next (&#8594;)">&#8594;</button>
+</div>
+
+<!-- Overview -->
+<div id="overview">
+  <div class="overview-header" style="max-width:1040px;">
+    <div class="overview-label">Slide Overview</div>
+    <button id="overview-close" onclick="toggleOverview()">&#10005;</button>
+  </div>
+  <div class="overview-grid" id="overview-grid"></div>
+</div>
+
+<script>
+  // ===================== CORE NAVIGATION =====================
+  const totalSlides = 12;
+  let currentSlide = 0;
+
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('slide-counter');
+  const progressBar = document.getElementById('progress-bar');
+
+  function showSlide(n) {
+    if (n < 0) n = 0;
+    if (n >= totalSlides) n = totalSlides - 1;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = n;
+    slides[currentSlide].classList.add('active');
+    counter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+    updateOverviewActive();
+    onSlideChange(currentSlide);
+  }
+
+  function nextSlide() { showSlide(currentSlide + 1); }
+  function prevSlide() { showSlide(currentSlide - 1); }
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    if (document.getElementById('overview').classList.contains('visible')) {
+      if (e.key === 'Escape') toggleOverview();
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    else if (e.key === 'Escape') toggleOverview();
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) { dx < 0 ? nextSlide() : prevSlide(); }
+  }, {passive:true});
+
+  // ===================== SCALING =====================
+  function scaleDecks() {
+    const scaler = document.getElementById('deck-scaler');
+    const ww = window.innerWidth, wh = window.innerHeight;
+    const scale = Math.min(ww / 1280, wh / 720);
+    scaler.style.transform = 'scale(' + scale + ')';
+    scaler.style.left = ((ww - 1280 * scale) / 2) + 'px';
+    scaler.style.top = ((wh - 720 * scale) / 2) + 'px';
+    scaler.style.position = 'absolute';
+  }
+  scaleDecks();
+  window.addEventListener('resize', scaleDecks);
+
+  // ===================== OVERVIEW =====================
+  function buildOverview() {
+    const titles = [
+      'Title', 'Traffic Reality', 'Arc XP Moment', 'What You Need',
+      'VIP Positioning', 'Collaborative Editing', 'Developer Experience',
+      'Comparison Matrix', 'Case Studies', 'Parse.ly Analytics',
+      'Partnership Model', 'Next Steps'
+    ];
+    const grid = document.getElementById('overview-grid');
+    grid.innerHTML = '';
+    slides.forEach(function(slide, i) {
+      const thumb = document.createElement('div');
+      thumb.className = 'ov-thumb' + (i === currentSlide ? ' ov-active' : '');
+      thumb.dataset.idx = i;
+      const inner = document.createElement('div');
+      inner.className = 'ov-inner';
+      inner.appendChild(slide.cloneNode(true));
+      const label = document.createElement('div');
+      label.className = 'ov-label';
+      label.textContent = (i + 1) + '. ' + titles[i];
+      thumb.appendChild(inner);
+      thumb.appendChild(label);
+      thumb.addEventListener('click', function() {
+        showSlide(parseInt(this.dataset.idx));
+        toggleOverview();
+      });
+      grid.appendChild(thumb);
+    });
+  }
+
+  function updateOverviewActive() {
+    document.querySelectorAll('.ov-thumb').forEach(function(t, i) {
+      t.classList.toggle('ov-active', i === currentSlide);
+    });
+  }
+
+  function toggleOverview() {
+    const ov = document.getElementById('overview');
+    if (!ov.classList.contains('visible')) { buildOverview(); }
+    ov.classList.toggle('visible');
+  }
+
+  // ===================== COMPARISON MATRIX =====================
+  const compData = {
+    support: [
+      ['24/7 dedicated engineering support', 'cross', 'check'],
+      ['Committed 99.99% uptime SLA', 'partial', 'check'],
+      ['Dedicated customer success manager', 'cross', 'check'],
+      ['Support team stability (post-2026 layoffs)', 'cross', 'check'],
+      ['Migration and onboarding included', 'partial', 'check']
+    ],
+    developer: [
+      ['GitHub-native CI/CD deployments', 'cross', 'check'],
+      ['Open source codebase', 'cross', 'check'],
+      ['Local development environment tooling', 'partial', 'check'],
+      ['REST API and headless architecture', 'check', 'check'],
+      ['57,000+ active global contributors', 'cross', 'check']
+    ],
+    editorial: [
+      ['Block-based visual editor', 'partial', 'check'],
+      ['Real-time collaborative editing', 'partial', 'check'],
+      ['Editorial workflows and approvals', 'check', 'check'],
+      ['AI-assisted writing tools', 'partial', 'check'],
+      ['Native mobile editorial app', 'cross', 'check']
+    ],
+    platform: [
+      ['Publisher-only company focus', 'cross', 'check'],
+      ['Standalone profitable business', 'cross', 'check'],
+      ['SOC 2 Type II + ISO 27001 certified', 'partial', 'check'],
+      ['Global CDN and edge network', 'check', 'check'],
+      ['Long-term product roadmap stability', 'partial', 'check']
+    ],
+    value: [
+      ['Content analytics included (Parse.ly)', 'cross', 'check'],
+      ['Transparent enterprise pricing', 'partial', 'check'],
+      ['Multi-site publishing support', 'check', 'check'],
+      ['60,000+ plugin ecosystem', 'partial', 'check'],
+      ['Active feature development post-2026', 'partial', 'check']
+    ]
+  };
+
+  const compLabels = {
+    support: ['Arc XP (Reduced)', 'WordPress VIP'],
+    developer: ['Arc XP', 'WordPress VIP'],
+    editorial: ['Arc XP', 'WordPress VIP'],
+    platform: ['Arc XP (WaPo)', 'WordPress VIP'],
+    value: ['Arc XP', 'WordPress VIP']
+  };
+
+  const ciHTML = { check: '<span class="ci-check">&#10003;</span>', cross: '<span class="ci-cross">&#10007;</span>', partial: '<span class="ci-partial">&#9684;</span>' };
+  const ciText = { check: 'Yes', cross: 'No', partial: 'Limited' };
+
+  function renderCompTable(cat) {
+    const tbody = document.getElementById('comp-tbody');
+    const rows = compData[cat];
+    const labels = compLabels[cat];
+    tbody.innerHTML = '';
+    rows.forEach(function(row) {
+      const tr = document.createElement('tr');
+      tr.className = 'comp-row';
+      tr.innerHTML = '<td class="td-cap">' + row[0] + '</td>' +
+        '<td class="td-arc">' + ciHTML[row[1]] + ' <span style="font-size:0.7vw;">' + ciText[row[1]] + '</span></td>' +
+        '<td class="td-vip">' + ciHTML[row[2]] + ' <span style="font-size:0.7vw;">' + ciText[row[2]] + '</span></td>';
+      tbody.appendChild(tr);
+    });
+    // Update th-arc label dynamically
+    const thArc = document.querySelector('.th-arc');
+    if (thArc) thArc.textContent = labels[0];
+  }
+
+  function switchCompTab(el) {
+    document.querySelectorAll('.comp-tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    renderCompTable(el.dataset.cat);
+  }
+
+  renderCompTable('support'); // Initial render
+
+  // ===================== FEATURE CARD TOGGLE =====================
+  function toggleFC(card) {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.fc').forEach(function(c) { c.classList.remove('open'); });
+    if (!isOpen) card.classList.add('open');
+  }
+
+  // ===================== CAROUSEL =====================
+  let carouselIndex = 0;
+  const cardCount = 3;
+  let carouselTimer = null;
+
+  function goToCard(i) {
+    carouselIndex = i;
+    const track = document.getElementById('carousel-track');
+    const cardWidth = 360 + 18; // card width + gap
+    track.style.transform = 'translateX(-' + (carouselIndex * cardWidth) + 'px)';
+    document.querySelectorAll('.cdot').forEach(function(d, idx) {
+      d.classList.toggle('active', idx === carouselIndex);
+    });
+  }
+
+  function startCarousel() {
+    stopCarousel();
+    carouselTimer = setInterval(function() {
+      if (currentSlide === 8) {
+        goToCard((carouselIndex + 1) % cardCount);
+      }
+    }, 4000);
+  }
+
+  function stopCarousel() {
+    if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+  }
+
+  // ===================== COLLABORATIVE EDITING TYPEWRITER =====================
+  const headline_text = "Canada's Trade Position Shifts as Tariff Talks Intensify";
+  const body_text = "Senior Canadian trade officials convened in Ottawa on Monday to assess the economic implications of new tariff proposals, as the federal government weighs its options in an increasingly uncertain North American trade environment.";
+  const note_text = "Sarah: Can we get a quote from the Trade Minister's office before we publish? Deadline is 4:00 PM.";
+
+  let typewriterActive = false;
+  let typewriterTimeouts = [];
+
+  function clearTypewriterTimeouts() {
+    typewriterTimeouts.forEach(function(t) { clearTimeout(t); });
+    typewriterTimeouts = [];
+  }
+
+  function typeInto(el, text, speed, cursorClass, authorClass, authorLabel, onDone) {
+    el.innerHTML = '<span class="cursor ' + cursorClass + '"></span>';
+    let i = 0;
+    function typeChar() {
+      if (i < text.length) {
+        el.innerHTML = text.substring(0, i + 1) +
+          '<span class="cursor ' + cursorClass + '"></span>' +
+          '<span class="author-tag ' + authorClass + '">' + authorLabel + '</span>';
+        i++;
+        const t = setTimeout(typeChar, speed + (Math.random() * 10 - 5));
+        typewriterTimeouts.push(t);
+      } else {
+        el.innerHTML = text +
+          '<span class="cursor ' + cursorClass + '"></span>' +
+          '<span class="author-tag ' + authorClass + '">' + authorLabel + '</span>';
+        if (onDone) { const t = setTimeout(onDone, 500); typewriterTimeouts.push(t); }
+      }
+    }
+    typeChar();
+  }
+
+  function startTypewriter() {
+    if (typewriterActive) return;
+    typewriterActive = true;
+    clearTypewriterTimeouts();
+    document.getElementById('ed-headline').innerHTML = '';
+    document.getElementById('ed-body').innerHTML = '';
+    document.getElementById('ed-note').innerHTML = '';
+
+    const t1 = setTimeout(function() {
+      typeInto(document.getElementById('ed-headline'), headline_text, 34, 'c-teal', 'at-teal', 'Alex T.',
+        function() {
+          const t2 = setTimeout(function() {
+            typeInto(document.getElementById('ed-body'), body_text, 18, 'c-gold', 'at-gold', 'Morgan K.',
+              function() {
+                const t3 = setTimeout(function() {
+                  typeInto(document.getElementById('ed-note'), note_text, 24, 'c-purple', 'at-purple', 'Sarah W.',
+                    function() { typewriterActive = false; });
+                }, 300);
+                typewriterTimeouts.push(t3);
+              }
+            );
+          }, 500);
+          typewriterTimeouts.push(t2);
+        }
+      );
+    }, 600);
+    typewriterTimeouts.push(t1);
+  }
+
+  // MutationObserver for slide 6
+  const slide6 = document.getElementById('slide-6');
+  const slide6Observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'attributes' && m.attributeName === 'class') {
+        if (slide6.classList.contains('active')) {
+          typewriterActive = false;
+          startTypewriter();
+        } else {
+          clearTypewriterTimeouts();
+          typewriterActive = false;
+        }
+      }
+    });
+  });
+  slide6Observer.observe(slide6, { attributes: true });
+
+  // ===================== SLIDE CHANGE HANDLER =====================
+  function onSlideChange(idx) {
+    // Carousel: start on slide 9 (idx 8), stop otherwise
+    if (idx === 8) { startCarousel(); } else { stopCarousel(); }
+  }
+
+  // ===================== INIT =====================
+  showSlide(0);
+</script>
+
+</body>
+</html>

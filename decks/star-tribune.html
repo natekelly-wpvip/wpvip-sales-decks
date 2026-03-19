@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Tribune | WordPress VIP</title>
+<style>
+:root {
+  --vip-black: #13191E;
+  --vip-white: #FFFFFF;
+  --vip-gold: #D8A45F;
+  --vip-gold-text: #9A6014;
+  --vip-gold-light: #EAE3DA;
+  --vip-turquoise: #3EA0AD;
+  --vip-turquoise-light: #B9E4EA;
+  --vip-turquoise-dark: #194146;
+  --vip-red: #FF595E;
+  --vip-orange: #FB902F;
+  --vip-gray: #A8ABAD;
+  --vip-gray-light: #DBDCDD;
+  --vip-off-white: #F5F5F5;
+  --parsely-green: #70AC1C;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0d0f;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.deck-wrapper {
+  position: relative; width: 1280px; height: 720px;
+  transform-origin: center center;
+}
+.deck { position: relative; width: 1280px; height: 720px; overflow: hidden; }
+.slide {
+  position: absolute; top: 0; left: 0; width: 1280px; height: 720px;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease; overflow: hidden;
+}
+.slide.active { opacity: 1; pointer-events: all; }
+
+/* Progress bar */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--vip-gold); transition: width 0.4s ease; z-index: 100;
+}
+/* Nav */
+.nav-controls {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; z-index: 100;
+}
+.nav-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25); background: rgba(19,25,30,0.85);
+  color: white; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; transition: all 0.2s;
+}
+.nav-btn:hover { background: var(--vip-gold); border-color: var(--vip-gold); color: var(--vip-black); }
+.slide-counter {
+  background: rgba(19,25,30,0.85); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--vip-gray); font-size: 11px; padding: 5px 13px;
+  border-radius: 20px; cursor: pointer; letter-spacing: 0.05em;
+}
+.slide-counter:hover { border-color: var(--vip-gold); color: var(--vip-gold); }
+
+/* Overview */
+.overview-mode {
+  position: fixed; inset: 0; background: rgba(10,13,15,0.96);
+  z-index: 200; display: none; overflow-y: auto; padding: 48px;
+}
+.overview-mode.active { display: block; }
+.overview-title {
+  color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; text-align: center; margin-bottom: 28px;
+}
+.overview-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  max-width: 1200px; margin: 0 auto;
+}
+.overview-thumb {
+  position: relative; padding-bottom: 56.25%; cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.overview-thumb:hover, .overview-thumb.active-thumb { border-color: var(--vip-gold); }
+.overview-thumb-inner {
+  position: absolute; inset: 0; transform-origin: top left;
+  overflow: hidden;
+}
+.overview-label {
+  position: absolute; bottom: 5px; left: 5px;
+  color: rgba(255,255,255,0.5); font-size: 9px;
+  background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 2px;
+}
+
+/* Shared */
+.vip-logo { display: flex; align-items: baseline; gap: 3px; }
+.vip-logo .logo-wp { color: rgba(255,255,255,0.9); font-weight: 400; letter-spacing: -0.02em; }
+.vip-logo .logo-vip { color: var(--vip-gold); font-weight: 700; letter-spacing: -0.02em; }
+.gold-line { height: 2px; background: var(--vip-gold); }
+.slide-eyebrow {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--vip-gold); margin-bottom: 10px;
+}
+.slide-title {
+  font-size: 2.6vw; font-weight: 700; color: white;
+  letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 6px;
+}
+.slide-subtitle { font-size: 1.05vw; color: rgba(255,255,255,0.45); }
+.slide-header { padding: 44px 64px 0; }
+
+/* Geo pattern */
+.geo-bg {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0.045;
+}
+
+/* Fade-up animation */
+.fade-up { opacity: 0; }
+.slide.active .fade-up { animation: fadeUp 0.5s ease forwards; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-up:nth-child(2) { animation-delay: 0.2s; }
+.fade-up:nth-child(3) { animation-delay: 0.3s; }
+.fade-up:nth-child(4) { animation-delay: 0.4s; }
+.fade-up:nth-child(5) { animation-delay: 0.5s; }
+.fade-up:nth-child(6) { animation-delay: 0.6s; }
+
+/* ================================================ SLIDE 1: TITLE ================================================ */
+#slide-1 { background: var(--vip-black); }
+#slide-1 .title-logo { position: absolute; top: 44px; left: 64px; font-size: 15px; z-index: 2; }
+#slide-1 .title-accent {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 400px;
+  background: linear-gradient(135deg, rgba(216,164,95,0.07) 0%, rgba(62,160,173,0.04) 100%);
+  z-index: 1;
+}
+#slide-1 .title-accent::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(216,164,95,0.5), transparent);
+}
+#slide-1 .title-content {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  justify-content: center; padding: 0 64px; z-index: 2;
+}
+#slide-1 .eyebrow {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--vip-gold); margin-bottom: 18px;
+}
+#slide-1 h1 {
+  font-size: 5.2vw; font-weight: 700; color: white;
+  letter-spacing: -0.03em; line-height: 1.0; margin-bottom: 20px;
+}
+#slide-1 .gold-line { width: 72px; margin-bottom: 20px; }
+#slide-1 .subtitle { font-size: 1.3vw; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+#slide-1 .contact { font-size: 1vw; color: rgba(255,255,255,0.4); }
+#slide-1 .date-badge {
+  position: absolute; bottom: 44px; right: 64px;
+  font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); text-transform: uppercase;
+}
+
+/* ================================================ SLIDE 2: AGENDA ================================================ */
+#slide-2 { background: var(--vip-black); }
+#slide-2 .agenda-grid {
+  position: absolute; top: 158px; left: 64px; right: 64px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.agenda-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 18px 20px; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 4px; background: rgba(255,255,255,0.025);
+  transition: border-color 0.2s;
+}
+.agenda-item:hover { border-color: rgba(216,164,95,0.3); }
+.agenda-num {
+  font-size: 1.6vw; font-weight: 700; color: var(--vip-gold);
+  opacity: 0.5; line-height: 1; min-width: 32px;
+}
+.agenda-text h3 { font-size: 1vw; font-weight: 600; color: white; margin-bottom: 3px; }
+.agenda-text p { font-size: 0.8vw; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+/* ================================================ SLIDE 3: YOUR WORLD ================================================ */
+#slide-3 { background: var(--vip-black); }
+#slide-3 .world-grid {
+  position: absolute; top: 152px; left: 64px; right: 64px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;
+}
+#slide-3 .world-left p {
+  font-size: 1.1vw; color: rgba(255,255,255,0.7); line-height: 1.65; margin-bottom: 18px;
+}
+#slide-3 .world-left .hl { color: var(--vip-gold); font-weight: 600; }
+#slide-3 .stat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card {
+  padding: 18px; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 4px; background: rgba(255,255,255,0.025);
+}
+.stat-card .snum {
+  font-size: 2.4vw; font-weight: 700; color: var(--vip-gold);
+  letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px;
+}
+.stat-card .slabel { font-size: 0.8vw; color: rgba(255,255,255,0.45); line-height: 1.35; }
+
+/* ================================================ SLIDE 4: ARC-XP REALITY ================================================ */
+#slide-4 { background: var(--vip-black); }
+#slide-4 .reality-layout {
+  position: absolute; top: 152px; left: 64px; right: 64px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 36px;
+}
+.risk-items { display: flex; flex-direction: column; gap: 12px; }
+.risk-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; border-left: 3px solid var(--vip-red);
+  background: rgba(255,89,94,0.05); border-radius: 0 4px 4px 0;
+}
+.risk-icon { font-size: 14px; min-width: 22px; }
+.risk-text h4 { font-size: 0.9vw; font-weight: 600; color: rgba(255,255,255,0.88); margin-bottom: 2px; }
+.risk-text p { font-size: 0.78vw; color: rgba(255,255,255,0.48); line-height: 1.4; }
+#slide-4 .reality-right { display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.reality-callout {
+  background: rgba(216,164,95,0.06); border: 1px solid rgba(216,164,95,0.18);
+  border-radius: 6px; padding: 24px;
+}
+.reality-callout p { font-size: 1.1vw; color: rgba(255,255,255,0.78); line-height: 1.55; font-style: italic; }
+.reality-callout .csource { font-size: 0.78vw; color: var(--vip-gold); margin-top: 10px; font-style: normal; font-weight: 600; }
+.reality-bottom { font-size: 0.9vw; color: rgba(255,255,255,0.48); line-height: 1.55; }
+.reality-bottom strong { color: rgba(255,255,255,0.82); }
+
+/* ================================================ SLIDE 5: VALUE PROPS ================================================ */
+#slide-5 { background: var(--vip-black); }
+#slide-5 .value-props {
+  position: absolute; top: 158px; left: 64px; right: 64px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.value-prop {
+  padding: 24px; border: 1px solid rgba(255,255,255,0.07); border-radius: 6px;
+  background: rgba(255,255,255,0.02); transition: all 0.25s;
+}
+.value-prop:hover { border-color: rgba(216,164,95,0.3); background: rgba(216,164,95,0.035); }
+.vp-icon {
+  width: 38px; height: 38px; border-radius: 8px;
+  border: 1px solid rgba(216,164,95,0.25); display: flex;
+  align-items: center; justify-content: center; font-size: 17px; margin-bottom: 14px;
+}
+.value-prop h3 {
+  font-size: 1.1vw; font-weight: 700; color: white;
+  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 8px;
+}
+.value-prop p { font-size: 0.83vw; color: rgba(255,255,255,0.5); line-height: 1.55; }
+.vp-list { margin-top: 12px; list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.vp-list li {
+  font-size: 0.78vw; color: rgba(255,255,255,0.5); padding-left: 13px; position: relative;
+}
+.vp-list li::before {
+  content: ''; position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%); width: 4px; height: 4px;
+  border-radius: 50%; background: var(--vip-turquoise);
+}
+
+/* ================================================ SLIDE 6: COLLAB EDITING ================================================ */
+#slide-6 { background: var(--vip-black); }
+#slide-6 .collab-layout {
+  position: absolute; top: 128px; left: 64px; right: 64px; bottom: 44px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+.editor-panel {
+  background: #1a2028; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.07); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.editor-toolbar {
+  background: #212b34; padding: 7px 10px; display: flex;
+  align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.tb-btn {
+  width: 24px; height: 24px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.1);
+  background: transparent; color: rgba(255,255,255,0.55); font-size: 9px; font-weight: 700;
+  cursor: default; display: flex; align-items: center; justify-content: center; font-family: inherit;
+}
+.tb-sep { width: 1px; height: 14px; background: rgba(255,255,255,0.1); margin: 0 2px; }
+.editor-avatars { margin-left: auto; display: flex; }
+.editor-avatar {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #212b34;
+  font-size: 7px; font-weight: 700; display: flex; align-items: center;
+  justify-content: center; color: white; margin-left: -4px;
+}
+.editor-content { flex: 1; padding: 16px 18px; font-size: 0.82vw; overflow: hidden; position: relative; }
+.editor-headline {
+  font-size: 1.05vw; font-weight: 700; color: rgba(255,255,255,0.88);
+  line-height: 1.3; margin-bottom: 10px; min-height: 1.3em;
+}
+.editor-body { font-size: 0.8vw; color: rgba(255,255,255,0.52); line-height: 1.6; margin-bottom: 10px; min-height: 3.2em; }
+.editor-note { font-size: 0.75vw; color: rgba(62,160,173,0.82); font-style: italic; line-height: 1.4; min-height: 1.2em; }
+.cursor {
+  display: inline-block; width: 2px; height: 1em; margin-left: 1px;
+  vertical-align: text-bottom; animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.cursor-wrap { position: relative; display: inline; }
+.cursor-label {
+  position: absolute; top: -18px; left: 0;
+  font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 2px;
+  color: white; white-space: nowrap; pointer-events: none;
+}
+.collab-cards { display: flex; flex-direction: column; gap: 9px; overflow-y: auto; }
+.collab-card {
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 6px;
+  padding: 12px 14px; cursor: pointer; transition: all 0.25s;
+  background: rgba(255,255,255,0.02);
+}
+.collab-card:hover, .collab-card.expanded { border-color: rgba(216,164,95,0.3); background: rgba(216,164,95,0.04); }
+.collab-card-header { display: flex; align-items: center; gap: 9px; }
+.cc-icon { font-size: 13px; width: 24px; text-align: center; }
+.cc-title { font-size: 0.85vw; font-weight: 600; color: rgba(255,255,255,0.82); flex: 1; }
+.cc-arrow { font-size: 9px; color: var(--vip-gold); transition: transform 0.25s; }
+.collab-card.expanded .cc-arrow { transform: rotate(90deg); }
+.cc-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.collab-card.expanded .cc-body { max-height: 80px; }
+.cc-body p { font-size: 0.75vw; color: rgba(255,255,255,0.48); line-height: 1.5; margin-top: 8px; }
+
+/* ================================================ SLIDE 7: PARSE.LY ================================================ */
+#slide-7 { background: var(--vip-black); }
+#slide-7 .parsely-layout {
+  position: absolute; top: 128px; left: 64px; right: 64px; bottom: 44px;
+  display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px;
+}
+.parsely-dashboard {
+  background: #181f26; border-radius: 8px;
+  border: 1px solid rgba(112,172,28,0.18); overflow: hidden; display: flex; flex-direction: column;
+}
+.parsely-hdr {
+  background: #1e2830; padding: 8px 14px; display: flex; align-items: center;
+  gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+}
+.parsely-brand { font-size: 11px; font-weight: 700; color: var(--parsely-green); letter-spacing: -0.01em; }
+.parsely-tabs { margin-left: auto; display: flex; gap: 3px; }
+.ptab {
+  padding: 3px 9px; border-radius: 12px; font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.35); cursor: pointer;
+  border: 1px solid transparent; transition: all 0.2s;
+}
+.ptab.active { background: var(--parsely-green); color: white; }
+.ptab:hover:not(.active) { border-color: rgba(112,172,28,0.4); color: rgba(255,255,255,0.65); }
+.parsely-kpis {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+}
+.pkpi { padding: 9px 11px; background: #181f26; }
+.pkpi-label {
+  font-size: 8px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; color: rgba(255,255,255,0.3); margin-bottom: 3px;
+}
+.pkpi-val { font-size: 1.1vw; font-weight: 700; color: white; letter-spacing: -0.02em; line-height: 1; margin-bottom: 2px; }
+.pkpi-chg { font-size: 8px; font-weight: 600; }
+.pkpi-chg.up { color: var(--parsely-green); }
+.pkpi-chg.down { color: var(--vip-red); }
+.parsely-chart { flex: 1; padding: 10px 14px; min-height: 80px; }
+.parsely-chart svg { width: 100%; height: 100%; }
+.parsely-trending { border-top: 1px solid rgba(255,255,255,0.05); padding: 7px 12px; flex-shrink: 0; }
+.pt-title {
+  font-size: 8px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: rgba(255,255,255,0.3); margin-bottom: 5px;
+}
+.pt-row { display: flex; align-items: center; gap: 7px; padding: 2px 0; }
+.pt-rank { font-size: 8px; font-weight: 700; color: var(--parsely-green); width: 12px; text-align: center; }
+.pt-title-text { flex: 1; font-size: 8px; color: rgba(255,255,255,0.55); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-views { font-size: 8px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+.parsely-sidebar { display: flex; flex-direction: column; gap: 10px; }
+.parsely-sources {
+  background: #181f26; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.07); padding: 14px; flex: 1;
+}
+.ps-title {
+  font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+}
+.src-row { margin-bottom: 9px; }
+.src-lrow { display: flex; justify-content: space-between; margin-bottom: 3px; }
+.src-name { font-size: 0.75vw; color: rgba(255,255,255,0.6); }
+.src-pct { font-size: 0.75vw; color: rgba(255,255,255,0.35); }
+.src-track { height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+.src-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.parsely-insight {
+  background: rgba(112,172,28,0.07); border: 1px solid rgba(112,172,28,0.2);
+  border-radius: 8px; padding: 13px; flex-shrink: 0;
+}
+.pi-label {
+  font-size: 8px; font-weight: 700; color: var(--parsely-green);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px;
+}
+.parsely-insight p { font-size: 0.8vw; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+/* ================================================ SLIDE 8: CDN ================================================ */
+#slide-8 { background: var(--vip-black); }
+#slide-8 .cdn-layout {
+  position: absolute; top: 128px; left: 64px; right: 64px; bottom: 44px;
+  display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px;
+}
+.cdn-map-wrap {
+  position: relative; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.07); overflow: hidden; background: #0e1519;
+}
+.cdn-map-wrap svg { width: 100%; height: 100%; display: block; }
+.cdn-tooltip {
+  position: absolute; background: #13191E; border: 1px solid rgba(216,164,95,0.4);
+  border-radius: 4px; padding: 7px 11px; pointer-events: none; opacity: 0;
+  transition: opacity 0.15s; z-index: 10; min-width: 130px;
+}
+.cdn-tooltip.vis { opacity: 1; }
+.cdn-tt-city { font-weight: 700; color: white; font-size: 11px; margin-bottom: 2px; }
+.cdn-tt-detail { color: rgba(255,255,255,0.45); font-size: 9px; line-height: 1.4; }
+.cdn-tt-lat { color: var(--vip-turquoise); font-weight: 600; font-size: 10px; margin-top: 3px; }
+@keyframes cdnPulse {
+  0% { r: 7; opacity: 0.6; }
+  70% { r: 15; opacity: 0; }
+  100% { r: 15; opacity: 0; }
+}
+.cdn-stats { display: flex; flex-direction: column; gap: 9px; }
+.cdn-stat {
+  background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.065);
+  border-radius: 6px; padding: 13px 15px; transition: border-color 0.2s;
+}
+.cdn-stat:hover { border-color: rgba(62,160,173,0.28); }
+.cdn-stat-num {
+  font-size: 1.55vw; font-weight: 700; color: var(--vip-turquoise);
+  letter-spacing: -0.03em; line-height: 1; margin-bottom: 3px;
+}
+.cdn-stat-label { font-size: 0.8vw; font-weight: 600; color: rgba(255,255,255,0.82); margin-bottom: 2px; }
+.cdn-stat-sub { font-size: 0.72vw; color: rgba(255,255,255,0.38); line-height: 1.3; }
+
+/* ================================================ SLIDE 9: COMPARISON ================================================ */
+#slide-9 { background: var(--vip-black); }
+#slide-9 .matrix-layout {
+  position: absolute; top: 128px; left: 64px; right: 64px; bottom: 44px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.matrix-tabs { display: flex; gap: 7px; flex-shrink: 0; }
+.mtab {
+  padding: 6px 15px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1); font-size: 0.78vw; font-weight: 600;
+  color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; background: transparent;
+}
+.mtab.active { background: var(--vip-gold); border-color: var(--vip-gold); color: var(--vip-black); }
+.mtab:hover:not(.active) { border-color: rgba(216,164,95,0.35); color: rgba(255,255,255,0.65); }
+.matrix-wrap { flex: 1; border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; overflow: hidden; }
+.mtable { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.mtable th {
+  padding: 9px 15px; text-align: left; font-size: 0.75vw; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.mtable th:first-child { color: rgba(255,255,255,0.45); width: 42%; }
+.mtable th:nth-child(2) { color: rgba(255,255,255,0.25); width: 29%; text-align: center; }
+.mtable th:nth-child(3) { color: var(--vip-gold); width: 29%; text-align: center; }
+.mtable td {
+  padding: 8px 15px; font-size: 0.82vw;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.mtable tr:last-child td { border-bottom: none; }
+.mtable tr:nth-child(odd) td { background: rgba(255,255,255,0.012); }
+.mtable td:first-child { color: rgba(255,255,255,0.68); }
+.mtable td:nth-child(2) { text-align: center; color: rgba(255,255,255,0.28); }
+.mtable td:nth-child(3) { text-align: center; }
+.mrow { display: table-row; }
+.mrow.hidden { display: none; }
+.ck { color: var(--vip-turquoise); font-size: 15px; }
+.cx { color: rgba(255,89,94,0.65); font-size: 15px; }
+.cp { color: var(--vip-orange); font-size: 13px; }
+
+/* ================================================ SLIDE 10: CAROUSEL ================================================ */
+#slide-10 { background: var(--vip-black); }
+#slide-10 .car-layout {
+  position: absolute; top: 138px; left: 64px; right: 64px; bottom: 60px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.car-track-wrap { flex: 1; overflow: hidden; }
+.car-track { display: flex; gap: 18px; height: 100%; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+.car-card {
+  min-width: calc(50% - 9px); height: 100%; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 8px;
+  padding: 26px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column;
+}
+.car-company { font-size: 1.5vw; font-weight: 700; color: white; letter-spacing: -0.02em; margin-bottom: 3px; }
+.car-type {
+  font-size: 0.7vw; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--vip-gold-text); margin-bottom: 14px;
+}
+.car-divider { height: 1px; background: rgba(216,164,95,0.18); margin-bottom: 14px; }
+.car-quote {
+  flex: 1; font-size: 0.87vw; color: rgba(255,255,255,0.62); line-height: 1.6;
+  font-style: italic; border-left: 2px solid var(--vip-gold); padding-left: 13px; margin-bottom: 14px;
+}
+.car-metrics { display: flex; gap: 20px; }
+.car-metric-num {
+  font-size: 1.5vw; font-weight: 700; color: var(--vip-turquoise);
+  letter-spacing: -0.03em; line-height: 1;
+}
+.car-metric-label { font-size: 0.68vw; color: rgba(255,255,255,0.38); margin-top: 2px; }
+.car-dots { display: flex; justify-content: center; align-items: center; gap: 7px; flex-shrink: 0; }
+.car-dot {
+  height: 5px; border-radius: 3px; background: rgba(255,255,255,0.18);
+  cursor: pointer; transition: all 0.3s; width: 5px;
+}
+.car-dot.active { background: var(--vip-gold); width: 22px; }
+
+/* ================================================ SLIDE 11: PARTNER ================================================ */
+#slide-11 { background: var(--vip-black); }
+#slide-11 .partner-layout {
+  position: absolute; top: 152px; left: 64px; right: 64px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;
+}
+#slide-11 .partner-left p { font-size: 1.05vw; color: rgba(255,255,255,0.68); line-height: 1.65; margin-bottom: 14px; }
+.pillar { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 10px; }
+.pillar-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--vip-gold); margin-top: 7px; flex-shrink: 0; }
+.pillar p { font-size: 0.85vw; color: rgba(255,255,255,0.55); line-height: 1.55; }
+.pillar p strong { color: rgba(255,255,255,0.88); }
+#slide-11 .partner-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ================================================ SLIDE 12: NEXT STEPS ================================================ */
+#slide-12 { background: var(--vip-black); }
+#slide-12 .steps-layout { position: absolute; top: 152px; left: 64px; right: 64px; }
+.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+.step-card {
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 6px;
+  padding: 22px 18px; background: rgba(255,255,255,0.02); transition: border-color 0.2s;
+}
+.step-card:hover { border-color: rgba(216,164,95,0.28); }
+.step-num {
+  font-size: 2.8vw; font-weight: 700; color: rgba(216,164,95,0.22);
+  letter-spacing: -0.04em; line-height: 1; margin-bottom: 10px;
+}
+.step-title { font-size: 0.95vw; font-weight: 700; color: white; margin-bottom: 7px; }
+.step-desc { font-size: 0.78vw; color: rgba(255,255,255,0.48); line-height: 1.5; }
+.step-time { font-size: 0.72vw; font-weight: 600; color: var(--vip-gold); margin-top: 9px; letter-spacing: 0.04em; }
+.steps-cta {
+  text-align: center; padding: 18px; border: 1px solid rgba(216,164,95,0.18);
+  border-radius: 6px; background: rgba(216,164,95,0.04);
+}
+.steps-cta p { font-size: 0.95vw; color: rgba(255,255,255,0.58); }
+.steps-cta strong { color: var(--vip-gold); }
+
+/* ================================================ SLIDE 13: BOOKING ================================================ */
+#slide-13 { background: var(--vip-black); }
+#slide-13 .cta-layout {
+  position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1.4fr;
+}
+#slide-13 .cta-left {
+  padding: 60px 44px; display: flex; flex-direction: column;
+  justify-content: center; border-right: 1px solid rgba(255,255,255,0.06);
+}
+#slide-13 .cta-logo { font-size: 15px; margin-bottom: 28px; }
+#slide-13 .cta-hl { font-size: 2.2vw; font-weight: 700; color: white; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 10px; }
+#slide-13 .cta-sub { font-size: 0.95vw; color: rgba(255,255,255,0.48); line-height: 1.6; margin-bottom: 24px; }
+#slide-13 .gold-line { width: 56px; margin-bottom: 24px; }
+#slide-13 .cta-name { font-size: 1.15vw; font-weight: 700; color: white; margin-bottom: 5px; }
+#slide-13 .cta-email { font-size: 0.88vw; color: var(--vip-gold-text); }
+#slide-13 .cta-right { background: white; padding: 28px 36px; display: flex; flex-direction: column; }
+#slide-13 .cal-header { font-size: 1.05vw; font-weight: 700; color: var(--vip-gold-text); margin-bottom: 14px; }
+#slide-13 .cal-wrap { flex: 1; background: white; border-radius: 4px; overflow: hidden; min-height: 0; }
+#slide-13 .cal-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+@media print {
+  .nav-controls, .progress-bar, .overview-mode { display: none !important; }
+  body { background: white; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck-wrapper" id="deckWrapper">
+  <div class="deck" id="deck">
+
+    <!-- SLIDE 1: TITLE -->
+    <div class="slide active" id="slide-1">
+      <svg class="geo-bg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="geo1" x="0" y="0" width="56" height="56" patternUnits="userSpaceOnUse">
+            <path d="M56 0 L0 56 M0 0 L56 56 M28 0 L0 28 M56 28 L28 56" stroke="white" stroke-width="0.5" fill="none"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#geo1)"/>
+      </svg>
+      <div class="title-accent"></div>
+      <div class="title-logo">
+        <div class="vip-logo" style="font-size:15px">
+          <span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span>
+        </div>
+      </div>
+      <div class="title-content">
+        <div class="eyebrow">Platform Partnership Discussion</div>
+        <h1>Star Tribune</h1>
+        <div class="gold-line"></div>
+        <div class="subtitle">The case for WordPress VIP</div>
+        <div class="contact">Prepared for Angie Schulke, Chief Product and Technology Officer</div>
+      </div>
+      <div class="date-badge">March 2026</div>
+    </div>
+
+    <!-- SLIDE 2: AGENDA -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Today's Discussion</div>
+        <div class="slide-title">What We'll Cover</div>
+      </div>
+      <div class="agenda-grid">
+        <div class="agenda-item fade-up">
+          <div class="agenda-num">01</div>
+          <div class="agenda-text">
+            <h3>Your World</h3>
+            <p>Where Star Tribune sits today and the platform decisions ahead</p>
+          </div>
+        </div>
+        <div class="agenda-item fade-up">
+          <div class="agenda-num">02</div>
+          <div class="agenda-text">
+            <h3>The Arc-XP Question</h3>
+            <p>Vendor stability, ownership risk, and what it means for your roadmap</p>
+          </div>
+        </div>
+        <div class="agenda-item fade-up">
+          <div class="agenda-num">03</div>
+          <div class="agenda-text">
+            <h3>Why WordPress VIP</h3>
+            <p>Open platform, publisher-first mission, and enterprise performance</p>
+          </div>
+        </div>
+        <div class="agenda-item fade-up">
+          <div class="agenda-num">04</div>
+          <div class="agenda-text">
+            <h3>Your Newsroom in Action</h3>
+            <p>Live demos: collaborative editing, Parse.ly analytics, global CDN</p>
+          </div>
+        </div>
+        <div class="agenda-item fade-up">
+          <div class="agenda-num">05</div>
+          <div class="agenda-text">
+            <h3>Proven Results</h3>
+            <p>Media publishers who moved to WordPress VIP and what they gained</p>
+          </div>
+        </div>
+        <div class="agenda-item fade-up">
+          <div class="agenda-num">06</div>
+          <div class="agenda-text">
+            <h3>Next Steps</h3>
+            <p>A clear path from discovery to decision, on your timeline</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: YOUR WORLD -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Customer Understanding</div>
+        <div class="slide-title">We Know Your World</div>
+        <div class="slide-subtitle">Minnesota's most trusted newsroom, navigating a defining platform moment</div>
+      </div>
+      <div class="world-grid">
+        <div class="world-left fade-up">
+          <p>The <span class="hl">Star Tribune</span> has been Minnesota's authoritative voice for over 155 years. Today you operate at a critical inflection point: audiences are digital-first, advertiser expectations have shifted, and the platform powering your newsroom must keep pace with all of it.</p>
+          <p>For a CPTO evaluating Arc-XP, the questions go beyond features. They go to <span class="hl">platform economics, vendor stability, editorial velocity,</span> and whether your CMS partner will still be invested in your success five years from now.</p>
+          <p>WordPress VIP was built to answer those questions.</p>
+        </div>
+        <div class="world-right fade-up">
+          <div class="stat-cards">
+            <div class="stat-card">
+              <div class="snum">155+</div>
+              <div class="slabel">Years of trusted journalism in Minnesota</div>
+            </div>
+            <div class="stat-card">
+              <div class="snum">#1</div>
+              <div class="slabel">News source in the Twin Cities market</div>
+            </div>
+            <div class="stat-card">
+              <!-- PLACEHOLDER: Replace with verified Star Tribune monthly unique visitor count -->
+              <div class="snum">~30M</div>
+              <div class="slabel">Monthly unique visitors (verify with team)</div>
+            </div>
+            <div class="stat-card">
+              <div class="snum">Digital</div>
+              <div class="slabel">Subscribers now majority of revenue base</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: ARC-XP REALITY -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Vendor Risk Assessment</div>
+        <div class="slide-title">The Arc-XP Reality</div>
+        <div class="slide-subtitle">What happens when your CMS vendor's parent company is struggling?</div>
+      </div>
+      <div class="reality-layout">
+        <div class="risk-items fade-up">
+          <div class="risk-item">
+            <div class="risk-icon">🏦</div>
+            <div class="risk-text">
+              <h4>Owned by The Washington Post / Jeff Bezos</h4>
+              <p>Arc-XP is not an independent company. Its roadmap, investment, and survival depend entirely on decisions made by WaPo leadership and Bezos himself.</p>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-icon">📉</div>
+            <div class="risk-text">
+              <h4>Washington Post Revenue and Readership in Decline</h4>
+              <p>WaPo has shed hundreds of millions in revenue and lost significant readership over the past several years, triggering multiple rounds of mass layoffs.</p>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-icon">✈️</div>
+            <div class="risk-text">
+              <!-- PLACEHOLDER: Verify offshore development details with sales team before presenting -->
+              <h4>Development Offshored to Bulgaria</h4>
+              <p>Engineering resources have reportedly been moved overseas, raising questions about product velocity and the support quality Arc-XP customers can expect going forward.</p>
+            </div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-icon">🔒</div>
+            <div class="risk-text">
+              <h4>Proprietary Lock-In, No Open Source Safety Net</h4>
+              <p>Arc-XP is a closed, proprietary platform. If the vendor exits the market or pivots, your content and workflows have nowhere to go.</p>
+            </div>
+          </div>
+        </div>
+        <div class="reality-right fade-up">
+          <div class="reality-callout">
+            <p>"The Washington Post announced it would lay off about 240 employees... the company has been losing money and readers in recent years."</p>
+            <div class="csource">The New York Times, 2023 &mdash; one of several rounds of WaPo cuts</div>
+          </div>
+          <div class="reality-bottom">
+            <strong>The strategic risk is real:</strong> any publisher running Arc-XP is now betting their digital infrastructure on the financial recovery of a struggling media company that does not put publishers first. <strong>WordPress VIP does.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: VALUE PROPS -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div class="slide-eyebrow">The WordPress VIP Difference</div>
+        <div class="slide-title">Why Publishers Choose VIP</div>
+      </div>
+      <div class="value-props">
+        <div class="value-prop fade-up">
+          <div class="vp-icon">🌐</div>
+          <h3>Open Platform, Total Control</h3>
+          <p>Built on WordPress, the world's most widely used CMS. Open source means no proprietary lock-in, a massive ecosystem, and a platform that evolves with you.</p>
+          <ul class="vp-list">
+            <li>60,000+ plugins and integrations</li>
+            <li>Full content and data portability</li>
+            <li>Headless and traditional architectures supported</li>
+            <li>No vendor exit risk</li>
+          </ul>
+        </div>
+        <div class="value-prop fade-up">
+          <div class="vp-icon">✍️</div>
+          <h3>Built for Modern Newsrooms</h3>
+          <p>Real-time collaborative editing, Parse.ly analytics, and editorial workflows designed for the pace of daily news publishing.</p>
+          <ul class="vp-list">
+            <li>Live multi-author collaboration</li>
+            <li>Parse.ly content analytics included</li>
+            <li>Block editor for rich storytelling</li>
+            <li>Multisite for brands and verticals</li>
+          </ul>
+        </div>
+        <div class="value-prop fade-up">
+          <div class="vp-icon">🏢</div>
+          <h3>A Partner Built to Last</h3>
+          <p>WordPress VIP is backed by Automattic, a profitable, independent company with 20+ years of WordPress leadership and no conflicting media interests.</p>
+          <ul class="vp-list">
+            <li>99.99% uptime SLA</li>
+            <li>24/7 US-based expert support</li>
+            <li>SOC 2 Type II and ISO 27001 certified</li>
+            <li>Dedicated migration team</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: COLLABORATIVE EDITING -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Live Demo</div>
+        <div class="slide-title">Real-Time Collaborative Editing</div>
+        <div class="slide-subtitle">Your entire newsroom, working together in one document simultaneously</div>
+      </div>
+      <div class="collab-layout">
+        <div class="editor-panel">
+          <div class="editor-toolbar">
+            <div class="tb-btn">B</div>
+            <div class="tb-btn" style="font-style:italic">I</div>
+            <div class="tb-btn" style="text-decoration:underline">U</div>
+            <div class="tb-sep"></div>
+            <div class="tb-btn">H1</div>
+            <div class="tb-btn">H2</div>
+            <div class="tb-sep"></div>
+            <div class="tb-btn">&#128279;</div>
+            <div class="tb-btn">&#128247;</div>
+            <div class="editor-avatars">
+              <div class="editor-avatar" style="background:#3EA0AD">JL</div>
+              <div class="editor-avatar" style="background:#D8A45F">RK</div>
+              <div class="editor-avatar" style="background:#9C5CE1">SM</div>
+            </div>
+          </div>
+          <div class="editor-content">
+            <div class="editor-headline" id="collabHeadline"></div>
+            <div class="editor-body" id="collabBody"></div>
+            <div class="editor-note" id="collabNote"></div>
+          </div>
+        </div>
+        <div class="collab-cards">
+          <div class="collab-card" onclick="toggleCard(this)">
+            <div class="collab-card-header">
+              <div class="cc-icon">&#128100;</div>
+              <div class="cc-title">Live Cursors and Presence</div>
+              <div class="cc-arrow">&#9654;</div>
+            </div>
+            <div class="cc-body"><p>See every active author's cursor in real time. Color-coded by contributor, with name labels, so your team always knows who is working where in the document.</p></div>
+          </div>
+          <div class="collab-card" onclick="toggleCard(this)">
+            <div class="collab-card-header">
+              <div class="cc-icon">&#128274;</div>
+              <div class="cc-title">Block Locking</div>
+              <div class="cc-arrow">&#9654;</div>
+            </div>
+            <div class="cc-body"><p>Lock individual content blocks so a reporter can work on the headline while an editor finalizes the body, eliminating overwrites and version conflicts.</p></div>
+          </div>
+          <div class="collab-card" onclick="toggleCard(this)">
+            <div class="collab-card-header">
+              <div class="cc-icon">&#128172;</div>
+              <div class="cc-title">Inline Comments</div>
+              <div class="cc-arrow">&#9654;</div>
+            </div>
+            <div class="cc-body"><p>Editors leave contextual feedback directly on specific text. Resolve threads, reply inline, and maintain a full comment history without leaving the editor.</p></div>
+          </div>
+          <div class="collab-card" onclick="toggleCard(this)">
+            <div class="collab-card-header">
+              <div class="cc-icon">&#128336;</div>
+              <div class="cc-title">Revision History</div>
+              <div class="cc-arrow">&#9654;</div>
+            </div>
+            <div class="cc-body"><p>Every change is tracked with author, timestamp, and content diff. Restore any version with a single click. No more lost work, ever.</p></div>
+          </div>
+          <div class="collab-card" onclick="toggleCard(this)">
+            <div class="collab-card-header">
+              <div class="cc-icon">&#128203;</div>
+              <div class="cc-title">Editorial Workflows</div>
+              <div class="cc-arrow">&#9654;</div>
+            </div>
+            <div class="cc-body"><p>Custom publish workflows with role-based gates: draft, review, legal hold, approved, and scheduled. Built for newsrooms with compliance requirements.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: PARSE.LY -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Included With WordPress VIP</div>
+        <div class="slide-title">Your Analytics Advantage</div>
+        <div class="slide-subtitle">Parse.ly real-time content intelligence, built in at no additional cost</div>
+      </div>
+      <div class="parsely-layout">
+        <div class="parsely-dashboard">
+          <div class="parsely-hdr">
+            <div class="parsely-brand">Parse.ly</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-left:6px">Star Tribune Dashboard</div>
+            <div class="parsely-tabs">
+              <div class="ptab active" data-range="1H">1H</div>
+              <div class="ptab" data-range="24H">24H</div>
+              <div class="ptab" data-range="7D">7D</div>
+              <div class="ptab" data-range="30D">30D</div>
+            </div>
+          </div>
+          <div class="parsely-kpis">
+            <div class="pkpi">
+              <div class="pkpi-label">Visitors</div>
+              <div class="pkpi-val" id="kpi-visitors">3.2K</div>
+              <div class="pkpi-chg up" id="kpi-v-chg">+12%</div>
+            </div>
+            <div class="pkpi">
+              <div class="pkpi-label">Page Views</div>
+              <div class="pkpi-val" id="kpi-views">8.7K</div>
+              <div class="pkpi-chg up" id="kpi-pv-chg">+8%</div>
+            </div>
+            <div class="pkpi">
+              <div class="pkpi-label">Avg. Engaged Time</div>
+              <div class="pkpi-val" id="kpi-engaged">2m 14s</div>
+              <div class="pkpi-chg up" id="kpi-e-chg">+5%</div>
+            </div>
+            <div class="pkpi">
+              <div class="pkpi-label">Recirculation</div>
+              <div class="pkpi-val" id="kpi-recirc">31%</div>
+              <div class="pkpi-chg up" id="kpi-r-chg">+2%</div>
+            </div>
+          </div>
+          <div class="parsely-chart">
+            <svg id="parselyChart" viewBox="0 0 400 80" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#70AC1C" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#70AC1C" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path id="chartFill" fill="url(#chartGrad)"/>
+              <path id="chartLine" fill="none" stroke="#70AC1C" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="parsely-trending">
+            <div class="pt-title">Trending Now</div>
+            <div id="parselyArticles"></div>
+          </div>
+        </div>
+        <div class="parsely-sidebar">
+          <div class="parsely-sources">
+            <div class="ps-title">Traffic Sources</div>
+            <div class="src-row">
+              <div class="src-lrow"><span class="src-name">Direct</span><span class="src-pct" id="src-direct-pct">42%</span></div>
+              <div class="src-track"><div class="src-fill" id="src-direct" style="width:42%;background:#3EA0AD"></div></div>
+            </div>
+            <div class="src-row">
+              <div class="src-lrow"><span class="src-name">Search</span><span class="src-pct" id="src-search-pct">31%</span></div>
+              <div class="src-track"><div class="src-fill" id="src-search" style="width:31%;background:#D8A45F"></div></div>
+            </div>
+            <div class="src-row">
+              <div class="src-lrow"><span class="src-name">Social</span><span class="src-pct" id="src-social-pct">18%</span></div>
+              <div class="src-track"><div class="src-fill" id="src-social" style="width:18%;background:#9C5CE1"></div></div>
+            </div>
+            <div class="src-row">
+              <div class="src-lrow"><span class="src-name">Referral</span><span class="src-pct" id="src-referral-pct">9%</span></div>
+              <div class="src-track"><div class="src-fill" id="src-referral" style="width:9%;background:#FB902F"></div></div>
+            </div>
+          </div>
+          <div class="parsely-insight">
+            <div class="pi-label">Editorial Insight</div>
+            <p>Parse.ly shows which story formats drive recirculation, so editors know when to use listicles vs. long-form for maximum audience depth.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: CDN EXPLORER -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Global Infrastructure</div>
+        <div class="slide-title">Performance Without Compromise</div>
+        <div class="slide-subtitle">A global edge network purpose-built for high-traffic publishing</div>
+      </div>
+      <div class="cdn-layout">
+        <div class="cdn-map-wrap" id="cdnMapWrap">
+          <svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" id="cdnSvg">
+            <!-- Continents -->
+            <g fill="rgba(62,160,173,0.12)" stroke="rgba(62,160,173,0.25)" stroke-width="0.8">
+              <!-- North America -->
+              <path d="M55,50 L210,42 L285,68 L310,110 L295,155 L268,193 L224,208 L175,198 L136,160 L96,115 L62,95 Z"/>
+              <!-- South America -->
+              <path d="M225,215 L310,208 L344,240 L340,298 L314,368 L280,403 L241,390 L220,340 L218,272 Z"/>
+              <!-- Europe -->
+              <path d="M384,48 L466,42 L510,62 L514,95 L484,118 L440,124 L400,110 L384,78 Z"/>
+              <!-- Africa -->
+              <path d="M408,128 L490,120 L527,140 L534,196 L524,268 L494,312 L458,324 L428,308 L412,258 L408,198 L410,152 Z"/>
+              <!-- Asia -->
+              <path d="M512,42 L728,38 L778,58 L788,96 L770,148 L733,188 L692,210 L644,214 L594,198 L552,164 L518,128 L508,88 Z"/>
+              <!-- Australia -->
+              <path d="M694,295 L784,288 L797,320 L787,356 L750,367 L710,357 L694,330 Z"/>
+            </g>
+            <!-- Connection lines -->
+            <g stroke="rgba(216,164,95,0.12)" stroke-width="0.6" fill="none">
+              <line x1="210" y1="135" x2="400" y2="80"/>
+              <line x1="260" y1="140" x2="400" y2="80"/>
+              <line x1="400" y1="80" x2="430" y2="83"/>
+              <line x1="430" y1="83" x2="600" y2="192"/>
+              <line x1="430" y1="83" x2="750" y2="128"/>
+              <line x1="600" y1="192" x2="658" y2="260"/>
+              <line x1="750" y1="128" x2="742" y2="332"/>
+            </g>
+            <!-- CDN Nodes -->
+            <g id="cdnNodes">
+              <!-- Chicago (highlight for Star Tribune) -->
+              <circle class="cdn-pulse" cx="210" cy="135" r="7" fill="rgba(216,164,95,0.25)" style="animation-delay:0s"/>
+              <circle cx="210" cy="135" r="5" fill="#D8A45F" style="cursor:pointer" data-city="Chicago" data-pop="US Central" data-lat="&lt;10ms" data-type="Tier 1 PoP"/>
+              <text x="218" y="130" fill="rgba(255,255,255,0.6)" font-size="8">Chicago</text>
+              <!-- New York -->
+              <circle class="cdn-pulse" cx="262" cy="140" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:0.4s"/>
+              <circle cx="262" cy="140" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="New York" data-pop="US East" data-lat="&lt;8ms" data-type="Tier 1 PoP"/>
+              <text x="270" y="136" fill="rgba(255,255,255,0.45)" font-size="7">New York</text>
+              <!-- Los Angeles -->
+              <circle class="cdn-pulse" cx="128" cy="168" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:0.8s"/>
+              <circle cx="128" cy="168" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Los Angeles" data-pop="US West" data-lat="&lt;12ms" data-type="Tier 1 PoP"/>
+              <text x="90" y="178" fill="rgba(255,255,255,0.45)" font-size="7">Los Angeles</text>
+              <!-- Sao Paulo -->
+              <circle class="cdn-pulse" cx="292" cy="344" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:1.2s"/>
+              <circle cx="292" cy="344" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Sao Paulo" data-pop="South America" data-lat="&lt;25ms" data-type="Tier 2 PoP"/>
+              <text x="300" y="340" fill="rgba(255,255,255,0.45)" font-size="7">Sao Paulo</text>
+              <!-- London -->
+              <circle class="cdn-pulse" cx="400" cy="80" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:0.2s"/>
+              <circle cx="400" cy="80" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="London" data-pop="Europe West" data-lat="&lt;6ms" data-type="Tier 1 PoP"/>
+              <text x="408" y="76" fill="rgba(255,255,255,0.45)" font-size="7">London</text>
+              <!-- Frankfurt -->
+              <circle class="cdn-pulse" cx="430" cy="83" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:0.6s"/>
+              <circle cx="430" cy="83" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Frankfurt" data-pop="Europe Central" data-lat="&lt;5ms" data-type="Tier 1 PoP"/>
+              <!-- Johannesburg -->
+              <circle class="cdn-pulse" cx="468" cy="296" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:1.0s"/>
+              <circle cx="468" cy="296" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Johannesburg" data-pop="Africa" data-lat="&lt;30ms" data-type="Tier 2 PoP"/>
+              <text x="476" y="292" fill="rgba(255,255,255,0.45)" font-size="7">Johannesburg</text>
+              <!-- Mumbai -->
+              <circle class="cdn-pulse" cx="600" cy="192" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:1.4s"/>
+              <circle cx="600" cy="192" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Mumbai" data-pop="South Asia" data-lat="&lt;15ms" data-type="Tier 1 PoP"/>
+              <text x="608" y="188" fill="rgba(255,255,255,0.45)" font-size="7">Mumbai</text>
+              <!-- Singapore -->
+              <circle class="cdn-pulse" cx="658" cy="260" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:1.8s"/>
+              <circle cx="658" cy="260" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Singapore" data-pop="Southeast Asia" data-lat="&lt;10ms" data-type="Tier 1 PoP"/>
+              <text x="666" y="256" fill="rgba(255,255,255,0.45)" font-size="7">Singapore</text>
+              <!-- Tokyo -->
+              <circle class="cdn-pulse" cx="750" cy="128" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:0.3s"/>
+              <circle cx="750" cy="128" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Tokyo" data-pop="East Asia" data-lat="&lt;8ms" data-type="Tier 1 PoP"/>
+              <text x="758" y="124" fill="rgba(255,255,255,0.45)" font-size="7">Tokyo</text>
+              <!-- Sydney -->
+              <circle class="cdn-pulse" cx="742" cy="332" r="7" fill="rgba(62,160,173,0.2)" style="animation-delay:1.6s"/>
+              <circle cx="742" cy="332" r="4" fill="#3EA0AD" style="cursor:pointer" data-city="Sydney" data-pop="Australia" data-lat="&lt;15ms" data-type="Tier 1 PoP"/>
+              <text x="750" y="328" fill="rgba(255,255,255,0.45)" font-size="7">Sydney</text>
+            </g>
+          </svg>
+          <div class="cdn-tooltip" id="cdnTooltip">
+            <div class="cdn-tt-city" id="ttCity"></div>
+            <div class="cdn-tt-detail" id="ttDetail"></div>
+            <div class="cdn-tt-lat" id="ttLat"></div>
+          </div>
+        </div>
+        <div class="cdn-stats">
+          <div class="cdn-stat fade-up">
+            <div class="cdn-stat-num">100+</div>
+            <div class="cdn-stat-label">Global Edge Locations</div>
+            <div class="cdn-stat-sub">Nodes across 6 continents, including US Central for your Midwest audience</div>
+          </div>
+          <div class="cdn-stat fade-up">
+            <div class="cdn-stat-num">&lt;50ms</div>
+            <div class="cdn-stat-label">Global TTFB</div>
+            <div class="cdn-stat-sub">Sub-50ms time-to-first-byte worldwide, keeping readers engaged</div>
+          </div>
+          <div class="cdn-stat fade-up">
+            <div class="cdn-stat-num">99.99%</div>
+            <div class="cdn-stat-label">Uptime SLA</div>
+            <div class="cdn-stat-sub">Contractually guaranteed. Your biggest traffic days are covered.</div>
+          </div>
+          <div class="cdn-stat fade-up">
+            <div class="cdn-stat-num">Auto</div>
+            <div class="cdn-stat-label">Traffic Scaling</div>
+            <div class="cdn-stat-sub">Scales instantly for breaking news, elections, and live events</div>
+          </div>
+          <div class="cdn-stat fade-up">
+            <div class="cdn-stat-num">10B+</div>
+            <div class="cdn-stat-label">Pages Served Monthly</div>
+            <div class="cdn-stat-sub">Across enterprise media customers globally</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: COMPARISON -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Platform Comparison</div>
+        <div class="slide-title">Arc-XP vs. WordPress VIP</div>
+        <div class="slide-subtitle">Explore by category to see where the platforms diverge</div>
+      </div>
+      <div class="matrix-layout">
+        <div class="matrix-tabs">
+          <div class="mtab active" data-cat="platform">Platform</div>
+          <div class="mtab" data-cat="editorial">Editorial</div>
+          <div class="mtab" data-cat="performance">Performance</div>
+          <div class="mtab" data-cat="support">Support</div>
+          <div class="mtab" data-cat="company">Company</div>
+        </div>
+        <div class="matrix-wrap">
+          <table class="mtable">
+            <thead>
+              <tr>
+                <th>Capability</th>
+                <th>Arc-XP</th>
+                <th>WordPress VIP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Platform -->
+              <tr class="mrow" data-cat="platform"><td>Open source foundation</td><td><span class="cx">&#10005;</span> Proprietary</td><td><span class="ck">&#10003;</span> WordPress</td></tr>
+              <tr class="mrow" data-cat="platform"><td>60,000+ plugin ecosystem</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow" data-cat="platform"><td>Headless / decoupled architecture</td><td><span class="cp">&#9679;</span> Partial</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow" data-cat="platform"><td>Full content and data portability</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow" data-cat="platform"><td>Self-hosted CDN included</td><td><span class="cp">&#9679;</span> Add-on</td><td><span class="ck">&#10003;</span> Included</td></tr>
+              <!-- Editorial -->
+              <tr class="mrow hidden" data-cat="editorial"><td>Real-time collaborative editing</td><td><span class="cp">&#9679;</span> Limited</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="editorial"><td>Block editor (visual page builder)</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span> Gutenberg</td></tr>
+              <tr class="mrow hidden" data-cat="editorial"><td>Content analytics included</td><td><span class="cx">&#10005;</span> Paid add-on</td><td><span class="ck">&#10003;</span> Parse.ly</td></tr>
+              <tr class="mrow hidden" data-cat="editorial"><td>Multisite / multi-brand management</td><td><span class="cp">&#9679;</span> Partial</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="editorial"><td>Custom editorial workflow support</td><td><span class="cp">&#9679;</span> Limited</td><td><span class="ck">&#10003;</span></td></tr>
+              <!-- Performance -->
+              <tr class="mrow hidden" data-cat="performance"><td>99.99% uptime SLA</td><td><span class="cp">&#9679;</span> Varies</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="performance"><td>Global edge network</td><td><span class="cp">&#9679;</span> Limited</td><td><span class="ck">&#10003;</span> 100+ PoPs</td></tr>
+              <tr class="mrow hidden" data-cat="performance"><td>Automatic traffic scaling</td><td><span class="cp">&#9679;</span> Partial</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="performance"><td>Sub-50ms TTFB globally</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="performance"><td>Enterprise DDoS protection</td><td><span class="cp">&#9679;</span> Basic</td><td><span class="ck">&#10003;</span></td></tr>
+              <!-- Support -->
+              <tr class="mrow hidden" data-cat="support"><td>24/7 US-based expert support</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="support"><td>Dedicated migration team</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="support"><td>Managed security updates</td><td><span class="cp">&#9679;</span> Partial</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="support"><td>SOC 2 Type II certified</td><td><span class="cp">&#9679;</span> Partial</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="support"><td>Developer documentation and community</td><td><span class="cp">&#9679;</span> Limited</td><td><span class="ck">&#10003;</span></td></tr>
+              <!-- Company -->
+              <tr class="mrow hidden" data-cat="company"><td>Independent, publisher-first mission</td><td><span class="cx">&#10005;</span> WaPo-owned</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="company"><td>Profitable, stable company</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span> Automattic</td></tr>
+              <tr class="mrow hidden" data-cat="company"><td>US-based engineering team</td><td><span class="cx">&#10005;</span> Offshored</td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="company"><td>20+ years of WordPress leadership</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+              <tr class="mrow hidden" data-cat="company"><td>Growing publisher customer base</td><td><span class="cx">&#10005;</span></td><td><span class="ck">&#10003;</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: CAROUSEL -->
+    <div class="slide" id="slide-10">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Customer Success</div>
+        <div class="slide-title">Publishers Who Made the Move</div>
+        <div class="slide-subtitle">Media organizations that chose WordPress VIP and what they gained</div>
+      </div>
+      <div class="car-layout">
+        <div class="car-track-wrap">
+          <div class="car-track" id="carTrack">
+            <div class="car-card">
+              <div class="car-company">ADWEEK</div>
+              <div class="car-type">Media &amp; Advertising Publishing</div>
+              <div class="car-divider"></div>
+              <div class="car-quote">"WordPress VIP gave us the infrastructure to handle massive traffic spikes without missing a beat during the biggest advertising events of the year. The Super Bowl is our Super Bowl."</div>
+              <div class="car-metrics">
+                <div>
+                  <div class="car-metric-num">100%</div>
+                  <div class="car-metric-label">Site uptime during Super Bowl LIX</div>
+                </div>
+                <div>
+                  <div class="car-metric-num">82%</div>
+                  <div class="car-metric-label">Traffic surge, zero downtime</div>
+                </div>
+                <div>
+                  <div class="car-metric-num">3x</div>
+                  <div class="car-metric-label">Content creation velocity</div>
+                </div>
+              </div>
+            </div>
+            <div class="car-card">
+              <div class="car-company">Katie Couric Media</div>
+              <div class="car-type">Digital Media</div>
+              <div class="car-divider"></div>
+              <div class="car-quote">"Parse.ly's audience insights transformed how we approach every editorial decision. We can see in real time what resonates, which directly drives our engagement and subscription growth."</div>
+              <div class="car-metrics">
+                <div>
+                  <div class="car-metric-num">Parse.ly</div>
+                  <div class="car-metric-label">Audience insights driving editorial</div>
+                </div>
+                <div>
+                  <div class="car-metric-num">Up</div>
+                  <div class="car-metric-label">Recirculation and engaged time</div>
+                </div>
+              </div>
+            </div>
+            <!-- PLACEHOLDER: Replace with verified case study data for New York Post -->
+            <div class="car-card">
+              <div class="car-company">New York Post</div>
+              <div class="car-type">News Publishing</div>
+              <div class="car-divider"></div>
+              <div class="car-quote">"WordPress VIP powers one of America's most-read news sites with the performance and reliability our readers demand 24 hours a day, through breaking news and everything in between."</div>
+              <div class="car-metrics">
+                <div>
+                  <div class="car-metric-num">100M+</div>
+                  <div class="car-metric-label">Monthly readers, enterprise scale</div>
+                </div>
+                <div>
+                  <div class="car-metric-num">24/7</div>
+                  <div class="car-metric-label">Expert support coverage</div>
+                </div>
+              </div>
+            </div>
+            <!-- PLACEHOLDER: Replace with verified case study data for USA TODAY Sports Media -->
+            <div class="car-card">
+              <div class="car-company">USA TODAY Sports Media</div>
+              <div class="car-type">Sports Media Publishing</div>
+              <div class="car-divider"></div>
+              <div class="car-quote">"Migrating to WordPress VIP gave our editorial teams a modern, unified platform that scales with our audience and lets us focus on storytelling instead of infrastructure."</div>
+              <div class="car-metrics">
+                <div>
+                  <div class="car-metric-num">Multisite</div>
+                  <div class="car-metric-label">Unified multi-brand publishing</div>
+                </div>
+                <div>
+                  <div class="car-metric-num">Real-time</div>
+                  <div class="car-metric-label">Live event coverage at scale</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="car-dots" id="carDots"></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: PARTNER -->
+    <div class="slide" id="slide-11">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Company Profile</div>
+        <div class="slide-title">A Partner Built for Publishers</div>
+        <div class="slide-subtitle">Profitable, independent, and committed to the open web</div>
+      </div>
+      <div class="partner-layout">
+        <div class="partner-left fade-up">
+          <p>WordPress VIP is backed by <strong style="color:rgba(255,255,255,0.88)">Automattic</strong>, the company behind WordPress.com, WooCommerce, Tumblr, and Jetpack. Automattic is privately held, profitable, and has been growing the WordPress ecosystem for over 20 years.</p>
+          <p>We have no conflicting media interests, no debt-laden parent company, and no reason to prioritize anything other than your success as a publisher.</p>
+          <div class="partner-pillars">
+            <div class="pillar">
+              <div class="pillar-dot"></div>
+              <p><strong>Publisher-first mission.</strong> Our customers are newsrooms, media companies, and content publishers. Your problems are the only ones we solve.</p>
+            </div>
+            <div class="pillar">
+              <div class="pillar-dot"></div>
+              <p><strong>Open source stewardship.</strong> Automattic contributes more to WordPress core than any other company in the world. The platform gets stronger every year.</p>
+            </div>
+            <div class="pillar">
+              <div class="pillar-dot"></div>
+              <p><strong>No vendor lock-in, ever.</strong> Because WordPress is open source, your content, your code, and your data are always yours. Migration in or out is always your choice.</p>
+            </div>
+            <div class="pillar">
+              <div class="pillar-dot"></div>
+              <p><strong>US-based engineering and support.</strong> The team who built the platform is the team who supports you, 24 hours a day.</p>
+            </div>
+          </div>
+        </div>
+        <div class="partner-stats fade-up">
+          <div class="stat-card">
+            <div class="snum">20+</div>
+            <div class="slabel">Years of WordPress platform leadership</div>
+          </div>
+          <div class="stat-card">
+            <div class="snum">43%</div>
+            <div class="slabel">Of the entire web runs on WordPress</div>
+          </div>
+          <div class="stat-card">
+            <div class="snum">99.99%</div>
+            <div class="slabel">Uptime SLA, contractually guaranteed</div>
+          </div>
+          <div class="stat-card">
+            <div class="snum">24/7</div>
+            <div class="slabel">Expert support, US-based engineering</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: NEXT STEPS -->
+    <div class="slide" id="slide-12">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Proposed Path Forward</div>
+        <div class="slide-title">How We Move Forward Together</div>
+        <div class="slide-subtitle">A clear, low-friction path from discovery to decision</div>
+      </div>
+      <div class="steps-layout">
+        <div class="steps-grid">
+          <div class="step-card fade-up">
+            <div class="step-num">01</div>
+            <div class="step-title">Technical Discovery Call</div>
+            <div class="step-desc">30-minute session with your engineering team and ours. We map your current Arc-XP architecture and identify migration considerations.</div>
+            <div class="step-time">Week 1</div>
+          </div>
+          <div class="step-card fade-up">
+            <div class="step-num">02</div>
+            <div class="step-title">Platform Demo</div>
+            <div class="step-desc">Live walkthrough of the WordPress VIP platform tailored to Star Tribune's editorial workflows, publishing volume, and tech stack.</div>
+            <div class="step-time">Week 2</div>
+          </div>
+          <div class="step-card fade-up">
+            <div class="step-num">03</div>
+            <div class="step-title">Migration Assessment</div>
+            <div class="step-desc">Our migration team reviews your content volume, integrations, and custom tooling to produce a realistic scope and timeline estimate.</div>
+            <div class="step-time">Weeks 3 to 4</div>
+          </div>
+          <div class="step-card fade-up">
+            <div class="step-num">04</div>
+            <div class="step-title">Partnership Proposal</div>
+            <div class="step-desc">We bring back a tailored proposal including platform fit, migration plan, support model, and commercial terms. No surprises.</div>
+            <div class="step-time">Week 5</div>
+          </div>
+        </div>
+        <div class="steps-cta">
+          <p>Ready to start? <strong>Book a technical discovery call directly on the next slide</strong>, or reach out to Nate Kelly at <strong>nate.kelly@wpvip.com</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: BOOKING -->
+    <div class="slide" id="slide-13">
+      <div class="cta-layout">
+        <div class="cta-left">
+          <div class="cta-logo">
+            <div class="vip-logo" style="font-size:15px">
+              <span class="logo-wp">WordPress</span><span class="logo-vip">VIP</span>
+            </div>
+          </div>
+          <div class="cta-hl">Let's talk about what's next for Star Tribune.</div>
+          <div class="cta-sub">Book a 30-minute discovery call with our team. No pressure, no pitch deck. Just an honest conversation about your platform and where we might help.</div>
+          <div class="gold-line" style="width:56px;margin-bottom:24px"></div>
+          <div class="cta-name">Nate Kelly</div>
+          <div class="cta-email">nate.kelly@wpvip.com</div>
+        </div>
+        <div class="cta-right">
+          <div class="cal-header">Book a Conversation</div>
+          <div class="cal-wrap">
+            <iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3dLMYNv_R-8BYp3D8eF2GMOxWuKfd6IwUIuBVUKRWwAWDNvivmNPn4PreJBcRoUAfzKeTmcTlC?gv=true" style="border:0" frameborder="0"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /deck -->
+</div><!-- /deck-wrapper -->
+
+<!-- Nav Controls -->
+<div class="nav-controls">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">&#8592;</button>
+  <div class="slide-counter" id="slideCounter" onclick="toggleOverview()">1 / 13</div>
+  <button class="nav-btn" id="nextBtn" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<!-- Overview -->
+<div class="overview-mode" id="overviewMode">
+  <div class="overview-title">Press Escape to close &bull; Click a slide to jump</div>
+  <div class="overview-grid" id="overviewGrid"></div>
+</div>
+
+<script>
+// ================================================
+// DECK STATE
+// ================================================
+const TOTAL = 13;
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(TOTAL - 1, n));
+  slides[current].classList.add('active');
+  document.getElementById('slideCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  document.getElementById('progressBar').style.width = ((current + 1) / TOTAL * 100) + '%';
+  updateOverviewThumbs();
+  onSlideEnter(current);
+}
+
+function navigate(dir) { goTo(current + dir); }
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+  if (e.key === 'Escape') toggleOverview();
+});
+
+// Touch swipe
+let touchX = 0;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
+});
+
+// ================================================
+// DECK SCALING
+// ================================================
+function scaleDecks() {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const scale = Math.min(vw / 1280, vh / 720);
+  document.getElementById('deckWrapper').style.transform = 'scale(' + scale + ')';
+}
+scaleDecks();
+window.addEventListener('resize', scaleDecks);
+
+// ================================================
+// OVERVIEW
+// ================================================
+function buildOverview() {
+  const grid = document.getElementById('overviewGrid');
+  slides.forEach((slide, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'overview-thumb' + (i === 0 ? ' active-thumb' : '');
+    thumb.innerHTML = '<div class="overview-thumb-inner" id="ot'+i+'"></div><div class="overview-label">' + (i+1) + '</div>';
+    thumb.addEventListener('click', () => { toggleOverview(); goTo(i); });
+    grid.appendChild(thumb);
+    // Clone slide content into thumb
+    const inner = thumb.querySelector('.overview-thumb-inner');
+    const clone = slide.cloneNode(true);
+    clone.style.cssText = 'position:absolute;top:0;left:0;width:1280px;height:720px;opacity:1;pointer-events:none;';
+    inner.appendChild(clone);
+    const scale = (thumb.offsetWidth || 280) / 1280;
+    inner.style.transform = 'scale(' + scale + ')';
+    inner.style.width = '1280px';
+    inner.style.height = '720px';
+  });
+}
+
+function updateOverviewThumbs() {
+  document.querySelectorAll('.overview-thumb').forEach((t, i) => {
+    t.classList.toggle('active-thumb', i === current);
+  });
+}
+
+function toggleOverview() {
+  const ov = document.getElementById('overviewMode');
+  const isActive = ov.classList.toggle('active');
+  if (isActive && !ov.dataset.built) {
+    buildOverview();
+    ov.dataset.built = '1';
+  }
+}
+
+// ================================================
+// SLIDE 6: COLLABORATIVE EDITING
+// ================================================
+const headline = 'Minneapolis Positioned for Midwest Tech Leadership';
+const body = 'The Twin Cities metropolitan area is emerging as a hub for enterprise technology companies, with analysts citing its strong talent pipeline, affordable real estate compared to coastal markets, and a growing base of Fortune 500 headquarters.';
+const note = '-- Editor note (RK): Can we get a quote from the Chamber of Commerce? Checking with source now.';
+
+let collabRunning = false;
+let collabTimer = null;
+
+function typeText(el, text, speed, callback) {
+  let i = 0;
+  el.textContent = '';
+  function step() {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      collabTimer = setTimeout(step, speed + (Math.random() * speed * 0.4));
+    } else if (callback) {
+      collabTimer = setTimeout(callback, 400);
+    }
+  }
+  step();
+}
+
+function runCollabAnimation() {
+  if (collabRunning) return;
+  collabRunning = true;
+  const h = document.getElementById('collabHeadline');
+  const b = document.getElementById('collabBody');
+  const n = document.getElementById('collabNote');
+  h.innerHTML = ''; b.innerHTML = ''; n.innerHTML = '';
+
+  typeText(h, headline, 32, () => {
+    // Add cursor
+    const cur = document.createElement('span');
+    cur.className = 'cursor'; cur.style.background = '#D8A45F';
+    h.appendChild(cur);
+    typeText(b, body, 16, () => {
+      const cur2 = document.createElement('span');
+      cur2.className = 'cursor'; cur2.style.background = '#3EA0AD';
+      b.appendChild(cur2);
+      typeText(n, note, 22, () => {
+        collabRunning = false;
+      });
+    });
+  });
+}
+
+function stopCollab() {
+  if (collabTimer) clearTimeout(collabTimer);
+  collabRunning = false;
+}
+
+// MutationObserver for slide 6
+const slide6 = document.getElementById('slide-6');
+new MutationObserver(() => {
+  if (slide6.classList.contains('active')) {
+    stopCollab();
+    setTimeout(runCollabAnimation, 300);
+  } else {
+    stopCollab();
+  }
+}).observe(slide6, { attributes: true, attributeFilter: ['class'] });
+
+function toggleCard(card) {
+  const wasExpanded = card.classList.contains('expanded');
+  document.querySelectorAll('.collab-card').forEach(c => c.classList.remove('expanded'));
+  if (!wasExpanded) card.classList.add('expanded');
+}
+
+// ================================================
+// SLIDE 7: PARSE.LY DASHBOARD
+// ================================================
+const parselyData = {
+  '1H': {
+    visitors:'3.2K', views:'8.7K', engaged:'2m 14s', recirc:'31%',
+    vChg:'+12%', pvChg:'+8%', eChg:'+5%', rChg:'+2%',
+    vUp:true, pvUp:true, eUp:true, rUp:true,
+    articles:[
+      {t:'Vikings Draft: Bold Round 1 Predictions',v:'1,842'},
+      {t:'Minneapolis Housing Defies National Trends',v:'1,204'},
+      {t:'Twin Cities Restaurant Openings: March 2026',v:'987'},
+      {t:'U of M Research Breakthrough in Cardiac Care',v:'743'},
+      {t:'Duluth Winter Storm: Travel Advisory Issued',v:'612'}
+    ],
+    sources:{direct:42,search:31,social:18,referral:9},
+    curve:'M0,60 C40,55 80,40 120,38 C160,36 200,48 240,42 C280,36 320,28 360,22 C380,19 390,18 400,16'
+  },
+  '24H': {
+    visitors:'48.2K', views:'127K', engaged:'2m 38s', recirc:'34%',
+    vChg:'+18%', pvChg:'+22%', eChg:'+9%', rChg:'+4%',
+    vUp:true, pvUp:true, eUp:true, rUp:true,
+    articles:[
+      {t:'Vikings Draft: Bold Round 1 Predictions',v:'24,100'},
+      {t:'Minneapolis Housing Defies National Trends',v:'18,450'},
+      {t:'Timberwolves Playoff Push: Full Analysis',v:'14,200'},
+      {t:'Twin Cities Restaurant Openings: March 2026',v:'11,890'},
+      {t:'U of M Research Breakthrough in Cardiac Care',v:'9,340'}
+    ],
+    sources:{direct:38,search:35,social:19,referral:8},
+    curve:'M0,70 C30,65 60,55 100,45 C140,35 180,50 220,40 C260,30 300,20 340,14 C370,10 385,8 400,6'
+  },
+  '7D': {
+    visitors:'312K', views:'841K', engaged:'2m 52s', recirc:'36%',
+    vChg:'+24%', pvChg:'+31%', eChg:'+14%', rChg:'+7%',
+    vUp:true, pvUp:true, eUp:true, rUp:true,
+    articles:[
+      {t:'Timberwolves Playoff Push: Full Analysis',v:'98,200'},
+      {t:'Vikings Draft: Bold Round 1 Predictions',v:'84,400'},
+      {t:'MN Legislature: Education Budget Debate',v:'67,100'},
+      {t:'Minneapolis Housing Defies National Trends',v:'58,900'},
+      {t:'Local Restaurants Thriving in New Economy',v:'44,200'}
+    ],
+    sources:{direct:35,search:38,social:18,referral:9},
+    curve:'M0,72 C20,68 50,60 90,50 C130,40 160,55 200,42 C240,29 280,18 320,12 C360,6 380,4 400,3'
+  },
+  '30D': {
+    visitors:'1.2M', views:'3.4M', engaged:'3m 04s', recirc:'38%',
+    vChg:'+31%', pvChg:'+38%', eChg:'+18%', rChg:'+11%',
+    vUp:true, pvUp:true, eUp:true, rUp:true,
+    articles:[
+      {t:'Super Bowl Coverage: Complete Recap',v:'428,000'},
+      {t:"Minnesota's 2026 Legislative Preview",v:'312,000'},
+      {t:'Timberwolves: Season in Review',v:'287,000'},
+      {t:'Top 50 Places to Eat in MN (2026)',v:'241,000'},
+      {t:'Minneapolis Downtown: 5-Year Outlook',v:'198,000'}
+    ],
+    sources:{direct:32,search:40,social:19,referral:9},
+    curve:'M0,75 C15,72 35,65 70,55 C110,44 140,58 180,46 C220,34 260,20 310,10 C350,4 375,2 400,1'
+  }
+};
+
+function updateParsely(range) {
+  const d = parselyData[range];
+  document.getElementById('kpi-visitors').textContent = d.visitors;
+  document.getElementById('kpi-views').textContent = d.views;
+  document.getElementById('kpi-engaged').textContent = d.engaged;
+  document.getElementById('kpi-recirc').textContent = d.recirc;
+  const setChg = (id, val, up) => {
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.className = 'pkpi-chg ' + (up ? 'up' : 'down');
+  };
+  setChg('kpi-v-chg', d.vChg, d.vUp);
+  setChg('kpi-pv-chg', d.pvChg, d.pvUp);
+  setChg('kpi-e-chg', d.eChg, d.eUp);
+  setChg('kpi-r-chg', d.rChg, d.rUp);
+
+  // Chart
+  const fillPath = d.curve + ' L400,80 L0,80 Z';
+  document.getElementById('chartFill').setAttribute('d', fillPath);
+  document.getElementById('chartLine').setAttribute('d', d.curve);
+
+  // Articles
+  const art = document.getElementById('parselyArticles');
+  art.innerHTML = d.articles.map((a,i) =>
+    '<div class="pt-row"><div class="pt-rank">'+(i+1)+'</div><div class="pt-title-text">'+a.t+'</div><div class="pt-views">'+a.v+'</div></div>'
+  ).join('');
+
+  // Sources
+  const s = d.sources;
+  ['direct','search','social','referral'].forEach(key => {
+    const pct = s[key];
+    document.getElementById('src-'+key).style.width = pct + '%';
+    document.getElementById('src-'+key+'-pct').textContent = pct + '%';
+  });
+}
+
+document.querySelectorAll('.ptab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    updateParsely(tab.dataset.range);
+  });
+});
+
+// Init parse.ly on slide entry
+const slide7 = document.getElementById('slide-7');
+new MutationObserver(() => {
+  if (slide7.classList.contains('active')) updateParsely('1H');
+}).observe(slide7, { attributes: true, attributeFilter: ['class'] });
+
+// ================================================
+// SLIDE 8: CDN MAP TOOLTIPS
+// ================================================
+const cdnTooltip = document.getElementById('cdnTooltip');
+const cdnMapWrap = document.getElementById('cdnMapWrap');
+
+document.querySelectorAll('#cdnNodes circle[data-city]').forEach(node => {
+  node.addEventListener('mouseenter', e => {
+    const city = node.dataset.city;
+    const pop = node.dataset.pop;
+    const lat = node.dataset.lat;
+    const type = node.dataset.type;
+    document.getElementById('ttCity').textContent = city;
+    document.getElementById('ttDetail').textContent = type + ' | ' + pop;
+    document.getElementById('ttLat').textContent = 'TTFB: ' + lat;
+
+    // Use SVG viewBox ratios with container offsetWidth/Height (never getBoundingClientRect in scaled container)
+    const cx = parseFloat(node.getAttribute('cx'));
+    const cy = parseFloat(node.getAttribute('cy'));
+    const cw = cdnMapWrap.offsetWidth;
+    const ch = cdnMapWrap.offsetHeight;
+    let x = (cx / 800) * cw + 10;
+    let y = (cy / 420) * ch - 10;
+
+    cdnTooltip.classList.add('vis');
+    const tw = 150, th = 70;
+    if (x + tw > cw) x = x - tw - 20;
+    if (y + th > ch) y = ch - th - 5;
+    if (y < 5) y = 5;
+    if (x < 5) x = 5;
+
+    cdnTooltip.style.left = x + 'px';
+    cdnTooltip.style.top = y + 'px';
+  });
+  node.addEventListener('mouseleave', () => { cdnTooltip.classList.remove('vis'); });
+});
+
+// ================================================
+// SLIDE 9: COMPETITOR MATRIX TABS
+// ================================================
+document.querySelectorAll('.mtab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const cat = tab.dataset.cat;
+    document.querySelectorAll('.mrow').forEach(row => {
+      row.classList.toggle('hidden', row.dataset.cat !== cat);
+    });
+  });
+});
+
+// ================================================
+// SLIDE 10: CAROUSEL
+// ================================================
+const CARD_COUNT = 4;
+let carIdx = 0;
+let carTimer = null;
+
+function buildCarDots() {
+  const dots = document.getElementById('carDots');
+  dots.innerHTML = '';
+  for (let i = 0; i < CARD_COUNT; i++) {
+    const d = document.createElement('div');
+    d.className = 'car-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goCarousel(i));
+    dots.appendChild(d);
+  }
+}
+
+function goCarousel(i) {
+  carIdx = i;
+  const track = document.getElementById('carTrack');
+  const cardW = track.children[0].offsetWidth + 18; // card width + gap
+  track.style.transform = 'translateX(-' + (carIdx * cardW) + 'px)';
+  document.querySelectorAll('.car-dot').forEach((d, j) => d.classList.toggle('active', j === carIdx));
+}
+
+function startCarAuto() {
+  stopCarAuto();
+  carTimer = setInterval(() => {
+    if (slides[current].id === 'slide-10') {
+      goCarousel((carIdx + 1) % CARD_COUNT);
+    }
+  }, 4000);
+}
+
+function stopCarAuto() {
+  if (carTimer) clearInterval(carTimer);
+}
+
+buildCarDots();
+
+const slide10 = document.getElementById('slide-10');
+new MutationObserver(() => {
+  if (slide10.classList.contains('active')) {
+    goCarousel(0);
+    startCarAuto();
+  } else {
+    stopCarAuto();
+  }
+}).observe(slide10, { attributes: true, attributeFilter: ['class'] });
+
+// ================================================
+// SLIDE ENTRY HOOK
+// ================================================
+function onSlideEnter(idx) {
+  // Reset parse.ly tab on entry
+  if (idx === 6) {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.ptab[data-range="1H"]').classList.add('active');
+    updateParsely('1H');
+  }
+}
+
+// ================================================
+// INIT
+// ================================================
+goTo(0);
+</script>
+</body>
+</html>
